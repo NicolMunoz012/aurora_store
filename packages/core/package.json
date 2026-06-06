@@ -1,5 +1,33 @@
 {
   "name": "@aurora/core",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.ts"
+    },
+    "./*": {
+      "types": "./*/index.ts",
+      "default": "./*/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aurora/database": "workspace:*",
+    "@aurora/shared": "workspace:*",
+    "decimal.js": "^10.4.3"
+  },
+  "devDependencies": {
+    "fast-check": "^3.15.0",
+    "typescript": "^5.3.3",
+    "vitest": "^2.1.0"
+  }
 }
