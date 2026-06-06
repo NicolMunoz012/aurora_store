@@ -1,7 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// =============================================================================
+// Aurora Belleza — Prisma Schema
+// Arquitectura: Lean Modular Monolith | Next.js | PostgreSQL | Prisma ORM v7
+// Fuente de verdad: dominio y requisitos del negocio (DER.md, SRS, HU)
+// Última auditoría: ver informe de auditoría adjunto
+// =============================================================================
 
 generator client {
   provider = "prisma-client"
@@ -9,5 +11,486 @@ generator client {
 }
 
 datasource db {
+  // La URL de conexión se configura en prisma.config.ts (Prisma v7)
   provider = "postgresql"
+}
+
+// =============================================================================
+// ENUMERACIONES
+// =============================================================================
+
+/// Roles del sistema.
+/// MVP: un único ADMIN. La tabla User soporta múltiples roles para versiones
+/// futuras sin necesidad de migración estructural (NF012, RF004).
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+/// Estado del carrito de compras.
+/// ACTIVE → carrito en uso actual (usuario autenticado o sesión anónima activa).
+/// MERGED → carrito anónimo fusionado al autenticarse (RF015). Se conserva
+///          para trazabilidad del evento de fusión.
+///
+/// NOTA: El estado ABANDONED fue omitido intencionalmente.
+/// Ningún requisito funcional ni historia de usuario del MVP lo referencia.
+/// Puede incorporarse cuando exista un RF de analytics de abandono de carrito.
+enum CartStatus {
+  ACTIVE
+  MERGED
+}
+
+/// Estados del ciclo de vida de un pedido (RF046, RF049).
+/// Secuencia operativa documentada:
+/// PENDING_CONFIRMATION → PENDING → IN_PREPARATION → SHIPPED → DELIVERED
+/// Transición a CANCELLED o AUTO_CANCELLED posible desde cualquier estado previo a DELIVERED.
+enum OrderStatus {
+  PENDING_CONFIRMATION /// por_confirmar — pedido registrado antes de WhatsApp (RF025)
+  PENDING              /// pendiente — admin confirma recepción del mensaje
+  IN_PREPARATION       /// en_preparacion — se descuenta stock aquí (RF028)
+  SHIPPED              /// enviado — también descuenta stock si IN_PREPARATION fue omitido (RF028)
+  DELIVERED            /// entregado
+  CANCELLED            /// cancelado manualmente por el administrador (RF047)
+  AUTO_CANCELLED       /// cancelado automáticamente por expiración del tiempo límite (RF049)
+}
+
+/// Método de entrega elegido en el paso 2 del checkout (RF022).
+enum DeliveryMethod {
+  HOME_DELIVERY /// envio_domicilio — requiere campos shippingXxx en Order
+  STORE_PICKUP  /// recoger_tienda — muestra storePickupAddress al cliente
+}
+
+/// Tipos de token de seguridad de un solo uso (RF003).
+/// PASSWORD_RESET: token para restablecer contraseña, vigencia 1 hora (RF003).
+/// EMAIL_VERIFICATION: no tiene RF asignado en el MVP pero se incluye para
+/// extensibilidad sin migración futura. No genera complejidad operativa.
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+// =============================================================================
+// USUARIOS Y AUTENTICACIÓN
+// =============================================================================
+
+/// Entidad central de identidad. Representa clientes y administradores.
+/// Un único administrador en MVP; el modelo soporta múltiples roles (NF012).
+model User {
+  id            String    @id @default(cuid())
+  fullName      String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(CLIENT)
+  /// Fecha de verificación del correo. Null = no verificado.
+  /// Sin RF asignado en MVP; campo defensivo para extensibilidad (relacionado con RF003).
+  emailVerified DateTime?
+  /// Registro del consentimiento obligatorio en el formulario de registro (RF005).
+  /// Distinto de Order.termsAccepted que cubre el checkout anónimo (RF027).
+  termsAccepted Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  savedAddresses     SavedAddress[]
+  verificationTokens VerificationToken[]
+  carts              Cart[]
+  orders             Order[]
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+/// Token de un solo uso para recuperación de contraseña y verificación de email.
+/// Permite múltiples tokens activos por usuario (ej. el usuario solicita reset
+/// varias veces). Al usar un token se invalidan todos los del mismo tipo
+/// para ese usuario (lógica en capa de servicio).
+/// Soporta RF003 (PASSWORD_RESET, vigencia 1 hora).
+model VerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  type      TokenType
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("verification_tokens")
+}
+
+/// Direcciones de envío guardadas por el cliente para agilizar el checkout (RF037).
+/// Un usuario puede tener múltiples direcciones. No existe concepto de "dirección
+/// predeterminada" en la documentación; la UI muestra todas ordenadas por createdAt DESC.
+model SavedAddress {
+  id           String   @id @default(cuid())
+  userId       String
+  addressName  String   /// Etiqueta descriptiva: "Casa", "Oficina", etc.
+  department   String
+  municipality String
+  address      String
+  neighborhood String?  /// Barrio — opcional según RF022
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_addresses")
+}
+
+// =============================================================================
+// CATÁLOGO
+// =============================================================================
+
+/// Categoría de producto con soporte de rutas SEO mediante slug.
+///
+/// DECISIÓN: isActive controla visibilidad. Desactivar una categoría NO pone
+/// categoryId en NULL en los productos (ver OBS-004 en auditoría). La FK
+/// permanece válida; la capa de servicio filtra con `category.isActive = true`
+/// en consultas públicas (RF043).
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  /// Slug inmutable para rutas SEO: /categoria/[slug].
+  /// Generado al crear; no debe cambiar tras publicación para preservar URLs indexadas.
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@index([slug])
+  @@map("categories")
+}
+
+/// Producto del catálogo de Aurora Belleza.
+///
+/// PRECIOS: retailPrice y wholesalePrice incluyen IVA (RF018).
+/// La lógica de activación del precio mayorista reside exclusivamente
+/// en el servidor; nunca se expone wholesalePrice sin validar el umbral (NF001).
+///
+/// BÚSQUEDA FULL-TEXT (RF011): La búsqueda por nombre y descripción requiere
+/// un índice GIN sobre tsvector, que Prisma no genera nativamente.
+/// DEUDA TÉCNICA: agregar índice GIN en una migración SQL manual cuando el
+/// volumen de productos justifique la complejidad. Para MVP (<50 productos,
+/// NF004) la búsqueda sin índice es aceptable.
+///
+/// SKU: no incluido. Ningún documento del proyecto referencia SKU, código
+/// interno ni código de barras. Sería sobreingeniería para este negocio.
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  /// Slug inmutable para rutas SEO: /producto/[slug].
+  slug            String   @unique
+  description     String?
+  /// Precio detal con IVA incluido (RF018).
+  retailPrice     Decimal  @db.Decimal(10, 2)
+  /// Precio mayorista con IVA incluido (RF018).
+  /// Solo se expone cuando el carrito supera el umbral configurado (NF001, RF017).
+  wholesalePrice  Decimal  @db.Decimal(10, 2)
+  stock           Int      @default(0)
+  /// Umbral de stock bajo configurable por producto (RF031).
+  /// Cuando stock <= lowStockAlert, se muestra advertencia en el panel.
+  lowStockAlert   Int      @default(0)
+  /// Cantidad mínima informativa asociada al precio mayorista (RF019).
+  /// SOLO informativa: no activa precio mayorista. El único criterio de
+  /// activación es el monto del carrito (RF017, RF048, RF051).
+  minWholesaleQty Int?
+  isActive        Boolean  @default(true)
+  /// NOT NULL — ver OBS-004: desactivar categoría no rompe la FK.
+  /// Filtro de visibilidad en catálogo: where category.isActive = true (RF043).
+  categoryId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  category   Category       @relation(fields: [categoryId], references: [id])
+  images     ProductImage[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([isActive])
+  @@map("products")
+}
+
+/// Imágenes de un producto. Mínimo 1, máximo 5 por producto (RF040, RF041).
+/// La restricción de 1-5 se aplica en la capa de servicio (no en DB).
+/// displayOrder = 0 corresponde a la imagen principal mostrada en el catálogo.
+///
+/// CAMBIO OBS-003: campo altText agregado.
+/// Justificación: WCAG 2.1 criterio 1.1.1 (nivel A) exige texto alternativo
+/// en imágenes. NF007 requiere que la interfaz funcione correctamente.
+/// Nullable para no bloquear el flujo de carga documentado en RF044.
+///
+/// CAMBIO OBS-016: campo renombrado de `order` a `displayOrder`.
+/// `order` es palabra reservada SQL; displayOrder es más expresivo semánticamente.
+model ProductImage {
+  id           String  @id @default(cuid())
+  productId    String
+  url          String
+  displayOrder Int     @default(0)
+  /// Texto alternativo para accesibilidad (WCAG 2.1 1.1.1) y SEO de imágenes.
+  /// Nullable para compatibilidad con el flujo de carga de RF044.
+  altText      String?
+  createdAt    DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+// =============================================================================
+// CARRITO
+// =============================================================================
+
+/// Carrito de compras.
+///
+/// CASOS DE USO:
+///   Usuario autenticado:  userId poblado, sessionId null.
+///   Usuario anónimo:      userId null, sessionId poblado (RF014).
+///   Post-autenticación:   carrito anónimo → MERGED; carrito del usuario → ACTIVE (RF015).
+///
+/// INVARIANTE CRÍTICA (OBS-007): Al marcar un carrito como MERGED, el campo
+/// sessionId DEBE ponerse en null en la capa de servicio. De lo contrario,
+/// si el mismo navegador vuelve a visitar sin sesión, el intento de crear un
+/// nuevo carrito anónimo con el mismo sessionId violará la restricción @unique.
+///
+/// UNICIDAD DEL CARRITO ACTIVO: Un usuario solo puede tener un carrito ACTIVE.
+/// Esta invariante se garantiza en la capa de servicio, no en DB (Prisma no
+/// soporta índices parciales en el schema; puede implementarse con SQL raw en
+/// una migración si se requiere garantía a nivel de base de datos).
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String?
+  /// Identificador de sesión para carritos anónimos almacenado en cookie (RF014).
+  /// Debe limpiarse (→ null) cuando el carrito pasa a estado MERGED (ver invariante arriba).
+  sessionId String?    @unique
+  status    CartStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  /// SetNull: si se elimina el usuario, el carrito se conserva sin dueño.
+  /// DEUDA TÉCNICA (OBS-015): carritos con status=ACTIVE y userId=null son
+  /// inalcanzables. Mitigar cuando exista RF de eliminación de cuentas.
+  user  User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items CartItem[]
+
+  @@index([userId, status])
+  @@map("carts")
+}
+
+/// Ítem dentro de un carrito.
+/// La restricción @@unique([cartId, productId]) previene duplicados a nivel DB.
+/// La cantidad se suma en lugar de insertar duplicados (lógica en servicio, RF016).
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  /// Restrict: no se puede eliminar un producto con ítems en carritos activos.
+  /// Protege la integridad; el admin debe desactivar productos (RF042), no eliminarlos.
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+// =============================================================================
+// PEDIDOS
+// =============================================================================
+
+/// Pedido de compra.
+///
+/// DESNORMALIZACIÓN INTENCIONAL:
+///   Los campos del cliente (clientName, clientPhone, clientEmail) son un snapshot
+///   del momento del pedido. El cliente puede editar su perfil posteriormente y
+///   el historial debe reflejar los datos originales (RF034, RF036).
+///   Los campos de envío (shippingXxx) son un snapshot por la misma razón:
+///   el cliente puede editar o eliminar sus direcciones guardadas (RF037).
+///
+/// userId es nullable para soportar pedidos anónimos (RF025).
+///
+/// CAMBIO OBS-008: campo ivaIncluded eliminado.
+/// RF018 establece que los precios SIEMPRE incluyen IVA. No existe ningún
+/// caso documentado donde ivaIncluded sea false. La leyenda "IVA incluido"
+/// en el checkout es responsabilidad de la capa de presentación, no de DB.
+model Order {
+  id                    String         @id @default(cuid())
+  /// Null para pedidos de usuarios no autenticados (RF025).
+  /// SetNull: si se elimina el usuario, el pedido se conserva para historial.
+  userId                String?
+  /// Snapshot del nombre del cliente al confirmar el pedido (RF021).
+  clientName            String
+  /// Snapshot del teléfono del cliente al confirmar el pedido (RF021).
+  clientPhone           String
+  /// Email opcional — solo para envío de confirmación (RF026).
+  /// No se usa para crear cuenta ni para marketing (RF026 explícito).
+  clientEmail           String?
+  status                OrderStatus    @default(PENDING_CONFIRMATION)
+  deliveryMethod        DeliveryMethod
+  /// Campos de envío a domicilio. Null cuando deliveryMethod = STORE_PICKUP (RF022).
+  shippingDepartment    String?
+  shippingMunicipality  String?
+  shippingAddress       String?
+  shippingNeighborhood  String?        /// Barrio — opcional (RF022)
+  /// Dirección de la tienda mostrada cuando deliveryMethod = STORE_PICKUP (RF022).
+  /// Snapshot de StoreConfig.storePhysicalAddress al momento del pedido.
+  storePickupAddress    String?
+  /// Número de guía registrado por el admin al marcar como SHIPPED (RF033).
+  /// Visible para el cliente en su historial (RF035).
+  trackingNumber        String?
+  /// Total de productos al momento del pedido. No incluye costo de envío
+  /// (el envío se coordina por WhatsApp, RF024). Con IVA incluido (RF018).
+  productsTotal         Decimal        @db.Decimal(10, 2)
+  /// Indica si se aplicó precio mayorista en este pedido (RF017).
+  /// Útil para auditoría y para regenerar el mensaje de WhatsApp (RF038).
+  wholesalePriceApplied Boolean        @default(false)
+  /// Consentimiento T&C obligatorio en el checkout (RF027).
+  /// Distinto de User.termsAccepted (RF005): este cubre el checkout anónimo.
+  termsAccepted         Boolean        @default(false)
+  /// Indica si el stock ya fue descontado para este pedido (RF028, RF047).
+  /// Al cancelar (RF047): si stockDeducted=true, el servicio revierte el stock.
+  stockDeducted         Boolean        @default(false)
+  /// Fecha límite para cancelación automática (RF049).
+  /// 5 días para anónimos, 30 días para registrados. Null cuando el pedido
+  /// ya no está en PENDING_CONFIRMATION.
+  expiresAt             DateTime?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  user  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items OrderItem[]
+
+  @@index([userId])
+  /// CAMBIO OBS-014: índice compuesto [status, createdAt] para consultas del panel
+  /// admin que filtran por estado y ordenan por fecha (RF045, RF046).
+  /// Reemplaza el índice simple @@index([status]).
+  @@index([status, createdAt])
+  /// CAMBIO OBS-014: índice compuesto [status, expiresAt] para el job de
+  /// cancelación automática: WHERE status=PENDING_CONFIRMATION AND expiresAt < now() (RF049).
+  /// Reemplaza el índice simple @@index([expiresAt]).
+  @@index([status, expiresAt])
+  @@map("orders")
+}
+
+/// Ítem de un pedido.
+///
+/// SNAPSHOT INMUTABLE: el precio se congela al momento de la compra.
+/// Cambios posteriores al producto no afectan pedidos históricos (RF034, RF045).
+///
+/// CAMBIO OBS-009: campo productName String agregado.
+/// Justificación: RF034 y RF045 requieren mostrar el nombre del producto en el
+/// historial de pedidos. Con onDelete:Restrict en productId, el admin nunca
+/// puede eliminar un producto pedido alguna vez — restricción operativa
+/// no documentada y problemática a largo plazo. El snapshot de productName
+/// permite en el futuro relajar Restrict a SetNull para limpieza del catálogo,
+/// manteniendo legible el historial sin JOIN a Product.
+model OrderItem {
+  id                  String   @id @default(cuid())
+  orderId             String
+  productId           String
+  /// Snapshot del nombre del producto al momento de la compra (RF034, RF045).
+  productName         String
+  quantity            Int
+  /// Precio unitario final (detal o mayorista) al momento de la compra (RF017).
+  unitPriceAtPurchase Decimal  @db.Decimal(10, 2)
+  createdAt           DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Restrict: protección conservadora para MVP. Si en el futuro se requiere
+  /// limpieza de catálogo, cambiar a SetNull aprovechando el snapshot productName.
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+// =============================================================================
+// AUDITORÍA
+// =============================================================================
+
+/// Registro de acciones administrativas (NF010, RF032).
+///
+/// previousData y newData usan Json → JSONB en PostgreSQL. Permite consultas
+/// sobre el contenido del log sin parsear texto. Ejemplo: buscar todos los
+/// cambios donde stock pasó a 0.
+///
+/// userId null permite registrar acciones de procesos automatizados,
+/// como la cancelación automática de pedidos (RF049).
+///
+/// CONVENCIÓN DE CÓDIGO (OBS-010): el campo action debe popularse usando
+/// constantes tipadas centralizadas en packages/core (NF008). Ejemplo:
+/// AuditActions.STOCK_UPDATED, AuditActions.ORDER_CANCELLED, etc.
+/// Esto evita strings libres inconsistentes entre módulos.
+model AuditLog {
+  id             String   @id @default(cuid())
+  /// Admin o sistema que realizó la acción. Null = proceso automatizado (RF049).
+  userId         String?
+  /// Acción realizada. Usar constantes de AuditActions en packages/core (NF008).
+  action         String
+  affectedEntity String
+  entityId       String
+  previousData   Json?
+  newData        Json?
+  /// Nota opcional del administrador para cambios manuales de stock (RF032).
+  note           String?
+  createdAt      DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([affectedEntity, entityId])
+  @@map("audit_log")
+}
+
+// =============================================================================
+// CONFIGURACIÓN DE TIENDA
+// =============================================================================
+
+/// Configuración global de la tienda. Patrón singleton: existe exactamente un registro.
+///
+/// CAMBIO OBS-011: migrado de patrón key-value a modelo tipado plano.
+/// Justificación: el MVP tiene exactamente 3 configuraciones con tipos conocidos
+/// (RF048: wholesaleThreshold Decimal, RF050: whatsappNumber String,
+/// RF051: storePhysicalAddress String). Un modelo tipado:
+///   - Garantiza tipos correctos en compilación (NF008 — tipado fuerte).
+///   - Elimina errores por claves mal escritas en runtime.
+///   - Es más expresivo y autocompletable en TypeScript.
+/// El patrón key-value escala cuando hay decenas de configuraciones dinámicas;
+/// no es el caso del MVP documentado.
+///
+/// Los valores de expiración de RF049 (5 días anónimo, 30 días registrado) son
+/// declarados "fijos en la configuración del sistema" en RF049. Se incluyen
+/// como campos con defaults para mantener configurabilidad futura sin migración.
+///
+/// USO: siempre consultar el registro único. En la capa de servicio:
+///   const config = await prisma.storeConfig.findFirstOrThrow()
+model StoreConfig {
+  id                      String   @id @default(cuid())
+  /// Monto mínimo del carrito para activar precio mayorista (RF048).
+  /// Único criterio de activación; nunca se combina con minWholesaleQty (RF019).
+  wholesaleThreshold      Decimal  @db.Decimal(10, 2)
+  /// Número de WhatsApp de la tienda para redirección de pedidos (RF050, RF024).
+  whatsappNumber          String
+  /// Dirección física de la tienda para opción STORE_PICKUP (RF051, RF022).
+  storePhysicalAddress    String
+  /// Días para expirar pedidos PENDING_CONFIRMATION de usuarios anónimos (RF049).
+  /// Valor fijo documentado: 5 días.
+  anonOrderExpiryDays     Int      @default(5)
+  /// Días para expirar pedidos PENDING_CONFIRMATION de usuarios registrados (RF049).
+  /// Valor fijo documentado: 30 días.
+  registeredOrderExpiryDays Int    @default(30)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("store_config")
 }
