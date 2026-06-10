@@ -11,11 +11,10 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": ".",
     "paths": {
-      "@aurora/shared": ["../shared/src"],
+      "@aurora/shared": ["../shared/src/index.ts"],
       "@aurora/shared/*": ["../shared/src/*"],
-      "@aurora/database": ["../database"],
+      "@aurora/database": ["../database/generated/prisma/client.ts"],
       "@aurora/database/*": ["../database/*"]
     }
   },

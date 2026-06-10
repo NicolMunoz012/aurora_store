@@ -4,7 +4,7 @@
 // Usa Decimal para aritmética monetaria precisa (Req 12.5, RF017).
 // =============================================================================
 
-import Decimal from "decimal.js";
+import { Decimal } from "decimal.js";
 import type { CartItemWithProduct } from "@aurora/shared";
 
 /**
