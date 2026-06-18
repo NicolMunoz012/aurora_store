@@ -4,9 +4,9 @@
 // y registro de auditoría (Req 4.10, 4.11).
 // =============================================================================
 
-import { AuditActions } from "../../shared/audit-actions.js";
-import { CategoryService } from "../services/category.service.js";
-import type { ToggleCategoryActiveParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import { CategoryService } from "../services/category.service";
+import type { ToggleCategoryActiveParams } from "../types";
 
 export async function toggleCategoryActiveUseCase(
   params: ToggleCategoryActiveParams,

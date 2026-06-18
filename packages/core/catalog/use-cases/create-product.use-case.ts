@@ -5,9 +5,9 @@
 
 import type { ProductDetail, InternalProductDetail } from "@aurora/shared";
 import { ProductRequiresImageError } from "@aurora/shared";
-import type { CreateProductParams } from "../types.js";
-import { CatalogService } from "../services/catalog.service.js";
-import { AuditActions } from "../../shared/audit-actions.js";
+import type { CreateProductParams } from "../types";
+import { CatalogService } from "../services/catalog.service";
+import { AuditActions } from "../../shared/audit-actions";
 
 function toPublicProductDetail(internal: InternalProductDetail): ProductDetail {
   const { wholesalePrice, ...publicDetail } = internal;

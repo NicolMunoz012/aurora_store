@@ -11,4 +11,4 @@ export {
   InvalidOrderTransitionError,
   EmailAlreadyInUseError,
   StoreConfigNotInitializedError,
-} from './domain.errors.js';
+} from './domain.errors';

@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { SavedAddressRecord } from "@aurora/shared";
-import type { AddSavedAddressParams } from "../types.js";
+import type { AddSavedAddressParams } from "../types";
 
 export async function addSavedAddressUseCase(
   params: AddSavedAddressParams,

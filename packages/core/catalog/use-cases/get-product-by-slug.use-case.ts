@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { ProductDetail, InternalProductDetail } from "@aurora/shared";
-import type { GetProductBySlugParams } from "../types.js";
+import type { GetProductBySlugParams } from "../types";
 
 function toPublicProductDetail(internal: InternalProductDetail): ProductDetail {
   const { wholesalePrice, ...publicDetail } = internal;

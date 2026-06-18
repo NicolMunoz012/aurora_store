@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { UpdateProfileData, CreateAddressData } from "@aurora/shared";
-import type { IUsersRepository } from "./repositories/users.repository.interface.js";
+import type { IUsersRepository } from "./repositories/users.repository.interface";
 
 /** Parámetros para getProfileUseCase */
 export interface GetProfileParams {

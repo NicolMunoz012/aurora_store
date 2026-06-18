@@ -25,6 +25,28 @@ export interface IAuthRepository {
   findUserByEmail(email: string): Promise<UserProfile | null>;
 
   /**
+   * Busca un usuario por su email incluyendo el passwordHash.
+   * Usado exclusivamente por el proveedor Credentials de Auth.js para verificar
+   * la contraseña. Nunca exponer el hash fuera de la capa de autenticación.
+   * @returns UserProfile extendido con passwordHash, o null si no existe.
+   */
+  findUserByEmailWithHash(
+    email: string,
+  ): Promise<(UserProfile & { passwordHash: string }) | null>;
+
+  /**
+   * Crea un nuevo usuario con credenciales (email + contraseña hasheada).
+   * El role se asigna como CLIENT por defecto. Lanza error si el email ya existe.
+   * @returns El perfil público del usuario recién creado.
+   */
+  createUserWithCredentials(data: {
+    email: string;
+    fullName: string;
+    passwordHash: string;
+    termsAccepted: boolean;
+  }): Promise<UserProfile>;
+
+  /**
    * Crea o actualiza un usuario a partir de datos del proveedor OAuth externo.
    * Si el email ya existe, actualiza fullName y emailVerified.
    * Si no existe, crea el registro con role CLIENT por defecto.

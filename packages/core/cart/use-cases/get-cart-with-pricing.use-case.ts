@@ -5,8 +5,8 @@
 // antes de enviar al cliente.
 // =============================================================================
 
-import type { ResolvedCart } from "../../shared/interfaces.js";
-import type { GetCartWithPricingParams } from "../types.js";
+import type { ResolvedCart } from "../../shared/interfaces";
+import type { GetCartWithPricingParams } from "../types";
 
 export async function getCartWithPricingUseCase(
   params: GetCartWithPricingParams,

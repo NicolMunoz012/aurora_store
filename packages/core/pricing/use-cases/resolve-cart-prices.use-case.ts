@@ -3,8 +3,8 @@
 // Orquesta la resolución de precios del carrito (Req 6.1–6.8).
 // =============================================================================
 
-import type { ResolvedCart } from "../../shared/interfaces.js";
-import type { ResolveCartPricesParams } from "../types.js";
+import type { ResolvedCart } from "../../shared/interfaces";
+import type { ResolveCartPricesParams } from "../types";
 
 export async function resolveCartPricesUseCase(
   params: ResolveCartPricesParams,

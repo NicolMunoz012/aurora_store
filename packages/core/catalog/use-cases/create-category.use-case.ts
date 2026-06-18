@@ -4,9 +4,9 @@
 // =============================================================================
 
 import type { CategoryRecord } from "@aurora/shared";
-import { AuditActions } from "../../shared/audit-actions.js";
-import { CategoryService } from "../services/category.service.js";
-import type { CreateCategoryParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import { CategoryService } from "../services/category.service";
+import type { CreateCategoryParams } from "../types";
 
 export async function createCategoryUseCase(
   params: CreateCategoryParams,

@@ -6,7 +6,7 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type {
   ProductListItem,
   InternalProductDetail,
@@ -18,7 +18,7 @@ import type {
 } from "@aurora/shared";
 import { AuroraError } from "@aurora/shared";
 import { Decimal } from "decimal.js";
-import type { ICatalogRepository } from "./catalog.repository.interface.js";
+import type { ICatalogRepository } from "./catalog.repository.interface";
 
 // ─── Helper mappers ───────────────────────────────────────────────────────────
 

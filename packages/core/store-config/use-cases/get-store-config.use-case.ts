@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { StoreConfigRecord } from "@aurora/shared";
-import type { GetStoreConfigParams } from "../types.js";
+import type { GetStoreConfigParams } from "../types";
 
 export async function getStoreConfigUseCase(
   params: GetStoreConfigParams,

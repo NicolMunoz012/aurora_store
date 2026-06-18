@@ -6,7 +6,8 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
+import { Prisma } from "@aurora/database";
 import type {
   OrderWithItems,
   OrderSummary,
@@ -14,19 +15,24 @@ import type {
   OrderItemRecord,
   CreateOrderData,
   AdminOrderFilters,
-  OrderStatus,
   UpdateOrderExtra,
 } from "@aurora/shared";
-import { AuroraError } from "@aurora/shared";
+import {
+  OrderStatus,
+  DeliveryMethod,
+  AuroraError,
+  OrderNotFoundError,
+} from "@aurora/shared";
 import { Decimal } from "decimal.js";
-import type { IOrdersRepository } from "./orders.repository.interface.js";
+import type { IOrdersRepository } from "./orders.repository.interface";
 
-// ─── Helper mappers ───────────────────────────────────────────────────────────
+// ─── Prisma field types ───────────────────────────────────────────────────────
 
-/**
- * Mapea un registro de pedido Prisma a OrderRecord (sin items).
- */
-function mapToOrderRecord(order: {
+/** Shape de Decimal que Prisma retorna — compatible con decimal.js vía toString() */
+type PrismaDecimal = { toString(): string };
+
+/** Shape base de un Order Prisma (campos escalares sin relaciones) */
+type PrismaOrderScalars = {
   id: string;
   userId: string | null;
   clientName: string;
@@ -40,29 +46,78 @@ function mapToOrderRecord(order: {
   shippingNeighborhood: string | null;
   storePickupAddress: string | null;
   trackingNumber: string | null;
-  productsTotal: unknown;
+  productsTotal: PrismaDecimal;
   wholesalePriceApplied: boolean;
-  termsAccepted: boolean;
   stockDeducted: boolean;
   expiresAt: Date | null;
   createdAt: Date;
-  updatedAt: Date;
-}): OrderRecord {
+};
+
+/** Shape de un OrderItem Prisma */
+type PrismaOrderItemScalars = {
+  id: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPriceAtPurchase: PrismaDecimal;
+  createdAt: Date;
+};
+
+// ─── Enum mapping helpers ─────────────────────────────────────────────────────
+
+/**
+ * Mapea el string que devuelve Prisma al enum de dominio OrderStatus.
+ * Ambos comparten los mismos valores string, pero son tipos distintos.
+ * El mapping explícito garantiza que un valor inesperado se detecte en runtime.
+ */
+function toDomainOrderStatus(value: string): OrderStatus {
+  if (Object.values(OrderStatus).includes(value as OrderStatus)) {
+    return value as OrderStatus;
+  }
+  throw new AuroraError(
+    "UNKNOWN_ORDER_STATUS",
+    `Unrecognized OrderStatus value from database: "${value}"`,
+  );
+}
+
+/**
+ * Mapea el string que devuelve Prisma al enum de dominio DeliveryMethod.
+ */
+function toDomainDeliveryMethod(value: string): DeliveryMethod {
+  if (Object.values(DeliveryMethod).includes(value as DeliveryMethod)) {
+    return value as DeliveryMethod;
+  }
+  throw new AuroraError(
+    "UNKNOWN_DELIVERY_METHOD",
+    `Unrecognized DeliveryMethod value from database: "${value}"`,
+  );
+}
+
+// ─── Helper mappers ───────────────────────────────────────────────────────────
+
+/**
+ * Mapea un registro de pedido Prisma a OrderRecord (sin items).
+ * Requiere termsAccepted y updatedAt además de los escalares base.
+ */
+function mapToOrderRecord(
+  order: PrismaOrderScalars & { termsAccepted: boolean; updatedAt: Date },
+): OrderRecord {
   return {
     id: order.id,
     userId: order.userId,
     clientName: order.clientName,
     clientPhone: order.clientPhone,
     clientEmail: order.clientEmail,
-    status: order.status as OrderStatus,
-    deliveryMethod: order.deliveryMethod as OrderRecord["deliveryMethod"],
+    status: toDomainOrderStatus(order.status),
+    deliveryMethod: toDomainDeliveryMethod(order.deliveryMethod),
     shippingDepartment: order.shippingDepartment,
     shippingMunicipality: order.shippingMunicipality,
     shippingAddress: order.shippingAddress,
     shippingNeighborhood: order.shippingNeighborhood,
     storePickupAddress: order.storePickupAddress,
     trackingNumber: order.trackingNumber,
-    productsTotal: new Decimal(order.productsTotal!.toString()),
+    productsTotal: new Decimal(order.productsTotal.toString()),
     wholesalePriceApplied: order.wholesalePriceApplied,
     termsAccepted: order.termsAccepted,
     stockDeducted: order.stockDeducted,
@@ -75,73 +130,40 @@ function mapToOrderRecord(order: {
 /**
  * Mapea un item de pedido Prisma a OrderItemRecord.
  */
-function mapToOrderItemRecord(item: {
-  id: string;
-  orderId: string;
-  productId: string;
-  productName: string;
-  quantity: number;
-  unitPriceAtPurchase: unknown;
-  createdAt: Date;
-}): OrderItemRecord {
+function mapToOrderItemRecord(item: PrismaOrderItemScalars): OrderItemRecord {
   return {
     id: item.id,
     orderId: item.orderId,
     productId: item.productId,
     productName: item.productName,
     quantity: item.quantity,
-    unitPriceAtPurchase: new Decimal(item.unitPriceAtPurchase!.toString()),
+    unitPriceAtPurchase: new Decimal(item.unitPriceAtPurchase.toString()),
     createdAt: item.createdAt,
   };
 }
 
 /**
  * Mapea un pedido Prisma con items a OrderWithItems.
+ * No incluye termsAccepted (no forma parte de OrderWithItems).
  */
-function mapToOrderWithItems(order: {
-  id: string;
-  userId: string | null;
-  clientName: string;
-  clientPhone: string;
-  clientEmail: string | null;
-  status: string;
-  deliveryMethod: string;
-  shippingDepartment: string | null;
-  shippingMunicipality: string | null;
-  shippingAddress: string | null;
-  shippingNeighborhood: string | null;
-  storePickupAddress: string | null;
-  trackingNumber: string | null;
-  productsTotal: unknown;
-  wholesalePriceApplied: boolean;
-  stockDeducted: boolean;
-  expiresAt: Date | null;
-  createdAt: Date;
-  items: Array<{
-    id: string;
-    orderId: string;
-    productId: string;
-    productName: string;
-    quantity: number;
-    unitPriceAtPurchase: unknown;
-    createdAt: Date;
-  }>;
-}): OrderWithItems {
+function mapToOrderWithItems(
+  order: PrismaOrderScalars & { items: PrismaOrderItemScalars[] },
+): OrderWithItems {
   return {
     id: order.id,
     userId: order.userId,
     clientName: order.clientName,
     clientPhone: order.clientPhone,
     clientEmail: order.clientEmail,
-    status: order.status as OrderStatus,
-    deliveryMethod: order.deliveryMethod as OrderWithItems["deliveryMethod"],
+    status: toDomainOrderStatus(order.status),
+    deliveryMethod: toDomainDeliveryMethod(order.deliveryMethod),
     shippingDepartment: order.shippingDepartment,
     shippingMunicipality: order.shippingMunicipality,
     shippingAddress: order.shippingAddress,
     shippingNeighborhood: order.shippingNeighborhood,
     storePickupAddress: order.storePickupAddress,
     trackingNumber: order.trackingNumber,
-    productsTotal: new Decimal(order.productsTotal!.toString()),
+    productsTotal: new Decimal(order.productsTotal.toString()),
     wholesalePriceApplied: order.wholesalePriceApplied,
     stockDeducted: order.stockDeducted,
     expiresAt: order.expiresAt,
@@ -160,7 +182,7 @@ function mapToOrderSummary(order: {
   clientPhone: string;
   status: string;
   deliveryMethod: string;
-  productsTotal: unknown;
+  productsTotal: PrismaDecimal;
   wholesalePriceApplied: boolean;
   createdAt: Date;
 }): OrderSummary {
@@ -169,9 +191,9 @@ function mapToOrderSummary(order: {
     userId: order.userId,
     clientName: order.clientName,
     clientPhone: order.clientPhone,
-    status: order.status as OrderStatus,
-    deliveryMethod: order.deliveryMethod as OrderSummary["deliveryMethod"],
-    productsTotal: new Decimal(order.productsTotal!.toString()),
+    status: toDomainOrderStatus(order.status),
+    deliveryMethod: toDomainDeliveryMethod(order.deliveryMethod),
+    productsTotal: new Decimal(order.productsTotal.toString()),
     wholesalePriceApplied: order.wholesalePriceApplied,
     createdAt: order.createdAt,
   };
@@ -262,21 +284,21 @@ export class PrismaOrdersRepository implements IOrdersRepository {
 
   async listAll(filters: AdminOrderFilters): Promise<OrderSummary[]> {
     try {
-      const where: Record<string, unknown> = {};
+      const where: Prisma.OrderWhereInput = {};
 
-      if (filters.status) {
+      if (filters.status !== undefined) {
         where.status = filters.status;
       }
 
-      if (filters.userId) {
+      if (filters.userId !== undefined) {
         where.userId = filters.userId;
       }
 
-      if (filters.dateFrom || filters.dateTo) {
-        const createdAt: Record<string, Date> = {};
-        if (filters.dateFrom) createdAt.gte = filters.dateFrom;
-        if (filters.dateTo) createdAt.lte = filters.dateTo;
-        where.createdAt = createdAt;
+      if (filters.dateFrom !== undefined || filters.dateTo !== undefined) {
+        where.createdAt = {
+          ...(filters.dateFrom !== undefined && { gte: filters.dateFrom }),
+          ...(filters.dateTo !== undefined && { lte: filters.dateTo }),
+        };
       }
 
       const orders = await this.prisma.order.findMany({
@@ -307,19 +329,19 @@ export class PrismaOrdersRepository implements IOrdersRepository {
     extra?: UpdateOrderExtra,
   ): Promise<OrderRecord> {
     try {
-      const data: Record<string, unknown> = { status };
+      const updateData: Prisma.OrderUpdateInput = { status };
 
       if (extra?.trackingNumber !== undefined) {
-        data.trackingNumber = extra.trackingNumber;
+        updateData.trackingNumber = extra.trackingNumber;
       }
 
       if (extra?.stockDeducted !== undefined) {
-        data.stockDeducted = extra.stockDeducted;
+        updateData.stockDeducted = extra.stockDeducted;
       }
 
       const order = await this.prisma.order.update({
         where: { id },
-        data,
+        data: updateData,
       });
 
       return mapToOrderRecord(order);
@@ -332,7 +354,7 @@ export class PrismaOrdersRepository implements IOrdersRepository {
     try {
       const orders = await this.prisma.order.findMany({
         where: {
-          status: "PENDING_CONFIRMATION",
+          status: OrderStatus.PENDING_CONFIRMATION,
           expiresAt: { lt: now },
         },
       });
@@ -357,6 +379,8 @@ export class PrismaOrdersRepository implements IOrdersRepository {
   /**
    * Captura errores de Prisma y los transforma en AuroraError.
    * Nunca se exponen errores crudos de Prisma fuera de la capa de repositorio (Req 11.3).
+   *
+   * P2025 (record not found) se mapea a OrderNotFoundError para operaciones sobre pedidos.
    */
   private handlePrismaError(error: unknown, operation: string): AuroraError {
     if (error instanceof AuroraError) {
@@ -370,17 +394,14 @@ export class PrismaOrdersRepository implements IOrdersRepository {
     ) {
       const prismaCode = (error as Record<string, unknown>).code as string;
 
+      if (prismaCode === "P2025") {
+        return new OrderNotFoundError();
+      }
+
       if (prismaCode === "P2002") {
         return new AuroraError(
           "REPOSITORY_ERROR",
           `Unique constraint violation in ${operation}`,
-        );
-      }
-
-      if (prismaCode === "P2025") {
-        return new AuroraError(
-          "REPOSITORY_ERROR",
-          `Record not found in ${operation}`,
         );
       }
 

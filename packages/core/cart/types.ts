@@ -5,8 +5,8 @@
 // =============================================================================
 
 import type { StoreConfigRecord } from "@aurora/shared";
-import type { IPricingService } from "../shared/interfaces.js";
-import type { ICartRepository } from "./repositories/cart.repository.interface.js";
+import type { IPricingService } from "../shared/interfaces";
+import type { ICartRepository } from "./repositories/cart.repository.interface";
 
 /** Parámetros para getOrCreateCartUseCase */
 export interface GetOrCreateCartParams {

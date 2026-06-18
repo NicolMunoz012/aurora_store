@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { SavedAddressRecord } from "@aurora/shared";
-import type { ListSavedAddressesParams } from "../types.js";
+import type { ListSavedAddressesParams } from "../types";
 
 export async function listSavedAddressesUseCase(
   params: ListSavedAddressesParams,

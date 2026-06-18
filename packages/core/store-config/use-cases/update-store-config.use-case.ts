@@ -4,8 +4,8 @@
 // =============================================================================
 
 import type { StoreConfigRecord } from "@aurora/shared";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { UpdateStoreConfigParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { UpdateStoreConfigParams } from "../types";
 
 export async function updateStoreConfigUseCase(
   params: UpdateStoreConfigParams,

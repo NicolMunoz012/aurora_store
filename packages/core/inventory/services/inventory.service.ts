@@ -7,9 +7,9 @@
 // =============================================================================
 
 import type { StockValidationResult } from "@aurora/shared";
-import type { IInventoryService, IAuditLogger } from "../../shared/interfaces.js";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { IInventoryRepository } from "../repositories/inventory.repository.interface.js";
+import type { IInventoryService, IAuditLogger } from "../../shared/interfaces";
+import { AuditActions } from "../../shared/audit-actions";
+import type { IInventoryRepository } from "../repositories/inventory.repository.interface";
 
 /** Tipo del callback para obtener items de un pedido (inyectado desde apps/web) */
 export type GetOrderItemsFn = (

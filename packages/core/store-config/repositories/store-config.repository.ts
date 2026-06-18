@@ -5,11 +5,11 @@
 // Mapea Decimal de Prisma a decimal.js para el dominio (Req 1.4, 12.1).
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type { StoreConfigRecord, UpdateStoreConfigData } from "@aurora/shared";
 import { AuroraError, StoreConfigNotInitializedError } from "@aurora/shared";
 import { Decimal } from "decimal.js";
-import type { IStoreConfigRepository } from "./store-config.repository.interface.js";
+import type { IStoreConfigRepository } from "./store-config.repository.interface";
 
 /**
  * Mapea un registro Prisma de StoreConfig al tipo de dominio StoreConfigRecord.

@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { ProductListItem } from "@aurora/shared";
-import type { ListProductsParams } from "../types.js";
+import type { ListProductsParams } from "../types";
 
 export async function listProductsUseCase(
   params: ListProductsParams,

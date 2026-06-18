@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { OrderSummary } from "@aurora/shared";
-import type { ListOrdersByUserParams } from "../types.js";
+import type { ListOrdersByUserParams } from "../types";
 
 export async function listOrdersByUserUseCase(
   params: ListOrdersByUserParams,

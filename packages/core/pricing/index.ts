@@ -5,10 +5,10 @@
 // =============================================================================
 
 // Use cases (primary public API)
-export { resolveCartPricesUseCase } from "./use-cases/resolve-cart-prices.use-case.js";
+export { resolveCartPricesUseCase } from "./use-cases/resolve-cart-prices.use-case";
 
 // Types (params for use cases + resolved cart types)
-export type { ResolveCartPricesParams, ResolvedCart, ResolvedCartItem } from "./types.js";
+export type { ResolveCartPricesParams, ResolvedCart, ResolvedCartItem } from "./types";
 
 // Service implementation (for DI wiring in apps/web)
-export { PricingService } from "./services/pricing.service.js";
+export { PricingService } from "./services/pricing.service";

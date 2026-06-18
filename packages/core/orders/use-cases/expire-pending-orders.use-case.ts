@@ -5,8 +5,8 @@
 // =============================================================================
 
 import { OrderStatus } from "@aurora/shared";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { ExpirePendingOrdersParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { ExpirePendingOrdersParams } from "../types";
 
 export async function expirePendingOrdersUseCase(
   params: ExpirePendingOrdersParams,

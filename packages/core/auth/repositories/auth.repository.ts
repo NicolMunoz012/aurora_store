@@ -6,10 +6,10 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type { UserProfile, UpsertUserFromProviderData } from "@aurora/shared";
 import { AuroraError } from "@aurora/shared";
-import type { IAuthRepository } from "./auth.repository.interface.js";
+import type { IAuthRepository } from "./auth.repository.interface";
 
 /**
  * Mapea un registro de usuario Prisma al tipo de dominio UserProfile.
@@ -81,6 +81,67 @@ export class PrismaAuthRepository implements IAuthRepository {
       return user ? mapToUserProfile(user) : null;
     } catch (error) {
       throw this.handlePrismaError(error, "findUserByEmail");
+    }
+  }
+
+  async findUserByEmailWithHash(
+    email: string,
+  ): Promise<(UserProfile & { passwordHash: string }) | null> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          role: true,
+          emailVerified: true,
+          termsAccepted: true,
+          createdAt: true,
+          passwordHash: true,
+        },
+      });
+
+      if (!user) return null;
+
+      return {
+        ...mapToUserProfile(user),
+        passwordHash: user.passwordHash,
+      };
+    } catch (error) {
+      throw this.handlePrismaError(error, "findUserByEmailWithHash");
+    }
+  }
+
+  async createUserWithCredentials(data: {
+    email: string;
+    fullName: string;
+    passwordHash: string;
+    termsAccepted: boolean;
+  }): Promise<UserProfile> {
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email: data.email,
+          fullName: data.fullName,
+          passwordHash: data.passwordHash,
+          termsAccepted: data.termsAccepted,
+          role: "CLIENT",
+        },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          role: true,
+          emailVerified: true,
+          termsAccepted: true,
+          createdAt: true,
+        },
+      });
+
+      return mapToUserProfile(user);
+    } catch (error) {
+      throw this.handlePrismaError(error, "createUserWithCredentials");
     }
   }
 

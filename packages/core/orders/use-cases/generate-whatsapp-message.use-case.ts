@@ -5,7 +5,7 @@
 // =============================================================================
 
 import { OrderNotFoundError } from "@aurora/shared";
-import type { GenerateWhatsappMessageParams } from "../types.js";
+import type { GenerateWhatsappMessageParams } from "../types";
 
 export async function generateWhatsappMessageUseCase(
   params: GenerateWhatsappMessageParams,

@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { StockValidationResult } from "@aurora/shared";
-import type { ValidateStockParams } from "../types.js";
+import type { ValidateStockParams } from "../types";
 
 export async function validateStockUseCase(
   params: ValidateStockParams,

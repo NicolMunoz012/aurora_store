@@ -6,9 +6,9 @@
 
 import { OrderStatus } from "@aurora/shared";
 import { OrderNotFoundError, InvalidOrderTransitionError } from "@aurora/shared";
-import { isValidTransition } from "../../shared/order-transitions.js";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { CancelOrderParams } from "../types.js";
+import { isValidTransition } from "../../shared/order-transitions";
+import { AuditActions } from "../../shared/audit-actions";
+import type { CancelOrderParams } from "../types";
 import type { OrderRecord } from "@aurora/shared";
 
 export async function cancelOrderUseCase(

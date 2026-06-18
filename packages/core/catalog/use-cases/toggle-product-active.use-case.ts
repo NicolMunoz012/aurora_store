@@ -4,8 +4,8 @@
 // =============================================================================
 
 import { ProductNotFoundError } from "@aurora/shared";
-import type { ToggleProductActiveParams } from "../types.js";
-import { AuditActions } from "../../shared/audit-actions.js";
+import type { ToggleProductActiveParams } from "../types";
+import { AuditActions } from "../../shared/audit-actions";
 
 export async function toggleProductActiveUseCase(
   params: ToggleProductActiveParams,

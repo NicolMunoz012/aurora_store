@@ -15,11 +15,11 @@ import type {
   IPricingService,
   ResolvedCart,
   ResolvedCartItem,
-} from "../../shared/interfaces.js";
+} from "../../shared/interfaces";
 import {
   calculateRetailSubtotal,
   isWholesaleThresholdMet,
-} from "../../shared/price-calculator.js";
+} from "../../shared/price-calculator";
 
 /**
  * Servicio de pricing — puro y sincrónico.

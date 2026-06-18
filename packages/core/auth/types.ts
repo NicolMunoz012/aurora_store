@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { Role, UpsertUserFromProviderData } from "@aurora/shared";
-import type { IAuthRepository } from "./repositories/auth.repository.interface.js";
+import type { IAuthRepository } from "./repositories/auth.repository.interface";
 
 /** Parámetros para getUserProfileUseCase */
 export interface GetUserProfileParams {

@@ -5,8 +5,8 @@
 
 import type { ProductDetail, InternalProductDetail } from "@aurora/shared";
 import { ProductNotFoundError } from "@aurora/shared";
-import type { UpdateProductParams } from "../types.js";
-import { AuditActions } from "../../shared/audit-actions.js";
+import type { UpdateProductParams } from "../types";
+import { AuditActions } from "../../shared/audit-actions";
 
 function toPublicProductDetail(internal: InternalProductDetail): ProductDetail {
   const { wholesalePrice, ...publicDetail } = internal;

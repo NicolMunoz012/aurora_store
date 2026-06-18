@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { AuditLogRecord } from "@aurora/shared";
-import type { ListAuditLogParams } from "../types.js";
+import type { ListAuditLogParams } from "../types";
 
 export async function listAuditLogUseCase(
   params: ListAuditLogParams,

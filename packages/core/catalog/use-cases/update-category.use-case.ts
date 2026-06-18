@@ -4,8 +4,8 @@
 // =============================================================================
 
 import type { CategoryRecord } from "@aurora/shared";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { UpdateCategoryParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { UpdateCategoryParams } from "../types";
 
 export async function updateCategoryUseCase(
   params: UpdateCategoryParams,

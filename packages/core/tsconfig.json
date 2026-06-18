@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -10,13 +10,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outDir": "./dist",
-    "paths": {
-      "@aurora/shared": ["../shared/src/index.ts"],
-      "@aurora/shared/*": ["../shared/src/*"],
-      "@aurora/database": ["../database/generated/prisma/client.ts"],
-      "@aurora/database/*": ["../database/*"]
-    }
+    "outDir": "./dist"
   },
   "include": ["./**/*.ts"],
   "exclude": ["node_modules", "dist"]

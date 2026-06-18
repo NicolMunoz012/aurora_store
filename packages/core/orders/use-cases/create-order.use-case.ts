@@ -5,8 +5,8 @@
 
 import type { OrderRecord } from "@aurora/shared";
 import { InsufficientStockError } from "@aurora/shared";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { CreateOrderParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { CreateOrderParams } from "../types";
 
 export async function createOrderUseCase(
   params: CreateOrderParams,

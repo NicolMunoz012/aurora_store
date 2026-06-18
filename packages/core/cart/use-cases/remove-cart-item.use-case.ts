@@ -3,7 +3,7 @@
 // Elimina un item del carrito (Req 5.4).
 // =============================================================================
 
-import type { RemoveCartItemParams } from "../types.js";
+import type { RemoveCartItemParams } from "../types";
 
 export async function removeCartItemUseCase(
   params: RemoveCartItemParams,

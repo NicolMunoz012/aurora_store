@@ -6,7 +6,7 @@
 
 import type { UserProfile } from "@aurora/shared";
 import { EmailAlreadyInUseError } from "@aurora/shared";
-import type { UpdateProfileParams } from "../types.js";
+import type { UpdateProfileParams } from "../types";
 
 export async function updateProfileUseCase(
   params: UpdateProfileParams,

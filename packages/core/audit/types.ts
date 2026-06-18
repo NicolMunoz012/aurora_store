@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { CreateAuditLogData, AuditFilters } from "@aurora/shared";
-import type { IAuditRepository } from "./repositories/audit.repository.interface.js";
+import type { IAuditRepository } from "./repositories/audit.repository.interface";
 
 /** Parámetros para logActionUseCase */
 export interface LogActionParams {

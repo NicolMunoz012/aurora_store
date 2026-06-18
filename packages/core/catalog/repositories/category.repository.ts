@@ -6,14 +6,14 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type {
   CategoryRecord,
   CreateCategoryData,
   UpdateCategoryData,
 } from "@aurora/shared";
 import { AuroraError } from "@aurora/shared";
-import type { ICategoryRepository } from "./category.repository.interface.js";
+import type { ICategoryRepository } from "./category.repository.interface";
 
 // ─── Helper mapper ────────────────────────────────────────────────────────────
 

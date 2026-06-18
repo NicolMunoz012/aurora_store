@@ -5,8 +5,8 @@
 // =============================================================================
 
 import { ProductRequiresImageError } from "@aurora/shared";
-import { generateUniqueSlug } from "../../shared/slug-generator.js";
-import type { ICatalogRepository } from "../repositories/catalog.repository.interface.js";
+import { generateUniqueSlug } from "../../shared/slug-generator";
+import type { ICatalogRepository } from "../repositories/catalog.repository.interface";
 
 export class CatalogService {
   private readonly repository: ICatalogRepository;

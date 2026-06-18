@@ -3,8 +3,8 @@
 // Revierte la deducción de stock para un pedido cancelado o expirado (Req 7.4, 7.5).
 // =============================================================================
 
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { RevertStockForOrderParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { RevertStockForOrderParams } from "../types";
 
 export async function revertStockForOrderUseCase(
   params: RevertStockForOrderParams,

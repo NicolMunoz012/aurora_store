@@ -5,7 +5,7 @@
 
 import type { OrderWithItems } from "@aurora/shared";
 import { OrderNotFoundError } from "@aurora/shared";
-import type { GetOrderParams } from "../types.js";
+import type { GetOrderParams } from "../types";
 
 export async function getOrderUseCase(
   params: GetOrderParams,

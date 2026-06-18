@@ -6,10 +6,10 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type { CreateAuditLogData, AuditFilters, AuditLogRecord } from "@aurora/shared";
 import { AuroraError } from "@aurora/shared";
-import type { IAuditRepository } from "./audit.repository.interface.js";
+import type { IAuditRepository } from "./audit.repository.interface";
 
 export class PrismaAuditRepository implements IAuditRepository {
   private readonly prisma: PrismaClient;

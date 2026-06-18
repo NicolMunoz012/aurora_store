@@ -6,7 +6,7 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type {
   UserProfile,
   SavedAddressRecord,
@@ -14,7 +14,7 @@ import type {
   CreateAddressData,
 } from "@aurora/shared";
 import { AuroraError } from "@aurora/shared";
-import type { IUsersRepository } from "./users.repository.interface.js";
+import type { IUsersRepository } from "./users.repository.interface";
 
 /**
  * Mapea un registro de usuario Prisma al tipo de dominio UserProfile.

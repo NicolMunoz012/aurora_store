@@ -7,18 +7,18 @@
 
 // ─── Module re-exports ────────────────────────────────────────────────────────
 
-export * from "./auth/index.js";
-export * from "./users/index.js";
-export * from "./catalog/index.js";
-export * from "./pricing/index.js";
-export * from "./cart/index.js";
-export * from "./inventory/index.js";
-export * from "./orders/index.js";
-export * from "./store-config/index.js";
-export * from "./audit/index.js";
+export * from "./auth/index";
+export * from "./users/index";
+export * from "./catalog/index";
+export * from "./pricing/index";
+export * from "./cart/index";
+export * from "./inventory/index";
+export * from "./orders/index";
+export * from "./store-config/index";
+export * from "./audit/index";
 
 // ─── Shared utilities (only what's not already re-exported by modules) ────────
 
-export type { Clock } from "./shared/clock.js";
-export { SystemClock, createTestClock } from "./shared/clock.js";
-export type { IAuditLogger, IInventoryService, IPricingService } from "./shared/interfaces.js";
+export type { Clock } from "./shared/clock";
+export { SystemClock, createTestClock } from "./shared/clock";
+export type { IAuditLogger, IInventoryService, IPricingService } from "./shared/interfaces";

@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { UserProfile } from "@aurora/shared";
-import type { GetProfileParams } from "../types.js";
+import type { GetProfileParams } from "../types";
 
 export async function getProfileUseCase(
   params: GetProfileParams,

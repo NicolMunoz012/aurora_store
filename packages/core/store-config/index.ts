@@ -5,17 +5,17 @@
 // =============================================================================
 
 // Use cases (primary public API)
-export { getStoreConfigUseCase } from "./use-cases/get-store-config.use-case.js";
-export { updateStoreConfigUseCase } from "./use-cases/update-store-config.use-case.js";
+export { getStoreConfigUseCase } from "./use-cases/get-store-config.use-case";
+export { updateStoreConfigUseCase } from "./use-cases/update-store-config.use-case";
 
 // Types (params for use cases)
 export type {
   GetStoreConfigParams,
   UpdateStoreConfigParams,
-} from "./types.js";
+} from "./types";
 
 // Repository interface (for DI wiring in apps/web)
-export type { IStoreConfigRepository } from "./repositories/store-config.repository.interface.js";
+export type { IStoreConfigRepository } from "./repositories/store-config.repository.interface";
 
 // Repository implementation (for DI wiring in apps/web)
-export { PrismaStoreConfigRepository } from "./repositories/store-config.repository.js";
+export { PrismaStoreConfigRepository } from "./repositories/store-config.repository";

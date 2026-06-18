@@ -4,8 +4,8 @@
 // Encapsula generación de slugs únicos y conteo de productos activos (Req 4.10).
 // =============================================================================
 
-import { generateUniqueSlug } from "../../shared/slug-generator.js";
-import type { ICategoryRepository } from "../repositories/category.repository.interface.js";
+import { generateUniqueSlug } from "../../shared/slug-generator";
+import type { ICategoryRepository } from "../repositories/category.repository.interface";
 
 export class CategoryService {
   private readonly repository: ICategoryRepository;

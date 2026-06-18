@@ -5,11 +5,11 @@
 // =============================================================================
 
 // Use cases (primary public API)
-export { adjustStockUseCase } from "./use-cases/adjust-stock.use-case.js";
-export { deductStockForOrderUseCase } from "./use-cases/deduct-stock-for-order.use-case.js";
-export { revertStockForOrderUseCase } from "./use-cases/revert-stock-for-order.use-case.js";
-export { getLowStockProductsUseCase } from "./use-cases/get-low-stock-products.use-case.js";
-export { validateStockUseCase } from "./use-cases/validate-stock.use-case.js";
+export { adjustStockUseCase } from "./use-cases/adjust-stock.use-case";
+export { deductStockForOrderUseCase } from "./use-cases/deduct-stock-for-order.use-case";
+export { revertStockForOrderUseCase } from "./use-cases/revert-stock-for-order.use-case";
+export { getLowStockProductsUseCase } from "./use-cases/get-low-stock-products.use-case";
+export { validateStockUseCase } from "./use-cases/validate-stock.use-case";
 
 // Types (params for use cases)
 export type {
@@ -18,14 +18,14 @@ export type {
   RevertStockForOrderParams,
   GetLowStockProductsParams,
   ValidateStockParams,
-} from "./types.js";
+} from "./types";
 
 // Repository interface (for DI wiring in apps/web)
-export type { IInventoryRepository } from "./repositories/inventory.repository.interface.js";
+export type { IInventoryRepository } from "./repositories/inventory.repository.interface";
 
 // Repository implementation (for DI wiring in apps/web)
-export { PrismaInventoryRepository } from "./repositories/inventory.repository.js";
+export { PrismaInventoryRepository } from "./repositories/inventory.repository";
 
 // Service (for DI wiring — implements IInventoryService cross-module contract)
-export { InventoryService } from "./services/inventory.service.js";
-export type { GetOrderItemsFn } from "./services/inventory.service.js";
+export { InventoryService } from "./services/inventory.service";
+export type { GetOrderItemsFn } from "./services/inventory.service";

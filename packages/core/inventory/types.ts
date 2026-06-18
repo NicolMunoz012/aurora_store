@@ -4,8 +4,8 @@
 // de dependencias via interfaz de repositorio (Req 1.6, 7.1–7.8).
 // =============================================================================
 
-import type { IAuditLogger } from "../shared/interfaces.js";
-import type { IInventoryRepository } from "./repositories/inventory.repository.interface.js";
+import type { IAuditLogger } from "../shared/interfaces";
+import type { IInventoryRepository } from "./repositories/inventory.repository.interface";
 
 /** Parámetros para adjustStockUseCase (RF032) */
 export interface AdjustStockParams {

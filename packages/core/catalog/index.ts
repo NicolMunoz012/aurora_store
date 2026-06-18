@@ -5,17 +5,17 @@
 // =============================================================================
 
 // Use cases — Products (primary public API)
-export { listProductsUseCase } from "./use-cases/list-products.use-case.js";
-export { getProductBySlugUseCase } from "./use-cases/get-product-by-slug.use-case.js";
-export { searchProductsUseCase } from "./use-cases/search-products.use-case.js";
-export { createProductUseCase } from "./use-cases/create-product.use-case.js";
-export { updateProductUseCase } from "./use-cases/update-product.use-case.js";
-export { toggleProductActiveUseCase } from "./use-cases/toggle-product-active.use-case.js";
+export { listProductsUseCase } from "./use-cases/list-products.use-case";
+export { getProductBySlugUseCase } from "./use-cases/get-product-by-slug.use-case";
+export { searchProductsUseCase } from "./use-cases/search-products.use-case";
+export { createProductUseCase } from "./use-cases/create-product.use-case";
+export { updateProductUseCase } from "./use-cases/update-product.use-case";
+export { toggleProductActiveUseCase } from "./use-cases/toggle-product-active.use-case";
 
 // Use cases — Categories
-export { createCategoryUseCase } from "./use-cases/create-category.use-case.js";
-export { updateCategoryUseCase } from "./use-cases/update-category.use-case.js";
-export { toggleCategoryActiveUseCase } from "./use-cases/toggle-category-active.use-case.js";
+export { createCategoryUseCase } from "./use-cases/create-category.use-case";
+export { updateCategoryUseCase } from "./use-cases/update-category.use-case";
+export { toggleCategoryActiveUseCase } from "./use-cases/toggle-category-active.use-case";
 
 // Types (params for use cases)
 export type {
@@ -28,16 +28,16 @@ export type {
   CreateCategoryParams,
   UpdateCategoryParams,
   ToggleCategoryActiveParams,
-} from "./types.js";
+} from "./types";
 
 // Repository interfaces (for DI wiring in apps/web)
-export type { ICatalogRepository } from "./repositories/catalog.repository.interface.js";
-export type { ICategoryRepository } from "./repositories/category.repository.interface.js";
+export type { ICatalogRepository } from "./repositories/catalog.repository.interface";
+export type { ICategoryRepository } from "./repositories/category.repository.interface";
 
 // Repository implementations (for DI wiring in apps/web)
-export { PrismaCatalogRepository } from "./repositories/catalog.repository.js";
-export { PrismaCategoryRepository } from "./repositories/category.repository.js";
+export { PrismaCatalogRepository } from "./repositories/catalog.repository";
+export { PrismaCategoryRepository } from "./repositories/category.repository";
 
 // Services (for DI wiring in apps/web)
-export { CatalogService } from "./services/catalog.service.js";
-export { CategoryService } from "./services/category.service.js";
+export { CatalogService } from "./services/catalog.service";
+export { CategoryService } from "./services/category.service";

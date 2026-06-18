@@ -3,7 +3,7 @@
 // Verifica si un usuario tiene un rol esperado (Req 2.3).
 // =============================================================================
 
-import type { VerifyUserRoleParams } from "../types.js";
+import type { VerifyUserRoleParams } from "../types";
 
 export async function verifyUserRoleUseCase(
   params: VerifyUserRoleParams,

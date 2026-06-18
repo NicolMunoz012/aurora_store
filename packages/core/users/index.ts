@@ -5,11 +5,11 @@
 // =============================================================================
 
 // Use cases (primary public API)
-export { getProfileUseCase } from "./use-cases/get-profile.use-case.js";
-export { updateProfileUseCase } from "./use-cases/update-profile.use-case.js";
-export { addSavedAddressUseCase } from "./use-cases/add-saved-address.use-case.js";
-export { removeSavedAddressUseCase } from "./use-cases/remove-saved-address.use-case.js";
-export { listSavedAddressesUseCase } from "./use-cases/list-saved-addresses.use-case.js";
+export { getProfileUseCase } from "./use-cases/get-profile.use-case";
+export { updateProfileUseCase } from "./use-cases/update-profile.use-case";
+export { addSavedAddressUseCase } from "./use-cases/add-saved-address.use-case";
+export { removeSavedAddressUseCase } from "./use-cases/remove-saved-address.use-case";
+export { listSavedAddressesUseCase } from "./use-cases/list-saved-addresses.use-case";
 
 // Types (params for use cases)
 export type {
@@ -18,10 +18,10 @@ export type {
   ListSavedAddressesParams,
   AddSavedAddressParams,
   RemoveSavedAddressParams,
-} from "./types.js";
+} from "./types";
 
 // Repository interface (for DI wiring in apps/web)
-export type { IUsersRepository } from "./repositories/users.repository.interface.js";
+export type { IUsersRepository } from "./repositories/users.repository.interface";
 
 // Repository implementation (for DI wiring in apps/web)
-export { PrismaUsersRepository } from "./repositories/users.repository.js";
+export { PrismaUsersRepository } from "./repositories/users.repository";

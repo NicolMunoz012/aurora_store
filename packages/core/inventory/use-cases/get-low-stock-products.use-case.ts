@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { LowStockProduct } from "@aurora/shared";
-import type { GetLowStockProductsParams } from "../types.js";
+import type { GetLowStockProductsParams } from "../types";
 
 export async function getLowStockProductsUseCase(
   params: GetLowStockProductsParams,

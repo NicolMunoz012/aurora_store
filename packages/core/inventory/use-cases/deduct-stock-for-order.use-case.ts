@@ -6,8 +6,8 @@
 // el UPDATE atómico del repositorio previene stock negativo.
 // =============================================================================
 
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { DeductStockForOrderParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { DeductStockForOrderParams } from "../types";
 
 export async function deductStockForOrderUseCase(
   params: DeductStockForOrderParams,

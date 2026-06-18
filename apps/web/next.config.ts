@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: [
+    "@prisma/client",
+    "@aurora/database",
+    "@aurora/core",
+    "@aurora/shared",
+    "bcryptjs",
+  ],
+  turbopack: {},
 };
 
 export default nextConfig;

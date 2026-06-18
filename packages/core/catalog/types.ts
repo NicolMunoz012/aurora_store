@@ -11,9 +11,9 @@ import type {
   CreateCategoryData,
   UpdateCategoryData,
 } from "@aurora/shared";
-import type { ICatalogRepository } from "./repositories/catalog.repository.interface.js";
-import type { ICategoryRepository } from "./repositories/category.repository.interface.js";
-import type { IAuditLogger } from "../shared/interfaces.js";
+import type { ICatalogRepository } from "./repositories/catalog.repository.interface";
+import type { ICategoryRepository } from "./repositories/category.repository.interface";
+import type { IAuditLogger } from "../shared/interfaces";
 
 // ─── Product Use Case Params ──────────────────────────────────────────────────
 

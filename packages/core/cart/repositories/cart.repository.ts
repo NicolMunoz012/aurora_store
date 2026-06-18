@@ -6,7 +6,7 @@
 // para re-lanzarlos como AuroraError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type {
   CartWithItems,
   CartRecord,
@@ -17,7 +17,7 @@ import type {
 } from "@aurora/shared";
 import { AuroraError } from "@aurora/shared";
 import { Decimal } from "decimal.js";
-import type { ICartRepository } from "./cart.repository.interface.js";
+import type { ICartRepository } from "./cart.repository.interface";
 
 // ─── Prisma include/select constants ──────────────────────────────────────────
 

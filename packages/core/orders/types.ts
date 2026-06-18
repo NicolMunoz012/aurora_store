@@ -6,9 +6,9 @@
 // =============================================================================
 
 import type { CreateOrderData, AdminOrderFilters, OrderStatus } from "@aurora/shared";
-import type { IOrdersRepository } from "./repositories/orders.repository.interface.js";
-import type { IAuditLogger, IInventoryService } from "../shared/interfaces.js";
-import type { Clock } from "../shared/clock.js";
+import type { IOrdersRepository } from "./repositories/orders.repository.interface";
+import type { IAuditLogger, IInventoryService } from "../shared/interfaces";
+import type { Clock } from "../shared/clock";
 
 export interface CreateOrderParams {
   repository: IOrdersRepository;

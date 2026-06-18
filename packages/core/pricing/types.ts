@@ -5,11 +5,11 @@
 // =============================================================================
 
 // Re-exports from shared interfaces (cross-module contract)
-export type { ResolvedCart, ResolvedCartItem } from "../shared/interfaces.js";
+export type { ResolvedCart, ResolvedCartItem } from "../shared/interfaces";
 
 // Use case params
 import type { CartItemWithProduct, StoreConfigRecord } from "@aurora/shared";
-import type { IPricingService } from "../shared/interfaces.js";
+import type { IPricingService } from "../shared/interfaces";
 
 /** Parámetros para resolveCartPricesUseCase */
 export interface ResolveCartPricesParams {

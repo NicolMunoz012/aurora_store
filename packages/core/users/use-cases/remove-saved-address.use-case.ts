@@ -4,7 +4,7 @@
 // La validación de pertenencia se maneja en el repositorio.
 // =============================================================================
 
-import type { RemoveSavedAddressParams } from "../types.js";
+import type { RemoveSavedAddressParams } from "../types";
 
 export async function removeSavedAddressUseCase(
   params: RemoveSavedAddressParams,

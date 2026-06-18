@@ -4,8 +4,8 @@
 // =============================================================================
 
 import type { StockRecord } from "@aurora/shared";
-import { AuditActions } from "../../shared/audit-actions.js";
-import type { AdjustStockParams } from "../types.js";
+import { AuditActions } from "../../shared/audit-actions";
+import type { AdjustStockParams } from "../types";
 
 export async function adjustStockUseCase(
   params: AdjustStockParams,

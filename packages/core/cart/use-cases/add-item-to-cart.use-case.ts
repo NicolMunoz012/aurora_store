@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { CartItemRecord } from "@aurora/shared";
-import type { AddItemToCartParams } from "../types.js";
+import type { AddItemToCartParams } from "../types";
 
 export async function addItemToCartUseCase(
   params: AddItemToCartParams,

@@ -9,14 +9,14 @@
 // UPDATE ... WHERE stock >= quantity. Si 0 filas afectadas → InsufficientStockError.
 // =============================================================================
 
-import type { PrismaClient } from "@aurora/database/generated/prisma/client.js";
+import type { PrismaClient } from "@aurora/database";
 import type {
   StockRecord,
   LowStockProduct,
   StockValidationResult,
 } from "@aurora/shared";
 import { AuroraError, InsufficientStockError } from "@aurora/shared";
-import type { IInventoryRepository } from "./inventory.repository.interface.js";
+import type { IInventoryRepository } from "./inventory.repository.interface";
 
 /**
  * Mapea un registro de producto Prisma al tipo de dominio StockRecord.

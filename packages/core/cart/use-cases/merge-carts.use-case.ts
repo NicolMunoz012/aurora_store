@@ -7,7 +7,7 @@
 
 import type { CartWithItems } from "@aurora/shared";
 import { CartStatus } from "@aurora/shared";
-import type { MergeCartsParams } from "../types.js";
+import type { MergeCartsParams } from "../types";
 
 export async function mergeCartsUseCase(
   params: MergeCartsParams,

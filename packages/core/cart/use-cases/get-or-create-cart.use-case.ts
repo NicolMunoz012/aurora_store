@@ -5,7 +5,7 @@
 // =============================================================================
 
 import type { CartWithItems } from "@aurora/shared";
-import type { GetOrCreateCartParams } from "../types.js";
+import type { GetOrCreateCartParams } from "../types";
 
 export async function getOrCreateCartUseCase(
   params: GetOrCreateCartParams,

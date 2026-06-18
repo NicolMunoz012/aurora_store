@@ -4,8 +4,8 @@
 // =============================================================================
 
 import type { UpdateStoreConfigData } from "@aurora/shared";
-import type { IStoreConfigRepository } from "./repositories/store-config.repository.interface.js";
-import type { IAuditLogger } from "../shared/interfaces.js";
+import type { IStoreConfigRepository } from "./repositories/store-config.repository.interface";
+import type { IAuditLogger } from "../shared/interfaces";
 
 export interface GetStoreConfigParams {
   repository: IStoreConfigRepository;

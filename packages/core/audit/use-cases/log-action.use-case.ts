@@ -5,7 +5,7 @@
 // Acepta userId = null para procesos automatizados (Req 10.2).
 // =============================================================================
 
-import type { LogActionParams } from "../types.js";
+import type { LogActionParams } from "../types";
 
 export async function logActionUseCase(params: LogActionParams): Promise<void> {
   const { repository, data } = params;

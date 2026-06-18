@@ -4,7 +4,7 @@
 // =============================================================================
 
 import type { UserProfile } from "@aurora/shared";
-import type { UpsertUserFromProviderParams } from "../types.js";
+import type { UpsertUserFromProviderParams } from "../types";
 
 export async function upsertUserFromProviderUseCase(
   params: UpsertUserFromProviderParams,
