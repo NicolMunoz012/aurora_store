@@ -280,6 +280,8 @@ model Cart {
   items CartItem[]
 
   @@index([userId, status])
+  /// MANUAL MIGRATION: Partial unique index "carts_one_active_per_user" ON (user_id) WHERE status = 'ACTIVE' AND user_id IS NOT NULL
+  /// See: migrations/20250101000000_add_cart_active_unique_index/migration.sql
   @@map("carts")
 }
 
