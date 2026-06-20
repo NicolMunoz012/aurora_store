@@ -1,8 +1,4 @@
 "use client";
-// =============================================================================
-// components/admin/AdminOrderStatusForm.tsx (Req 18.3–18.6)
-// Status transition form with tracking number input and cancel confirmation.
-// =============================================================================
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -16,13 +12,7 @@ const NEXT_STATUSES: Partial<Record<string, OrderStatus[]>> = {
   SHIPPED: ["DELIVERED"],
 };
 
-export function AdminOrderStatusForm({
-  orderId,
-  currentStatus,
-}: {
-  orderId: string;
-  currentStatus: string;
-}) {
+export function AdminOrderStatusForm({ orderId, currentStatus }: { orderId: string; currentStatus: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | "">("");
@@ -37,15 +27,8 @@ export function AdminOrderStatusForm({
     if (!selectedStatus) return;
     setError(null);
     startTransition(async () => {
-      const result = await updateOrderStatusAction(
-        orderId,
-        selectedStatus,
-        selectedStatus === "SHIPPED" ? trackingNumber : undefined,
-      );
-      if (result.error) {
-        setError(result.error.message);
-        return;
-      }
+      const result = await updateOrderStatusAction(orderId, selectedStatus, selectedStatus === "SHIPPED" ? trackingNumber : undefined);
+      if (result.error) { setError(result.error.message); return; }
       router.refresh();
     });
   }
@@ -60,19 +43,17 @@ export function AdminOrderStatusForm({
   }
 
   if (isFinal) {
-    return <p className="text-sm text-zinc-400">Este pedido está en estado final ({currentStatus}).</p>;
+    return <p className="text-sm text-gray-400">Este pedido está en estado final ({currentStatus}).</p>;
   }
 
+  const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100";
+
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
-      <h2 className="mb-4 text-sm font-semibold text-zinc-800 dark:text-zinc-100">Cambiar estado</h2>
+    <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+      <h2 className="mb-4 text-sm font-semibold text-gray-800">Cambiar estado</h2>
 
       <div className="flex flex-col gap-3">
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value as OrderStatus)}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-        >
+        <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value as OrderStatus)} className={inputClass}>
           <option value="">Seleccionar nuevo estado…</option>
           {nextOptions.filter((s) => s !== "CANCELLED").map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -80,52 +61,33 @@ export function AdminOrderStatusForm({
         </select>
 
         {selectedStatus === "SHIPPED" && (
-          <input
-            type="text"
-            placeholder="Número de rastreo"
-            value={trackingNumber}
-            onChange={(e) => setTrackingNumber(e.target.value)}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
+          <input type="text" placeholder="Número de rastreo" value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} className={inputClass} />
         )}
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <div className="rounded-lg bg-red-50 px-3 py-2"><p className="text-sm text-red-600">{error}</p></div>}
 
         <div className="flex gap-2">
-          <button
-            onClick={handleUpdate}
-            disabled={!selectedStatus || isPending}
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
-          >
+          <button onClick={handleUpdate} disabled={!selectedStatus || isPending} className="rounded-full bg-cerise-500 px-4 py-2 text-sm font-semibold text-white hover:bg-cerise-600 disabled:opacity-60">
             {isPending ? "Actualizando..." : "Actualizar estado"}
           </button>
 
-          {/* Cancel with confirmation dialog (Req 18.5) */}
           {nextOptions.includes("CANCELLED") && !confirmCancel && (
-            <button
-              onClick={() => setConfirmCancel(true)}
-              disabled={isPending}
-              className="rounded-full border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
-            >
+            <button onClick={() => setConfirmCancel(true)} disabled={isPending} className="rounded-full border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60">
               Cancelar pedido
             </button>
           )}
         </div>
 
         {confirmCancel && (
-          <div className="rounded-lg bg-red-50 px-3 py-3 dark:bg-red-900/20">
-            <p className="mb-2 text-sm text-red-700 dark:text-red-300">
-              ¿Confirmar cancelación del pedido? Esta acción revertirá el stock.
+          <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3">
+            <p className="mb-2 text-sm text-red-700">
+              ¿Confirmar cancelación? Si el stock ya fue descontado, será revertido.
             </p>
             <div className="flex gap-2">
-              <button
-                onClick={handleCancel}
-                disabled={isPending}
-                className="rounded-full bg-red-500 px-4 py-2 text-xs font-semibold text-white hover:bg-red-600"
-              >
-                Confirmar cancelación
+              <button onClick={handleCancel} disabled={isPending} className="rounded-full bg-red-500 px-4 py-1.5 text-xs font-semibold text-white hover:bg-red-600">
+                Confirmar
               </button>
-              <button onClick={() => setConfirmCancel(false)} className="text-xs text-zinc-400 underline">
+              <button onClick={() => setConfirmCancel(false)} className="text-xs text-gray-500 hover:text-gray-700">
                 No cancelar
               </button>
             </div>

@@ -1,7 +1,6 @@
 "use client";
 // =============================================================================
-// components/catalog/CategoryFilter.tsx (Req 5.3)
-// Checkbox group — updates ?categoryIds= URL param (comma-separated).
+// components/catalog/CategoryFilter.tsx — Category filter chips
 // =============================================================================
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -38,24 +37,27 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
 
   return (
     <fieldset>
-      <legend className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+      <legend className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
         Categorías
       </legend>
-      <div className="flex flex-col gap-2">
-        {categories.map((cat) => (
-          <label
-            key={cat.id}
-            className="flex cursor-pointer items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400"
-          >
-            <input
-              type="checkbox"
-              checked={selected.has(cat.id)}
-              onChange={() => toggle(cat.id)}
-              className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500"
-            />
-            {cat.name}
-          </label>
-        ))}
+      <div className="flex flex-wrap gap-2">
+        {categories.map((cat) => {
+          const isActive = selected.has(cat.id);
+          return (
+            <button
+              key={cat.id}
+              onClick={() => toggle(cat.id)}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all ${
+                isActive
+                  ? "bg-cerise-500 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-600 hover:bg-cerise-50 hover:text-cerise-700"
+              }`}
+              aria-pressed={isActive}
+            >
+              {cat.name}
+            </button>
+          );
+        })}
       </div>
     </fieldset>
   );

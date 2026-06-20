@@ -1,10 +1,6 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// =============================================================================
-// app/(admin)/admin/configuracion/page.tsx — Store config (Req 20.1–20.3)
-// =============================================================================
-
 import { getStoreConfigAdminAction } from "@/lib/actions/admin.store-config.actions";
 import { StoreConfigForm } from "@/components/admin/StoreConfigForm";
 
@@ -15,10 +11,12 @@ export default async function AdminConfiguracionPage() {
   const config = result.data;
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-8 sm:px-6">
-      <h1 className="mb-6 text-xl font-bold text-zinc-900 dark:text-white">Configuración de tienda</h1>
+    <div className="mx-auto max-w-lg">
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">Configuración de tienda</h1>
       {config ? (
-        <StoreConfigForm initialConfig={config} />
+        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+          <StoreConfigForm initialConfig={config} />
+        </div>
       ) : (
         <p className="text-sm text-red-500">No se pudo cargar la configuración.</p>
       )}

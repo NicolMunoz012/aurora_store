@@ -1,6 +1,6 @@
 "use client";
 // =============================================================================
-// components/admin/AdminProductForm.tsx (Req 16.1–16.9)
+// components/admin/AdminProductForm.tsx — Product create/edit form
 // Image upload via /api/upload. 1–5 images. Per-file error without blocking.
 // =============================================================================
 
@@ -8,7 +8,11 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Decimal } from "decimal.js";
 import type { CategoryRecord, ProductImageRecord } from "@aurora/shared";
-import { createProductAction, updateProductAction, toggleProductActiveAction } from "@/lib/actions/admin.catalog.actions";
+import {
+  createProductAction,
+  updateProductAction,
+  toggleProductActiveAction,
+} from "@/lib/actions/admin.catalog.actions";
 
 interface AdminProductFormProps {
   categories: CategoryRecord[];
@@ -53,13 +57,11 @@ export function AdminProductForm({
   const [categoryId, setCategoryId] = useState(initialData?.categoryId ?? categories[0]?.id ?? "");
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
 
-  // Images
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>(
     initialData?.images.map((img) => ({ url: img.url, key: img.url, altText: img.altText ?? "" })) ?? [],
   );
   const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
-
   const [formError, setFormError] = useState<string | null>(null);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -79,7 +81,7 @@ export function AdminProductForm({
       formData.append("file", file);
       try {
         const res = await fetch("/api/upload", { method: "POST", body: formData });
-        const json = await res.json() as { url?: string; key?: string; error?: string };
+        const json = (await res.json()) as { url?: string; key?: string; error?: string };
         if (!res.ok || !json.url) {
           newErrors[file.name] = json.error ?? "Error al subir archivo.";
         } else {
@@ -151,97 +153,184 @@ export function AdminProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      {[
-        { id: "name", label: "Nombre *", type: "text", value: name, set: setName },
-        { id: "retailPrice", label: "Precio retail (COP) *", type: "number", value: retailPrice, set: setRetailPrice },
-        { id: "wholesalePrice", label: "Precio mayorista (COP) *", type: "number", value: wholesalePrice, set: setWholesalePrice },
-      ].map(({ id, label, type, value, set }) => (
-        <div key={id}>
-          <label htmlFor={id} className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">{label}</label>
-          <input
-            id={id}
-            type={type}
-            value={value}
-            onChange={(e) => set(e.target.value)}
-            required
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
-        </div>
-      ))}
-
+      {/* Name */}
       <div>
-        <label htmlFor="description" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Descripción</label>
+        <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
+          Nombre del producto *
+        </label>
+        <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+        />
+      </div>
+
+      {/* Description */}
+      <div>
+        <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-gray-700">
+          Descripción
+        </label>
         <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={3}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      {/* Prices */}
+      <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="stock" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Stock</label>
-          <input id="stock" type="number" min={0} value={stock} onChange={(e) => setStock(Number(e.target.value))} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white" />
+          <label htmlFor="retailPrice" className="mb-1.5 block text-sm font-medium text-gray-700">
+            Precio detal (COP) *
+          </label>
+          <input
+            id="retailPrice"
+            type="number"
+            min="0"
+            step="100"
+            value={retailPrice}
+            onChange={(e) => setRetailPrice(e.target.value)}
+            required
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+          />
         </div>
         <div>
-          <label htmlFor="lowStock" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Alerta stock</label>
-          <input id="lowStock" type="number" min={0} value={lowStockAlert} onChange={(e) => setLowStockAlert(Number(e.target.value))} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white" />
-        </div>
-        <div>
-          <label htmlFor="minWholesale" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Min. mayorista</label>
-          <input id="minWholesale" type="number" min={0} value={minWholesaleQty} onChange={(e) => setMinWholesaleQty(Number(e.target.value))} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white" />
+          <label htmlFor="wholesalePrice" className="mb-1.5 block text-sm font-medium text-gray-700">
+            Precio mayorista (COP) *
+          </label>
+          <input
+            id="wholesalePrice"
+            type="number"
+            min="0"
+            step="100"
+            value={wholesalePrice}
+            onChange={(e) => setWholesalePrice(e.target.value)}
+            required
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+          />
         </div>
       </div>
 
+      {/* Stock & Alerts */}
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label htmlFor="stock" className="mb-1.5 block text-sm font-medium text-gray-700">Stock</label>
+          <input
+            id="stock"
+            type="number"
+            min={0}
+            value={stock}
+            onChange={(e) => setStock(Number(e.target.value))}
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+          />
+        </div>
+        <div>
+          <label htmlFor="lowStock" className="mb-1.5 block text-sm font-medium text-gray-700">Alerta stock</label>
+          <input
+            id="lowStock"
+            type="number"
+            min={0}
+            value={lowStockAlert}
+            onChange={(e) => setLowStockAlert(Number(e.target.value))}
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+          />
+        </div>
+        <div>
+          <label htmlFor="minWholesale" className="mb-1.5 block text-sm font-medium text-gray-700">Min. mayorista</label>
+          <input
+            id="minWholesale"
+            type="number"
+            min={0}
+            value={minWholesaleQty}
+            onChange={(e) => setMinWholesaleQty(Number(e.target.value))}
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+          />
+        </div>
+      </div>
+
+      {/* Category */}
       <div>
-        <label htmlFor="category" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Categoría *</label>
-        <select id="category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white">
-          {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+        <label htmlFor="category" className="mb-1.5 block text-sm font-medium text-gray-700">Categoría *</label>
+        <select
+          id="category"
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+        >
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          ))}
         </select>
       </div>
 
       {/* Images */}
       <div>
-        <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Imágenes (1–5, JPG/PNG/WebP, máx. 2 MB)
+        <p className="mb-2 text-sm font-medium text-gray-700">
+          Imágenes ({uploadedImages.length}/5) — JPG, PNG o WebP, máx. 2 MB
         </p>
-        <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex flex-wrap gap-3 mb-3">
           {uploadedImages.map((img, i) => (
-            <div key={img.key + i} className="relative h-16 w-16 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-600">
+            <div key={img.key + i} className="relative h-20 w-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
               <img src={img.url} alt="" className="h-full w-full object-cover" />
               <button
                 type="button"
                 onClick={() => removeImage(i)}
-                className="absolute right-0.5 top-0.5 rounded-full bg-red-500 p-0.5 text-[10px] text-white"
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm hover:bg-red-600"
                 aria-label="Eliminar imagen"
               >
                 ✕
               </button>
             </div>
           ))}
+          {uploadedImages.length < 5 && (
+            <label className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-gray-400 transition-colors hover:border-cerise-300 hover:text-cerise-500">
+              {isUploading ? (
+                <span className="text-xs">...</span>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-6 w-6">
+                  <path d="M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z" />
+                </svg>
+              )}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="sr-only"
+                onChange={handleFileChange}
+                disabled={isUploading}
+              />
+            </label>
+          )}
         </div>
         {Object.entries(uploadErrors).map(([fname, err]) => (
           <p key={fname} className="mb-1 text-xs text-red-500">{fname}: {err}</p>
         ))}
-        {uploadedImages.length < 5 && (
-          <label className="cursor-pointer text-sm text-zinc-500 underline">
-            {isUploading ? "Subiendo..." : "Subir imagen"}
-            <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={handleFileChange} disabled={isUploading} />
-          </label>
-        )}
       </div>
 
-      {formError && <p className="text-sm text-red-500">{formError}</p>}
+      {/* Error */}
+      {formError && (
+        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3">
+          <p className="text-sm text-red-600">{formError}</p>
+        </div>
+      )}
 
-      <div className="flex items-center justify-between">
+      {/* Actions */}
+      <div className="flex items-center justify-between pt-2">
         {mode === "edit" && productId && (
           <button
             type="button"
             onClick={handleToggleActive}
             disabled={isPending}
-            className={`rounded-full px-4 py-2 text-xs font-semibold ${isActive ? "bg-zinc-200 text-zinc-700 hover:bg-zinc-300" : "bg-green-100 text-green-700 hover:bg-green-200"}`}
+            className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
+              isActive
+                ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
+                : "bg-green-50 text-green-700 hover:bg-green-100"
+            }`}
           >
             {isActive ? "Desactivar producto" : "Activar producto"}
           </button>
@@ -249,7 +338,7 @@ export function AdminProductForm({
         <button
           type="submit"
           disabled={isPending || isUploading}
-          className="ml-auto rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
+          className="ml-auto rounded-full bg-cerise-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cerise-600 hover:shadow-md disabled:opacity-60"
         >
           {isPending ? "Guardando..." : mode === "create" ? "Crear producto" : "Guardar cambios"}
         </button>

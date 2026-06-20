@@ -1,7 +1,4 @@
 "use client";
-// =============================================================================
-// components/admin/StoreConfigForm.tsx (Req 20.1–20.3)
-// =============================================================================
 
 import { useState, useTransition } from "react";
 import type { SerializedStoreConfig } from "@/lib/actions/admin.store-config.actions";
@@ -22,7 +19,6 @@ export function StoreConfigForm({ initialConfig }: { initialConfig: SerializedSt
     setError(null);
     setSuccess(false);
 
-    // Validate wholesaleThreshold (Req 20.2)
     const parsed = parseFloat(threshold);
     if (isNaN(parsed) || parsed <= 0) {
       setError("El umbral mayorista debe ser un número positivo.");
@@ -42,81 +38,41 @@ export function StoreConfigForm({ initialConfig }: { initialConfig: SerializedSt
     });
   }
 
+  const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100";
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div>
-        <label htmlFor="threshold" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label htmlFor="threshold" className="mb-1.5 block text-sm font-medium text-gray-700">
           Umbral precio mayorista (COP)
         </label>
-        <input
-          id="threshold"
-          type="number"
-          min={1}
-          value={threshold}
-          onChange={(e) => setThreshold(e.target.value)}
-          required
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-        />
+        <input id="threshold" type="number" min={1} value={threshold} onChange={(e) => setThreshold(e.target.value)} required className={inputClass} />
       </div>
       <div>
-        <label htmlFor="whatsapp" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label htmlFor="whatsapp" className="mb-1.5 block text-sm font-medium text-gray-700">
           Número WhatsApp (con código de país, sin +)
         </label>
-        <input
-          id="whatsapp"
-          type="text"
-          value={whatsapp}
-          onChange={(e) => setWhatsapp(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-        />
+        <input id="whatsapp" type="text" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className={inputClass} />
       </div>
       <div>
-        <label htmlFor="storeAddr" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label htmlFor="storeAddr" className="mb-1.5 block text-sm font-medium text-gray-700">
           Dirección física de la tienda
         </label>
-        <input
-          id="storeAddr"
-          type="text"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-        />
+        <input id="storeAddr" type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label htmlFor="anonDays" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Expiración pedidos anónimos (días)
-          </label>
-          <input
-            id="anonDays"
-            type="number"
-            min={1}
-            value={anonDays}
-            onChange={(e) => setAnonDays(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
+          <label htmlFor="anonDays" className="mb-1.5 block text-sm font-medium text-gray-700">Expiración anónimos (días)</label>
+          <input id="anonDays" type="number" min={1} value={anonDays} onChange={(e) => setAnonDays(Number(e.target.value))} className={inputClass} />
         </div>
         <div>
-          <label htmlFor="regDays" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Expiración pedidos registrados (días)
-          </label>
-          <input
-            id="regDays"
-            type="number"
-            min={1}
-            value={regDays}
-            onChange={(e) => setRegDays(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
+          <label htmlFor="regDays" className="mb-1.5 block text-sm font-medium text-gray-700">Expiración registrados (días)</label>
+          <input id="regDays" type="number" min={1} value={regDays} onChange={(e) => setRegDays(Number(e.target.value))} className={inputClass} />
         </div>
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      {success && <p className="text-sm text-green-600">Configuración guardada correctamente.</p>}
-      <button
-        type="submit"
-        disabled={isPending}
-        className="self-start rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
-      >
+      {error && <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3"><p className="text-sm text-red-600">{error}</p></div>}
+      {success && <div className="rounded-xl border border-green-100 bg-green-50 px-4 py-3"><p className="text-sm text-green-600">✓ Configuración guardada.</p></div>}
+      <button type="submit" disabled={isPending} className="self-start rounded-full bg-cerise-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cerise-600 hover:shadow-md disabled:opacity-60">
         {isPending ? "Guardando..." : "Guardar configuración"}
       </button>
     </form>
