@@ -87,9 +87,11 @@ export interface ProductListItem {
   retailPrice: Decimal;
   stock: number;
   isActive: boolean;
+  discountPercentage: number | null;
+  brand: string | null;
   mainImageUrl: string;
   mainImageAlt: string | null;
-  category: { id: string; name: string; slug: string };
+  category: { id: string; name: string; slug: string } | null;
 }
 
 /** Imagen de producto */
@@ -245,6 +247,10 @@ export interface StoreConfigRecord {
   storePhysicalAddress: string;
   anonOrderExpiryDays: number;
   registeredOrderExpiryDays: number;
+  instagramUrl: string | null;
+  facebookUrl: string | null;
+  tiktokUrl: string | null;
+  announcementText: string | null;
 }
 
 /** Registro de auditoría (NF010, DA-007) */
@@ -330,7 +336,9 @@ export interface CreateProductData {
   stock?: number;
   lowStockAlert?: number;
   minWholesaleQty?: number | null;
-  categoryId: string;
+  discountPercentage?: number | null;
+  brand?: string | null;
+  categoryId?: string | null;
   images: AddImageData[];
 }
 
@@ -343,7 +351,9 @@ export interface UpdateProductData {
   stock?: number;
   lowStockAlert?: number;
   minWholesaleQty?: number | null;
-  categoryId?: string;
+  discountPercentage?: number | null;
+  brand?: string | null;
+  categoryId?: string | null;
   isActive?: boolean;
 }
 
@@ -447,4 +457,8 @@ export interface UpdateStoreConfigData {
   storePhysicalAddress?: string;
   anonOrderExpiryDays?: number;
   registeredOrderExpiryDays?: number;
+  instagramUrl?: string | null;
+  facebookUrl?: string | null;
+  tiktokUrl?: string | null;
+  announcementText?: string | null;
 }

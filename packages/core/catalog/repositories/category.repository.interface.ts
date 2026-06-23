@@ -69,4 +69,16 @@ export interface ICategoryRepository {
    * Usado por generateUniqueSlug como existsFn.
    */
   slugExists(slug: string): Promise<boolean>;
+
+  /**
+   * Cuenta TODOS los productos (activos e inactivos) en una categoría.
+   * Usado en la UI admin para mostrar cuántos productos se verán afectados.
+   */
+  countProductsInCategory(categoryId: string): Promise<number>;
+
+  /**
+   * Elimina una categoría permanentemente.
+   * Los productos con este categoryId quedan con categoryId = null (onDelete: SetNull).
+   */
+  deleteCategory(id: string): Promise<void>;
 }

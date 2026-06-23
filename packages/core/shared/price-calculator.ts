@@ -49,3 +49,21 @@ export function isWholesaleThresholdMet(
 ): boolean {
   return retailSubtotal.gte(threshold);
 }
+
+/**
+ * Calcula el precio con descuento aplicado.
+ * Si no hay descuento (null/0), retorna el precio original.
+ * Redondea hacia abajo al entero más cercano (COP no usa decimales).
+ *
+ * @param price - Precio original (Decimal)
+ * @param discountPercentage - Porcentaje de descuento (5, 10, 15, 20, 25, 30) o null
+ * @returns Precio final con descuento aplicado
+ */
+export function calculateDiscountedPrice(
+  price: Decimal,
+  discountPercentage: number | null,
+): Decimal {
+  if (!discountPercentage || discountPercentage <= 0) return price;
+  const discount = price.mul(discountPercentage).div(100);
+  return price.sub(discount).floor();
+}

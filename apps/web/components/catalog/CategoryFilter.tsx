@@ -1,6 +1,6 @@
 "use client";
 // =============================================================================
-// components/catalog/CategoryFilter.tsx — Category filter chips
+// components/catalog/CategoryFilter.tsx — Category filter pills (editorial)
 // =============================================================================
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -35,30 +35,67 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  function clearAll() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("categoryIds");
+    params.delete("discount");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  const hasFilter = selected.size > 0;
+
+  // Discount filter from URL
+  const isDiscountActive = searchParams.get("discount") === "true";
+
+  function toggleDiscount() {
+    const params = new URLSearchParams(searchParams.toString());
+    if (isDiscountActive) {
+      params.delete("discount");
+    } else {
+      params.set("discount", "true");
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
   return (
-    <fieldset>
-      <legend className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">
-        Categorías
-      </legend>
-      <div className="flex flex-wrap gap-2">
-        {categories.map((cat) => {
-          const isActive = selected.has(cat.id);
-          return (
-            <button
-              key={cat.id}
-              onClick={() => toggle(cat.id)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all ${
-                isActive
-                  ? "bg-cerise-500 text-white shadow-sm"
-                  : "bg-gray-100 text-gray-600 hover:bg-cerise-50 hover:text-cerise-700"
-              }`}
-              aria-pressed={isActive}
-            >
-              {cat.name}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
+    <div className="flex flex-wrap gap-2">
+      <button
+        onClick={clearAll}
+        className={`px-4 py-2 text-[11px] tracking-luxe font-semibold border rounded-full transition-colors ${
+          !hasFilter && !isDiscountActive
+            ? "bg-gray-900 text-white border-gray-900"
+            : "border-gray-200 text-gray-500 hover:border-cerise-300 hover:text-cerise-600"
+        }`}
+      >
+        Todos
+      </button>
+      <button
+        onClick={toggleDiscount}
+        className={`px-4 py-2 text-[11px] tracking-luxe font-semibold border rounded-full transition-colors ${
+          isDiscountActive
+            ? "bg-cerise-600 text-white border-cerise-600"
+            : "border-gray-200 text-gray-500 hover:border-cerise-300 hover:text-cerise-600"
+        }`}
+      >
+        En promoción
+      </button>
+      {categories.map((cat) => {
+        const isActive = selected.has(cat.id);
+        return (
+          <button
+            key={cat.id}
+            onClick={() => toggle(cat.id)}
+            className={`px-4 py-2 text-[11px] tracking-luxe font-semibold border rounded-full transition-colors ${
+              isActive
+                ? "bg-gray-900 text-white border-gray-900"
+                : "border-gray-200 text-gray-500 hover:border-cerise-300 hover:text-cerise-600"
+            }`}
+            aria-pressed={isActive}
+          >
+            {cat.name}
+          </button>
+        );
+      })}
+    </div>
   );
 }

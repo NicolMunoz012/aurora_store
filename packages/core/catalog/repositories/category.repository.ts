@@ -171,6 +171,26 @@ export class PrismaCategoryRepository implements ICategoryRepository {
     }
   }
 
+  async countProductsInCategory(categoryId: string): Promise<number> {
+    try {
+      return await this.prisma.product.count({
+        where: { categoryId },
+      });
+    } catch (error) {
+      throw this.handlePrismaError(error, "countProductsInCategory");
+    }
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    try {
+      // Products with this categoryId will have categoryId set to null
+      // automatically by the DB due to onDelete: SetNull in the schema.
+      await this.prisma.category.delete({ where: { id } });
+    } catch (error) {
+      throw this.handlePrismaError(error, "deleteCategory");
+    }
+  }
+
   /**
    * Captura errores de Prisma y los transforma en AuroraError.
    * Nunca se exponen errores crudos de Prisma fuera de la capa de repositorio (Req 11.3).

@@ -14,24 +14,60 @@
   --color-cerise-900: #45011B;
   --color-cerise-950: #2B010E;
 
-  --font-display: var(--font-lora);
-  --font-sans: var(--font-lora);
+  /* Soft tones */
+  --color-blush: oklch(0.96 0.025 350);
+  --color-blush-soft: oklch(0.985 0.012 350);
+  --color-warm-gray: oklch(0.96 0.005 60);
+
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
 }
 
 body {
   background-color: #fdfbf8;
   color: #1a1a1a;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Smooth scrolling */
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: color-mix(in oklch, #CD0E5E 18%, transparent);
+  color: #CD0E5E;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
-/* Focus ring for accessibility */
 :focus-visible {
   outline: 2px solid #FD5388;
   outline-offset: 2px;
+}
+
+/* Utilities */
+@utility container-aurora {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  max-width: 80rem;
+}
+
+@utility tracking-luxe {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@keyframes aurora-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-fade-up {
+  animation: aurora-fade-up 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
 }

@@ -24,9 +24,10 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">
+      <h1 className="font-serif text-3xl mb-2 text-gray-900">
         Pedido #{order.id.slice(-8).toUpperCase()}
       </h1>
+      <p className="text-gray-400 text-sm mb-8">Detalle y gestión del pedido.</p>
 
       <div className="mb-6 rounded-xl border border-gray-100 bg-white p-5 shadow-sm text-sm">
         <p><span className="font-medium text-gray-700">Cliente:</span> {order.clientName} — {order.clientPhone}</p>

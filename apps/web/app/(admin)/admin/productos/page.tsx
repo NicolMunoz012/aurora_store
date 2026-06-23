@@ -26,8 +26,11 @@ export default async function AdminProductosPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <h1 className="font-serif text-3xl text-gray-900">Productos</h1>
+          <p className="text-gray-400 text-sm mt-1">Gestiona tu catálogo de productos.</p>
+        </div>
         <Link
           href="/admin/productos/nuevo"
           className="rounded-lg bg-cerise-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cerise-600 hover:shadow-md"
@@ -67,7 +70,7 @@ export default async function AdminProductosPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{product.category.name}</td>
+                  <td className="px-4 py-3 text-gray-500">{product.category?.name ?? "—"}</td>
                   <td className="px-4 py-3 text-right text-gray-700">{formatCOP(product.retailPrice)}</td>
                   <td className="px-4 py-3 text-right font-medium text-gray-700">{product.stock}</td>
                   <td className="px-4 py-3 text-center">

@@ -36,7 +36,8 @@ export default async function AdminPedidosPage({ searchParams }: AdminPedidosPag
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Pedidos</h1>
+      <h1 className="font-serif text-3xl mb-2 text-gray-900">Pedidos</h1>
+      <p className="text-gray-400 text-sm mb-8">Gestión y seguimiento de pedidos.</p>
 
       {/* Status filter */}
       <div className="mb-4 flex flex-wrap gap-2">

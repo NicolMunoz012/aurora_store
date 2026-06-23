@@ -225,12 +225,12 @@ export function CheckoutFlow({
   // ── WhatsApp fallback ───────────────────────────────────────────────────────
   if (whatsappMessage) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-        <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="rounded-xl border border-gray-100 bg-white p-6 ">
+        <p className="mb-4 text-sm text-gray-600 ">
           No se pudo abrir WhatsApp automáticamente. Copia el mensaje y envíalo
           manualmente:
         </p>
-        <pre className="mb-4 max-h-60 overflow-auto rounded-lg bg-zinc-100 p-4 text-xs text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">
+        <pre className="mb-4 max-h-60 overflow-auto rounded-lg bg-gray-50 p-4 text-xs text-gray-800   whitespace-pre-wrap">
           {decodeURIComponent(whatsappMessage.split("?text=")[1] ?? "")}
         </pre>
         <button
@@ -240,7 +240,7 @@ export function CheckoutFlow({
             );
             navigator.clipboard.writeText(text);
           }}
-          className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900"
+          className="rounded-full bg-cerise-600 px-5 py-2 text-sm font-semibold text-white hover:bg-cerise-700 "
         >
           Copiar mensaje
         </button>
@@ -259,30 +259,30 @@ export function CheckoutFlow({
               <span
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
                   step === s
-                    ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                    ? "bg-cerise-600 text-white "
                     : step > s
                     ? "bg-green-500 text-white"
-                    : "bg-zinc-200 text-zinc-500 dark:bg-zinc-700"
+                    : "bg-gray-200 text-gray-500 dark:bg-zinc-700"
                 }`}
               >
                 {step > s ? "✓" : s}
               </span>
-              <span className={step === s ? "text-zinc-900 dark:text-white" : "text-zinc-400"}>
+              <span className={step === s ? "text-gray-900 " : "text-gray-400"}>
                 {s === 1 ? "Datos" : s === 2 ? "Entrega" : "Confirmar"}
               </span>
-              {s < 3 && <span className="text-zinc-300">›</span>}
+              {s < 3 && <span className="text-gray-300">›</span>}
             </div>
           ))}
         </div>
 
         {/* ── STEP 1 ── */}
         {step === 1 && (
-          <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-white">
+          <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-6 ">
+            <h2 className="text-base font-semibold text-gray-900 ">
               Tus datos
             </h2>
             <div>
-              <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-gray-700 ">
                 Nombre completo *
               </label>
               <input
@@ -290,14 +290,14 @@ export function CheckoutFlow({
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cerise-400 focus:outline-none  "
               />
               {step1Errors.fullName && (
                 <p className="mt-1 text-xs text-red-500">{step1Errors.fullName}</p>
               )}
             </div>
             <div>
-              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700 ">
                 Teléfono *
               </label>
               <input
@@ -305,7 +305,7 @@ export function CheckoutFlow({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cerise-400 focus:outline-none  "
               />
               {step1Errors.phone && (
                 <p className="mt-1 text-xs text-red-500">{step1Errors.phone}</p>
@@ -314,7 +314,7 @@ export function CheckoutFlow({
             {/* Email optional for anonymous (Req 10.4) */}
             {!isAuthenticated && (
               <div>
-                <label htmlFor="email" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700 ">
                   Correo electrónico
                 </label>
                 <input
@@ -322,9 +322,9 @@ export function CheckoutFlow({
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cerise-400 focus:outline-none  "
                 />
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-gray-400">
                   Opcional. Solo se usará para enviarte la confirmación de tu pedido.
                 </p>
               </div>
@@ -332,7 +332,7 @@ export function CheckoutFlow({
             <button
               onClick={goToStep2}
               disabled={isPending}
-              className="self-end rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
+              className="self-end rounded-full bg-cerise-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-cerise-700 disabled:opacity-60 "
             >
               Continuar
             </button>
@@ -341,8 +341,8 @@ export function CheckoutFlow({
 
         {/* ── STEP 2 ── */}
         {step === 2 && (
-          <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-white">
+          <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-6 ">
+            <h2 className="text-base font-semibold text-gray-900 ">
               Método de entrega
             </h2>
 
@@ -351,7 +351,7 @@ export function CheckoutFlow({
               {(["HOME_DELIVERY", "STORE_PICKUP"] as const).map((method) => (
                 <label
                   key={method}
-                  className="flex cursor-pointer items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                  className="flex cursor-pointer items-center gap-2 text-sm font-medium text-gray-700 "
                 >
                   <input
                     type="radio"
@@ -372,14 +372,14 @@ export function CheckoutFlow({
                 {/* Saved addresses selector (Req 11.5) */}
                 {savedAddresses.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-medium text-zinc-500">Usar dirección guardada:</p>
+                    <p className="mb-2 text-xs font-medium text-gray-500">Usar dirección guardada:</p>
                     <div className="flex flex-wrap gap-2">
                       {savedAddresses.map((addr) => (
                         <button
                           key={addr.id}
                           type="button"
                           onClick={() => applySavedAddress(addr)}
-                          className="rounded-full border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-600 dark:hover:bg-zinc-800"
+                          className="rounded-full border border-gray-200 px-3 py-1 text-xs hover:bg-blush-soft  "
                         >
                           {addr.addressName}
                         </button>
@@ -394,7 +394,7 @@ export function CheckoutFlow({
                   { id: "barrio", label: "Barrio", value: neighborhood, set: setNeighborhood, err: undefined },
                 ].map(({ id, label, value, set, err }) => (
                   <div key={id}>
-                    <label htmlFor={id} className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700 ">
                       {label}
                     </label>
                     <input
@@ -402,13 +402,13 @@ export function CheckoutFlow({
                       type="text"
                       value={value}
                       onChange={(e) => set(e.target.value)}
-                      className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-cerise-400 focus:outline-none  "
                     />
                     {err && <p className="mt-1 text-xs text-red-500">{err}</p>}
                   </div>
                 ))}
                 {/* Shipping cost notice (Req 11.3) */}
-                <p className="rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                <p className="rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700 ">
                   El costo de envío será comunicado por WhatsApp una vez recibamos tu pedido.
                 </p>
               </>
@@ -416,16 +416,16 @@ export function CheckoutFlow({
 
             {/* STORE_PICKUP: show store address (Req 11.4) */}
             {deliveryMethod === "STORE_PICKUP" && storeConfig && (
-              <div className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800">
-                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Dirección de retiro:</p>
-                <p className="text-sm text-zinc-500">{storeConfig.storePhysicalAddress}</p>
+              <div className="rounded-lg bg-blush-soft px-3 py-2 ">
+                <p className="text-sm font-medium text-gray-700 ">Dirección de retiro:</p>
+                <p className="text-sm text-gray-500">{storeConfig.storePhysicalAddress}</p>
               </div>
             )}
 
             {/* Stock errors */}
             {stockErrors.length > 0 && (
-              <div className="rounded-lg bg-red-50 px-3 py-2 dark:bg-red-900/20">
-                <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+              <div className="rounded-lg bg-red-50 px-3 py-2 ">
+                <p className="text-sm font-semibold text-red-700 ">
                   Stock insuficiente para:
                 </p>
                 <ul className="mt-1 list-disc pl-4 text-sm text-red-600">
@@ -435,13 +435,13 @@ export function CheckoutFlow({
             )}
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(1)} className="text-sm text-zinc-500 underline">
+              <button onClick={() => setStep(1)} className="text-sm text-gray-500 underline">
                 Atrás
               </button>
               <button
                 onClick={goToStep3}
                 disabled={isPending}
-                className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
+                className="rounded-full bg-cerise-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-cerise-700 disabled:opacity-60 "
               >
                 {isPending ? "Verificando stock..." : "Continuar"}
               </button>
@@ -451,64 +451,64 @@ export function CheckoutFlow({
 
         {/* ── STEP 3 ── */}
         {step === 3 && (
-          <div className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-white">
+          <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-6 ">
+            <h2 className="text-base font-semibold text-gray-900 ">
               Confirmar pedido
             </h2>
 
             {/* Order summary */}
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-700 text-sm">
+            <div className="divide-y divide-gray-100  text-sm">
               {cart.items.map((item) => (
                 <div key={item.productId} className="flex justify-between py-2">
-                  <span className="text-zinc-700 dark:text-zinc-300">
+                  <span className="text-gray-700 ">
                     {item.productName} × {item.quantity}
                   </span>
-                  <span className="font-medium text-zinc-900 dark:text-white">
+                  <span className="font-medium text-gray-900 ">
                     {formatCOP(item.lineTotal)}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="flex justify-between border-t border-zinc-200 pt-3 text-sm dark:border-zinc-700">
-              <span className="font-semibold text-zinc-800 dark:text-zinc-100">Total</span>
+            <div className="flex justify-between border-t border-gray-100 pt-3 text-sm ">
+              <span className="font-semibold text-gray-800 ">Total</span>
               <div className="text-right">
-                <span className="text-base font-bold text-zinc-900 dark:text-white">
+                <span className="text-base font-bold text-gray-900 ">
                   {formatCOP(cart.finalSubtotal)}
                 </span>
-                <p className="text-xs text-zinc-400">IVA incluido</p>
+                
               </div>
             </div>
 
             {/* Delivery summary */}
-            <div className="rounded-lg bg-zinc-50 px-3 py-2 text-sm dark:bg-zinc-800">
+            <div className="rounded-lg bg-blush-soft px-3 py-2 text-sm ">
               {deliveryMethod === "HOME_DELIVERY" ? (
                 <>
-                  <p className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <p className="font-medium text-gray-700 ">
                     Envío a domicilio
                   </p>
-                  <p className="text-zinc-500">{[address, neighborhood, municipality, department].filter(Boolean).join(", ")}</p>
-                  <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
+                  <p className="text-gray-500">{[address, neighborhood, municipality, department].filter(Boolean).join(", ")}</p>
+                  <p className="mt-1 text-xs text-blue-600 ">
                     El costo de envío será informado por WhatsApp.
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="font-medium text-zinc-700 dark:text-zinc-300">Retiro en tienda</p>
-                  <p className="text-zinc-500">{storeConfig?.storePhysicalAddress}</p>
+                  <p className="font-medium text-gray-700 ">Retiro en tienda</p>
+                  <p className="text-gray-500">{storeConfig?.storePhysicalAddress}</p>
                 </>
               )}
             </div>
 
             {/* Progressive registration for anonymous (Req 4.3) */}
             {!isAuthenticated && !showRegForm && (
-              <div className="rounded-lg border border-zinc-200 px-3 py-3 dark:border-zinc-700">
-                <p className="text-sm text-zinc-500">
+              <div className="rounded-lg border border-gray-100 px-3 py-3 ">
+                <p className="text-sm text-gray-500">
                   ¿Quieres hacer seguimiento de tu pedido?{" "}
                   <button
                     type="button"
                     onClick={() => setShowRegForm(true)}
-                    className="font-medium text-zinc-800 underline dark:text-zinc-200"
+                    className="font-medium text-gray-800 underline "
                   >
                     Crea una cuenta ahora
                   </button>
@@ -517,8 +517,8 @@ export function CheckoutFlow({
             )}
 
             {showRegForm && (
-              <div className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+              <div className="flex flex-col gap-3 rounded-lg border border-gray-100 p-4 ">
+                <p className="text-sm font-medium text-gray-800 ">
                   Crear cuenta para seguimiento de pedidos
                 </p>
                 <input
@@ -526,16 +526,16 @@ export function CheckoutFlow({
                   placeholder="Nombre"
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
-                  className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm  "
                 />
                 <input
                   type="password"
                   placeholder="Contraseña (mín. 8 caracteres)"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
-                  className="rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm  "
                 />
-                <label className="flex items-start gap-2 text-xs text-zinc-500">
+                <label className="flex items-start gap-2 text-xs text-gray-500">
                   <input
                     type="checkbox"
                     checked={regTerms}
@@ -550,14 +550,14 @@ export function CheckoutFlow({
                     type="button"
                     onClick={handleRegister}
                     disabled={isPending}
-                    className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
+                    className="rounded-full bg-cerise-600 px-4 py-2 text-xs font-semibold text-white hover:bg-cerise-700 disabled:opacity-60 "
                   >
                     Crear cuenta
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowRegForm(false)}
-                    className="text-xs text-zinc-400 underline"
+                    className="text-xs text-gray-400 underline"
                   >
                     Cancelar
                   </button>
@@ -567,7 +567,7 @@ export function CheckoutFlow({
 
             {/* Terms checkbox (Req 12.4, 12.9) */}
             <div className="flex flex-col gap-1">
-              <label className="flex cursor-pointer items-start gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <label className="flex cursor-pointer items-start gap-2 text-sm text-gray-600 ">
                 <input
                   type="checkbox"
                   checked={termsAccepted}
@@ -575,7 +575,7 @@ export function CheckoutFlow({
                     setTermsAccepted(e.target.checked);
                     setTermsError(false);
                   }}
-                  className="mt-0.5 h-4 w-4 rounded border-zinc-300"
+                  className="mt-0.5 h-4 w-4 rounded border-gray-200"
                 />
                 Acepto los Términos y Condiciones y la Política de Tratamiento de Datos Personales.
               </label>
@@ -591,13 +591,13 @@ export function CheckoutFlow({
             )}
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(2)} className="text-sm text-zinc-500 underline">
+              <button onClick={() => setStep(2)} className="text-sm text-gray-500 underline">
                 Atrás
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isPending}
-                className="rounded-full bg-rose-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-rose-600 disabled:opacity-60"
+                className="rounded-full bg-cerise-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-cerise-700 disabled:opacity-60"
               >
                 {isPending ? "Procesando..." : "Confirmar pedido por WhatsApp"}
               </button>
@@ -608,16 +608,16 @@ export function CheckoutFlow({
 
       {/* Cart summary sidebar */}
       <aside className="w-full lg:w-64 shrink-0">
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
-          <h3 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+        <div className="rounded-xl border border-gray-100 bg-blush-soft p-4 ">
+          <h3 className="mb-3 text-sm font-semibold text-gray-700 ">
             Resumen ({cart.items.length} producto{cart.items.length !== 1 ? "s" : ""})
           </h3>
-          <div className="text-sm text-zinc-600 dark:text-zinc-400">
+          <div className="text-sm text-gray-600 ">
             <div className="flex justify-between">
               <span>Subtotal</span>
               <span>{formatCOP(cart.finalSubtotal)}</span>
             </div>
-            <p className="mt-1 text-xs text-zinc-400">IVA incluido</p>
+            
           </div>
         </div>
       </aside>

@@ -16,6 +16,8 @@ export { toggleProductActiveUseCase } from "./use-cases/toggle-product-active.us
 export { createCategoryUseCase } from "./use-cases/create-category.use-case";
 export { updateCategoryUseCase } from "./use-cases/update-category.use-case";
 export { toggleCategoryActiveUseCase } from "./use-cases/toggle-category-active.use-case";
+export { deleteCategoryUseCase } from "./use-cases/delete-category.use-case";
+export type { DeleteCategoryParams } from "./use-cases/delete-category.use-case";
 
 // Types (params for use cases)
 export type {

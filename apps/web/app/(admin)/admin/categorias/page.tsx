@@ -8,15 +8,21 @@ export const dynamic = "force-dynamic";
 
 import { listAllCategoriesAction } from "@/lib/actions/catalog.actions";
 import { CategoryManagementPanel } from "@/components/admin/CategoryManagementPanel";
+import { getCategoryProductCountsAction } from "@/lib/actions/admin.catalog.actions";
 
 export default async function AdminCategoriasPage() {
-  const result = await listAllCategoriesAction();
-  const categories = result.data ?? [];
+  const [categoriesResult, countsResult] = await Promise.all([
+    listAllCategoriesAction(),
+    getCategoryProductCountsAction(),
+  ]);
+  const categories = categoriesResult.data ?? [];
+  const productCounts = countsResult.data ?? {};
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Categorías</h1>
-      <CategoryManagementPanel categories={categories} />
+    <div className="max-w-3xl">
+      <h1 className="font-serif text-3xl mb-2 text-gray-900">Categorías</h1>
+      <p className="text-gray-400 text-sm mb-8">Organiza tu catálogo con categorías.</p>
+      <CategoryManagementPanel categories={categories} productCounts={productCounts} />
     </div>
   );
 }

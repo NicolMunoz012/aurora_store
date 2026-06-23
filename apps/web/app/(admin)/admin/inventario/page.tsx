@@ -18,7 +18,8 @@ export default async function AdminInventarioPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Inventario</h1>
+      <h1 className="font-serif text-3xl mb-2 text-gray-900">Inventario</h1>
+      <p className="text-gray-400 text-sm mb-8">Niveles de stock en tiempo real.</p>
 
       {lowStockResult.data && lowStockResult.data.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">

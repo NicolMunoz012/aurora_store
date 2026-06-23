@@ -5,6 +5,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getCartWithPricingAction } from "@/lib/actions/cart.actions";
 import { getStoreConfigAction } from "@/lib/actions/catalog.actions";
@@ -71,10 +72,11 @@ export default async function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <h1 className="mb-8 text-2xl font-bold text-zinc-900 dark:text-white">
-        Checkout
-      </h1>
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <Link href="/carrito" className="text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
+        ← Volver al carrito
+      </Link>
+      <h1 className="font-serif text-4xl md:text-5xl mt-3 mb-2">Checkout</h1>
       <CheckoutFlow
         cart={cart}
         storeConfig={

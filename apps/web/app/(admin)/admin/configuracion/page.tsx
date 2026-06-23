@@ -11,10 +11,11 @@ export default async function AdminConfiguracionPage() {
   const config = result.data;
 
   return (
-    <div className="mx-auto max-w-lg">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Configuración de tienda</h1>
+    <div className="max-w-4xl">
+      <h1 className="font-serif text-3xl mb-2 text-gray-900">Configuración</h1>
+      <p className="text-gray-400 text-sm mb-8">Administra los datos de tu tienda, redes sociales y banner de anuncios.</p>
       {config ? (
-        <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="bg-white border border-gray-100 rounded-md p-8">
           <StoreConfigForm initialConfig={config} />
         </div>
       ) : (

@@ -13,6 +13,7 @@ import {
   updateProductAction,
   toggleProductActiveAction,
 } from "@/lib/actions/admin.catalog.actions";
+import { DISCOUNT_PERCENTAGES, getDiscountedPrice, getSavings, formatCOP } from "@/lib/discount";
 
 interface AdminProductFormProps {
   categories: CategoryRecord[];
@@ -26,6 +27,8 @@ interface AdminProductFormProps {
     stock: number;
     lowStockAlert: number;
     minWholesaleQty?: number;
+    discountPercentage?: number | null;
+    brand?: string | null;
     categoryId: string;
     isActive: boolean;
     images: Pick<ProductImageRecord, "id" | "url" | "altText" | "displayOrder">[];
@@ -56,6 +59,8 @@ export function AdminProductForm({
   const [minWholesaleQty, setMinWholesaleQty] = useState(initialData?.minWholesaleQty ?? 0);
   const [categoryId, setCategoryId] = useState(initialData?.categoryId ?? categories[0]?.id ?? "");
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
+  const [discountPercentage, setDiscountPercentage] = useState<number | null>(initialData?.discountPercentage ?? null);
+  const [brand, setBrand] = useState(initialData?.brand ?? "");
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>(
     initialData?.images.map((img) => ({ url: img.url, key: img.url, altText: img.altText ?? "" })) ?? [],
@@ -118,12 +123,14 @@ export function AdminProductForm({
       const data = {
         name,
         description: description || null,
-        retailPrice: new Decimal(retailPrice),
-        wholesalePrice: new Decimal(wholesalePrice),
+        retailPrice,     // string — converted to Decimal in the server action
+        wholesalePrice,  // string — converted to Decimal in the server action
         stock,
         lowStockAlert,
         minWholesaleQty: minWholesaleQty > 0 ? minWholesaleQty : null,
-        categoryId,
+        discountPercentage,
+        brand: brand.trim() || null,
+        categoryId: categoryId || null,
         images: uploadedImages.map((img, i) => ({
           url: img.url,
           altText: img.altText ?? null,
@@ -164,6 +171,22 @@ export function AdminProductForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
+        />
+      </div>
+
+      {/* Brand */}
+      <div>
+        <label htmlFor="brand" className="mb-1.5 block text-sm font-medium text-gray-700">
+          Marca <span className="text-gray-400 font-normal">(opcional)</span>
+        </label>
+        <input
+          id="brand"
+          type="text"
+          maxLength={60}
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          placeholder="Ej: Maybelline, MAC, L'Oréal"
           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
         />
       </div>
@@ -268,6 +291,62 @@ export function AdminProductForm({
         </select>
       </div>
 
+      {/* Promotion */}
+      <div className="bg-blush-soft border border-gray-100 rounded-md p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-serif text-lg text-gray-900">Promoción</h3>
+          <button
+            type="button"
+            onClick={() => setDiscountPercentage(discountPercentage ? null : 5)}
+            className={`text-[11px] tracking-luxe font-semibold px-3 py-1 rounded-full transition-colors ${
+              discountPercentage
+                ? "bg-cerise-600 text-white"
+                : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+            }`}
+          >
+            {discountPercentage ? "Activa" : "Sin promoción"}
+          </button>
+        </div>
+
+        {discountPercentage !== null && (
+          <>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {DISCOUNT_PERCENTAGES.map((pct) => (
+                <button
+                  key={pct}
+                  type="button"
+                  onClick={() => setDiscountPercentage(pct)}
+                  className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
+                    discountPercentage === pct
+                      ? "bg-cerise-600 text-white"
+                      : "bg-white border border-gray-200 text-gray-600 hover:border-cerise-300 hover:text-cerise-600"
+                  }`}
+                >
+                  {pct}%
+                </button>
+              ))}
+            </div>
+
+            {retailPrice && (
+              <div className="bg-white border border-gray-100 rounded-sm p-4 text-sm">
+                <div className="flex justify-between text-gray-500">
+                  <span>Precio original</span>
+                  <span>{formatCOP(retailPrice)}</span>
+                </div>
+                <div className="flex justify-between text-gray-500 mt-1">
+                  <span>Descuento ({discountPercentage}%)</span>
+                  <span>-{formatCOP(getSavings(parseFloat(retailPrice), discountPercentage))}</span>
+                </div>
+                <div className="flex justify-between font-semibold text-gray-900 mt-2 pt-2 border-t border-gray-100">
+                  <span>Precio final</span>
+                  <span className="text-cerise-600">{formatCOP(getDiscountedPrice(parseFloat(retailPrice), discountPercentage))}</span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
       {/* Images */}
       <div>
         <p className="mb-2 text-sm font-medium text-gray-700">
@@ -321,24 +400,37 @@ export function AdminProductForm({
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-2">
-        {mode === "edit" && productId && (
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={handleToggleActive}
-            disabled={isPending}
-            className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
-              isActive
-                ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
-                : "bg-green-50 text-green-700 hover:bg-green-100"
-            }`}
+            onClick={() => {
+              if (confirm("¿Salir sin guardar? Los cambios no guardados se perderán.")) {
+                router.push("/admin/productos");
+              }
+            }}
+            className="rounded-full px-4 py-2 text-xs font-semibold text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-700 transition-colors"
           >
-            {isActive ? "Desactivar producto" : "Activar producto"}
+            Cancelar
           </button>
-        )}
+          {mode === "edit" && productId && (
+            <button
+              type="button"
+              onClick={handleToggleActive}
+              disabled={isPending}
+              className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
+                isActive
+                  ? "bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600"
+                  : "bg-green-50 text-green-700 hover:bg-green-100"
+              }`}
+            >
+              {isActive ? "Desactivar producto" : "Activar producto"}
+            </button>
+          )}
+        </div>
         <button
           type="submit"
           disabled={isPending || isUploading}
-          className="ml-auto rounded-full bg-cerise-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cerise-600 hover:shadow-md disabled:opacity-60"
+          className="rounded-full bg-cerise-500 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cerise-600 hover:shadow-md disabled:opacity-60"
         >
           {isPending ? "Guardando..." : mode === "create" ? "Crear producto" : "Guardar cambios"}
         </button>

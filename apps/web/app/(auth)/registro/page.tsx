@@ -6,7 +6,11 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { registerAction } from "@/lib/actions/auth.actions";
+import { LegalModal } from "@/components/ui/LegalModal";
+import { TermsContent } from "@/components/ui/TermsContent";
+import { PrivacyContent } from "@/components/ui/PrivacyContent";
 
 const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -96,10 +100,11 @@ export default function RegistroPage() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   function handleBlur(field: string) {
     setTouched((prev) => ({ ...prev, [field]: true }));
-    // Validate on blur
     const errors = validateFields(name, email, password, termsAccepted);
     setFieldErrors(errors);
   }
@@ -108,7 +113,6 @@ export default function RegistroPage() {
     e.preventDefault();
     setServerError(null);
 
-    // Validate all fields
     const errors = validateFields(name, email, password, termsAccepted);
     setFieldErrors(errors);
     setTouched({ name: true, email: true, password: true, terms: true });
@@ -142,142 +146,173 @@ export default function RegistroPage() {
     });
   }
 
+  const inputBase = "w-full px-4 py-3 bg-white border rounded-sm text-sm focus:outline-none transition-colors";
+  const inputOk = "border-gray-200 focus:border-cerise-400";
+  const inputErr = "border-red-300 focus:border-red-400";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-        <h1 className="mb-6 text-xl font-bold text-gray-900">Crear cuenta</h1>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-          {/* Name */}
-          <div>
-            <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Nombre completo
-            </label>
-            <input
-              id="name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onBlur={() => handleBlur("name")}
-              className={`w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 ${
-                touched.name && fieldErrors.name
-                  ? "border-red-300 focus:border-red-300 focus:ring-red-100"
-                  : "border-gray-200 focus:border-cerise-300 focus:ring-cerise-100"
-              }`}
-              placeholder="Ej: María López"
-            />
-            {touched.name && fieldErrors.name && (
-              <p className="mt-1 text-xs text-red-500">{fieldErrors.name}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Correo electrónico
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
-              onBlur={() => handleBlur("email")}
-              className={`w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 ${
-                touched.email && fieldErrors.email
-                  ? "border-red-300 focus:border-red-300 focus:ring-red-100"
-                  : "border-gray-200 focus:border-cerise-300 focus:ring-cerise-100"
-              }`}
-              placeholder="correo@ejemplo.com"
-            />
-            {touched.email && fieldErrors.email && (
-              <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-gray-700">
-              Contraseña
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
-              onBlur={() => handleBlur("password")}
-              className={`w-full rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-all focus:outline-none focus:ring-2 ${
-                touched.password && fieldErrors.password
-                  ? "border-red-300 focus:border-red-300 focus:ring-red-100"
-                  : "border-gray-200 focus:border-cerise-300 focus:ring-cerise-100"
-              }`}
-              placeholder="Mínimo 8 caracteres"
-            />
-            {touched.password && fieldErrors.password && (
-              <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
-            )}
-            <PasswordStrength password={password} />
-          </div>
-
-          {/* Terms */}
-          <div className="flex flex-col gap-1">
-            <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-600">
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={(e) => {
-                  setTermsAccepted(e.target.checked);
-                  if (e.target.checked) {
-                    setFieldErrors((prev) => {
-                      const { terms, ...rest } = prev;
-                      return rest;
-                    });
-                  }
-                }}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-cerise-500 focus:ring-cerise-300"
-              />
-              <span>
-                Acepto los{" "}
-                <a href="/terminos" className="text-cerise-600 underline hover:text-cerise-700">
-                  Términos y Condiciones
-                </a>{" "}
-                y la{" "}
-                <a href="/privacidad" className="text-cerise-600 underline hover:text-cerise-700">
-                  Política de Datos
-                </a>
-                .
-              </span>
-            </label>
-            {touched.terms && fieldErrors.terms && (
-              <p className="text-xs text-red-500">{fieldErrors.terms}</p>
-            )}
-          </div>
-
-          {/* Server error */}
-          {serverError && (
-            <div className="rounded-lg bg-red-50 px-3 py-2">
-              <p className="text-sm text-red-600">{serverError}</p>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-full bg-cerise-500 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cerise-600 hover:shadow-md disabled:opacity-60"
-          >
-            {isPending ? "Creando cuenta..." : "Crear cuenta"}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-gray-500">
-          ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="font-medium text-cerise-600 underline hover:text-cerise-700">
-            Ingresar
-          </Link>
-        </p>
+    <div className="min-h-screen grid lg:grid-cols-2">
+      {/* Brand panel */}
+      <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
+        <div className="absolute top-8 left-8">
+          <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} />
+        </div>
+        <div className="text-center max-w-md">
+          <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
+            Únete al ritual
+          </span>
+          <p className="font-serif text-3xl md:text-4xl leading-snug text-balance italic text-gray-800">
+            "Cada mujer merece sentirse radiante, todos los días."
+          </p>
+          <p className="text-[11px] tracking-luxe text-gray-400 mt-8 font-medium">
+            — Aurora Belleza
+          </p>
+        </div>
       </div>
+
+      {/* Form panel */}
+      <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden mb-8">
+            <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} />
+          </div>
+          <div className="mb-6">
+            <Link href="/catalog" className="inline-flex items-center gap-1.5 text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-3.5"><path fillRule="evenodd" d="M14 8a.75.75 0 0 1-.75.75H4.56l3.22 3.22a.75.75 0 1 1-1.06 1.06l-4.5-4.5a.75.75 0 0 1 0-1.06l4.5-4.5a.75.75 0 0 1 1.06 1.06L4.56 7.25H13.25A.75.75 0 0 1 14 8Z" clipRule="evenodd" /></svg>
+              Volver al catálogo
+            </Link>
+          </div>
+          <h1 className="font-serif text-3xl md:text-4xl mb-2">Comienza tu ritual.</h1>
+          <p className="text-gray-500 text-sm mb-8">Crea tu cuenta Aurora Belleza.</p>
+
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            {/* Name */}
+            <div>
+              <label htmlFor="name" className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">
+                Nombre completo
+              </label>
+              <input
+                id="name"
+                type="text"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => handleBlur("name")}
+                placeholder="Ej: María López"
+                className={`${inputBase} ${touched.name && fieldErrors.name ? inputErr : inputOk}`}
+              />
+              {touched.name && fieldErrors.name && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.name}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">
+                Correo electrónico
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value.replace(/\s/g, ""))}
+                onBlur={() => handleBlur("email")}
+                placeholder="correo@ejemplo.com"
+                className={`${inputBase} ${touched.email && fieldErrors.email ? inputErr : inputOk}`}
+              />
+              {touched.email && fieldErrors.email && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">
+                Contraseña
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
+                onBlur={() => handleBlur("password")}
+                placeholder="Mínimo 8 caracteres"
+                className={`${inputBase} ${touched.password && fieldErrors.password ? inputErr : inputOk}`}
+              />
+              {touched.password && fieldErrors.password && (
+                <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
+              )}
+              <PasswordStrength password={password} />
+            </div>
+
+            {/* Terms */}
+            <div className="flex flex-col gap-1 pt-1">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => {
+                    setTermsAccepted(e.target.checked);
+                    if (e.target.checked) {
+                      setFieldErrors((prev) => {
+                        const { terms, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-cerise-500 focus:ring-cerise-300"
+                />
+                <span>
+                  Acepto los{" "}
+                  <button type="button" onClick={() => setShowTerms(true)} className="text-cerise-600 underline hover:text-cerise-700">
+                    Términos y Condiciones
+                  </button>{" "}
+                  y la{" "}
+                  <button type="button" onClick={() => setShowPrivacy(true)} className="text-cerise-600 underline hover:text-cerise-700">
+                    Política de Datos
+                  </button>
+                  .
+                </span>
+              </label>
+              {touched.terms && fieldErrors.terms && (
+                <p className="text-xs text-red-500">{fieldErrors.terms}</p>
+              )}
+            </div>
+
+            {/* Server error */}
+            {serverError && (
+              <div className="bg-cerise-50 border border-cerise-100 rounded-sm px-4 py-2.5">
+                <p className="text-sm text-cerise-700">{serverError}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-cerise-600 text-white py-3.5 text-[12px] tracking-luxe font-semibold rounded-sm hover:bg-cerise-700 transition-colors disabled:opacity-60"
+            >
+              {isPending ? "Creando cuenta..." : "Crear cuenta"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-gray-500">
+            ¿Ya tienes cuenta?{" "}
+            <Link href="/login" className="text-cerise-600 font-medium hover:underline">
+              Ingresar
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Legal modals */}
+      <LegalModal open={showTerms} onClose={() => setShowTerms(false)} title="Términos y Condiciones">
+        <TermsContent />
+      </LegalModal>
+      <LegalModal open={showPrivacy} onClose={() => setShowPrivacy(false)} title="Política de Datos">
+        <PrivacyContent />
+      </LegalModal>
     </div>
   );
 }
