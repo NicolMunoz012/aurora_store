@@ -12,8 +12,12 @@ import { signIn } from "@/lib/auth";
 import { mergeCartsAction } from "@/lib/actions/cart.actions";
 import {
   registerClientUseCase,
+  requestPasswordResetUseCase,
+  resetPasswordUseCase,
   PrismaAuthRepository,
+  PrismaVerificationTokenRepository,
 } from "@aurora/core/auth";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 // ─── Validation helpers ───────────────────────────────────────────────────────
 
@@ -124,35 +128,64 @@ export async function registerAction(params: {
 // ─── Password Reset Request ───────────────────────────────────────────────────
 
 export async function requestPasswordResetAction(
-  _email: string,
+  email: string,
 ): Promise<ActionResult<{ message: string }>> {
-  // TODO: Implement once requestPasswordResetUseCase is added to @aurora/core/auth.
-  // This use case requires: IVerificationTokenRepository, VerificationToken model,
-  // and a transactional email provider (Resend recommended).
-  // Always return the same message regardless of email existence (Req 2.2).
-  return {
-    data: {
-      message:
-        "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.",
-    },
-    error: null,
-  };
+  // Validate email format first
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email.trim())) {
+    return { data: null, error: { code: "INVALID_EMAIL", message: "Ingresa un correo electrónico válido." } };
+  }
+
+  try {
+    const authRepository = new PrismaAuthRepository(prisma);
+    const tokenRepository = new PrismaVerificationTokenRepository(prisma);
+    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+
+    await requestPasswordResetUseCase({
+      authRepository,
+      tokenRepository,
+      sendEmail: sendPasswordResetEmail,
+      email: email.trim().toLowerCase(),
+      resetBaseUrl: baseUrl,
+    });
+
+    // Always same message — anti-enumeration (Req 2.2)
+    return {
+      data: { message: "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña." },
+      error: null,
+    };
+  } catch {
+    // Still return success message even on error — anti-enumeration
+    return {
+      data: { message: "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña." },
+      error: null,
+    };
+  }
 }
 
 // ─── Password Reset ───────────────────────────────────────────────────────────
 
-export async function resetPasswordAction(_params: {
+export async function resetPasswordAction(params: {
   token: string;
   newPassword: string;
 }): Promise<ActionResult<void>> {
-  // TODO: Implement once resetPasswordUseCase is added to @aurora/core/auth.
-  // This use case requires: IVerificationTokenRepository + token validation logic.
-  return {
-    data: null,
-    error: {
-      code: "NOT_IMPLEMENTED",
-      message:
-        "El restablecimiento de contraseña no está disponible aún. Por favor contacta al administrador.",
-    },
-  };
+  try {
+    if (!params.newPassword || params.newPassword.length < 8) {
+      return { data: null, error: { code: "INVALID_PASSWORD", message: "La contraseña debe tener al menos 8 caracteres." } };
+    }
+
+    const authRepository = new PrismaAuthRepository(prisma);
+    const tokenRepository = new PrismaVerificationTokenRepository(prisma);
+
+    await resetPasswordUseCase({
+      authRepository,
+      tokenRepository,
+      token: params.token,
+      newPassword: params.newPassword,
+    });
+
+    return { data: undefined, error: null };
+  } catch (error) {
+    return handleActionError(error);
+  }
 }

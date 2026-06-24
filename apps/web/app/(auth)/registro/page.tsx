@@ -11,6 +11,7 @@ import { registerAction } from "@/lib/actions/auth.actions";
 import { LegalModal } from "@/components/ui/LegalModal";
 import { TermsContent } from "@/components/ui/TermsContent";
 import { PrivacyContent } from "@/components/ui/PrivacyContent";
+import { Eye, EyeOff } from "lucide-react";
 
 const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -102,6 +103,7 @@ export default function RegistroPage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   function handleBlur(field: string) {
     setTouched((prev) => ({ ...prev, [field]: true }));
@@ -155,7 +157,7 @@ export default function RegistroPage() {
       {/* Brand panel */}
       <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
         <div className="absolute top-8 left-8">
-          <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} />
+          <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} /></Link>
         </div>
         <div className="text-center max-w-md">
           <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
@@ -174,7 +176,7 @@ export default function RegistroPage() {
       <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8">
-            <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} />
+            <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} /></Link>
           </div>
           <div className="mb-6">
             <Link href="/catalog" className="inline-flex items-center gap-1.5 text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
@@ -231,16 +233,26 @@ export default function RegistroPage() {
               <label htmlFor="password" className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">
                 Contraseña
               </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
-                onBlur={() => handleBlur("password")}
-                placeholder="Mínimo 8 caracteres"
-                className={`${inputBase} ${touched.password && fieldErrors.password ? inputErr : inputOk}`}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value.replace(/\s/g, ""))}
+                  onBlur={() => handleBlur("password")}
+                  placeholder="Mínimo 8 caracteres"
+                  className={`${inputBase} pr-10 ${touched.password && fieldErrors.password ? inputErr : inputOk} [&::-webkit-credentials-auto-fill-button]:hidden [&::-ms-reveal]:hidden [&::-webkit-textfield-decoration-container]:hidden`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cerise-600 transition-colors"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
               {touched.password && fieldErrors.password && (
                 <p className="mt-1 text-xs text-red-500">{fieldErrors.password}</p>
               )}

@@ -91,6 +91,7 @@ export interface ProductListItem {
   brand: string | null;
   mainImageUrl: string;
   mainImageAlt: string | null;
+  secondImageUrl: string | null;
   category: { id: string; name: string; slug: string } | null;
 }
 

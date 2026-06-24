@@ -1,7 +1,9 @@
+"use client";
 // =============================================================================
-// components/catalog/ProductCard.tsx — Product card with discount support
+// components/catalog/ProductCard.tsx — Product card with hover second image
 // =============================================================================
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { SerializedProductListItem } from "@/lib/serializers";
@@ -18,25 +20,47 @@ export function ProductCard({ product }: ProductCardProps) {
   const finalPrice = hasDiscount
     ? getDiscountedPrice(originalPrice, product.discountPercentage)
     : originalPrice;
+  const hasSecondImage = !!product.secondImageUrl;
+  const [hovered, setHovered] = useState(false);
+
+  const displayImage = hasSecondImage && hovered
+    ? product.secondImageUrl!
+    : product.mainImageUrl;
 
   return (
     <article className="group">
-      <Link href={`/producto/${product.slug}`} className="block relative aspect-[4/5] bg-warm-gray rounded-md overflow-hidden mb-4">
+      <Link
+        href={`/producto/${product.slug}`}
+        className="block relative aspect-[4/5] bg-warm-gray rounded-md overflow-hidden mb-4"
+        onMouseEnter={() => hasSecondImage && setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         <Image
-          src={product.mainImageUrl}
+          src={displayImage}
           alt={product.mainImageAlt ?? product.name}
           fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          className="object-cover transition-all duration-500"
           loading="lazy"
         />
+        {/* Smooth second image crossfade */}
+        {hasSecondImage && (
+          <Image
+            src={product.secondImageUrl!}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className={`object-cover absolute inset-0 transition-opacity duration-700 ease-in-out ${hovered ? "opacity-100" : "opacity-0"}`}
+            loading="eager"
+          />
+        )}
         {outOfStock && (
-          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-600 text-[10px] font-semibold px-2.5 py-1 tracking-luxe rounded-sm">
+          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-600 text-[10px] font-semibold px-2.5 py-1 tracking-luxe rounded-sm z-10">
             Agotado
           </span>
         )}
         {hasDiscount && !outOfStock && (
-          <span className="absolute top-3 left-3 bg-cerise-600 text-white text-[10px] font-semibold px-2.5 py-1 tracking-luxe rounded-sm">
+          <span className="absolute top-3 left-3 bg-cerise-600 text-white text-[10px] font-semibold px-2.5 py-1 tracking-luxe rounded-sm z-10">
             -{product.discountPercentage}%
           </span>
         )}

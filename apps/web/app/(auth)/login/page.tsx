@@ -9,6 +9,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -17,6 +18,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -46,7 +48,7 @@ function LoginForm() {
       {/* Brand panel — solo desktop */}
       <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
         <div className="absolute top-8 left-8">
-          <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} />
+          <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} /></Link>
         </div>
         <div className="text-center max-w-md">
           <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
@@ -65,7 +67,7 @@ function LoginForm() {
       <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8">
-            <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} />
+            <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} /></Link>
           </div>
           <div className="mb-6">
             <Link href="/catalog" className="inline-flex items-center gap-1.5 text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
@@ -95,14 +97,24 @@ function LoginForm() {
               <label className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">
                 Contraseña
               </label>
+              <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-sm text-sm focus:outline-none focus:border-cerise-400 transition-colors"
+                className="w-full px-4 py-3 pr-10 bg-white border border-gray-200 rounded-sm text-sm focus:outline-none focus:border-cerise-400 transition-colors [&::-webkit-credentials-auto-fill-button]:hidden [&::-ms-reveal]:hidden"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cerise-600 transition-colors"
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+              </div>
             </div>
 
             {error && (

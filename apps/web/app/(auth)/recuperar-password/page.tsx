@@ -27,7 +27,7 @@ export default function RecuperarPasswordPage() {
       {/* Brand panel */}
       <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
         <div className="absolute top-8 left-8">
-          <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} />
+          <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} /></Link>
         </div>
         <div className="text-center max-w-md">
           <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
@@ -46,7 +46,7 @@ export default function RecuperarPasswordPage() {
       <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8">
-            <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} />
+            <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} /></Link>
           </div>
 
           {submitted ? (

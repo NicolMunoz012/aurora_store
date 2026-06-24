@@ -37,9 +37,11 @@ function mapToProductListItem(product: {
   category: { id: string; name: string; slug: string } | null;
   images: Array<{ url: string; altText: string | null; displayOrder: number }>;
 }): ProductListItem {
-  const mainImage = product.images.length > 0
-    ? product.images.sort((a, b) => a.displayOrder - b.displayOrder)[0]
-    : null;
+  const sorted = product.images.length > 0
+    ? [...product.images].sort((a, b) => a.displayOrder - b.displayOrder)
+    : [];
+  const mainImage = sorted[0] ?? null;
+  const secondImage = sorted[1] ?? null;
 
   return {
     id: product.id,
@@ -52,6 +54,7 @@ function mapToProductListItem(product: {
     brand: product.brand,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
+    secondImageUrl: secondImage?.url ?? null,
     category: product.category
       ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
       : null,
@@ -109,6 +112,7 @@ function mapToInternalProductDetail(product: {
     brand: product.brand,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
+    secondImageUrl: null, // InternalProductDetail has full images array
     category: product.category
       ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
       : null,
@@ -127,7 +131,7 @@ const productListInclude = {
   images: {
     select: { url: true, altText: true, displayOrder: true },
     orderBy: { displayOrder: "asc" as const },
-    take: 1,
+    take: 2,
   },
 } as const;
 

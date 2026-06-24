@@ -180,6 +180,17 @@ export class PrismaAuthRepository implements IAuthRepository {
     }
   }
 
+  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    try {
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { passwordHash },
+      });
+    } catch (error) {
+      throw this.handlePrismaError(error, "updatePassword");
+    }
+  }
+
   /**
    * Captura errores de Prisma y los transforma en AuroraError.
    * Nunca se exponen errores crudos de Prisma fuera de la capa de repositorio (Req 11.3).

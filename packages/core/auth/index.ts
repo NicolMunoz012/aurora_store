@@ -23,3 +23,13 @@ export type { IAuthRepository } from "./repositories/auth.repository.interface";
 
 // Repository implementation (for DI wiring in apps/web)
 export { PrismaAuthRepository } from "./repositories/auth.repository";
+
+// Password reset use cases
+export { requestPasswordResetUseCase } from "./use-cases/request-password-reset.use-case";
+export { resetPasswordUseCase } from "./use-cases/reset-password.use-case";
+export type { RequestPasswordResetParams } from "./use-cases/request-password-reset.use-case";
+export type { ResetPasswordParams } from "./use-cases/reset-password.use-case";
+
+// Token repository
+export type { IVerificationTokenRepository } from "./repositories/token.repository.interface";
+export { PrismaVerificationTokenRepository } from "./repositories/token.repository";

@@ -7,18 +7,11 @@ import Link from "next/link";
 import Image from "next/image";
 import type { SerializedProductListItem } from "@/lib/serializers";
 import type { CategoryRecord } from "@aurora/shared";
+import { ProductCard } from "@/components/catalog/ProductCard";
 
 interface HomePageProps {
   featuredProducts: SerializedProductListItem[];
   categories: CategoryRecord[];
-}
-
-function formatCOP(value: string): string {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(parseFloat(value));
 }
 
 export function HomePage({ featuredProducts, categories }: HomePageProps) {
@@ -94,34 +87,7 @@ export function HomePage({ featuredProducts, categories }: HomePageProps) {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-10">
               {featuredProducts.slice(0, 4).map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/producto/${product.slug}`}
-                  className="group block"
-                >
-                  <div className="relative aspect-[4/5] bg-warm-gray rounded-md overflow-hidden mb-4">
-                    <Image
-                      src={product.mainImageUrl}
-                      alt={product.mainImageAlt ?? product.name}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
-                  </div>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="font-serif text-[17px] leading-snug truncate">
-                        {product.name}
-                      </h3>
-                      <p className="text-[13px] text-gray-400 mt-0.5 truncate">
-                        {product.category?.name ?? "Sin categoría"}
-                      </p>
-                    </div>
-                    <span className="text-cerise-600 font-semibold text-sm shrink-0 mt-1">
-                      {formatCOP(product.retailPrice)}
-                    </span>
-                  </div>
-                </Link>
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>
