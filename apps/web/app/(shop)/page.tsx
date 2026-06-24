@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 // =============================================================================
 
 import { listProductsAction, listActiveCategoriesAction } from "@/lib/actions/catalog.actions";
+import { listActiveBrandsAction } from "@/lib/actions/admin.brands.actions";
 import { HomePage } from "@/components/shop/HomePage";
 
 export const metadata = {
@@ -15,13 +16,15 @@ export const metadata = {
 };
 
 export default async function ShopHomePage() {
-  const [productsResult, categoriesResult] = await Promise.all([
+  const [productsResult, categoriesResult, brandsResult] = await Promise.all([
     listProductsAction({}),
     listActiveCategoriesAction(),
+    listActiveBrandsAction(),
   ]);
 
   const featuredProducts = productsResult.data ?? [];
   const categories = categoriesResult.data ?? [];
+  const brands = brandsResult.data ?? [];
 
-  return <HomePage featuredProducts={featuredProducts} categories={categories} />;
+  return <HomePage featuredProducts={featuredProducts} categories={categories} brands={brands} />;
 }

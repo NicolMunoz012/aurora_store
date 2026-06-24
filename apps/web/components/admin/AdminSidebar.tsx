@@ -7,12 +7,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { LayoutDashboard, Package, Tag, ShoppingBag, BarChart3, Settings, ArrowUpRight, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Tag, ShoppingBag, BarChart3, Settings, ArrowUpRight, LogOut, Star } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/productos", label: "Productos", icon: Package },
   { href: "/admin/categorias", label: "Categorías", icon: Tag },
+  { href: "/admin/marcas", label: "Marcas", icon: Star },
   { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   { href: "/admin/inventario", label: "Inventario", icon: BarChart3 },
   { href: "/admin/configuracion", label: "Configuración", icon: Settings },

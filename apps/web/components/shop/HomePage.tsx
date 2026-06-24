@@ -7,14 +7,16 @@ import Link from "next/link";
 import Image from "next/image";
 import type { SerializedProductListItem } from "@/lib/serializers";
 import type { CategoryRecord } from "@aurora/shared";
+import type { BrandRecord } from "@/lib/actions/admin.brands.actions";
 import { ProductCard } from "@/components/catalog/ProductCard";
 
 interface HomePageProps {
   featuredProducts: SerializedProductListItem[];
   categories: CategoryRecord[];
+  brands: BrandRecord[];
 }
 
-export function HomePage({ featuredProducts, categories }: HomePageProps) {
+export function HomePage({ featuredProducts, categories, brands }: HomePageProps) {
   return (
     <div>
       {/* Hero */}
@@ -64,6 +66,25 @@ export function HomePage({ featuredProducts, categories }: HomePageProps) {
           </div>
         </div>
       </section>
+
+      {/* Brands section */}
+      {brands.length > 0 && (
+        <section className="py-12 border-y border-gray-100 bg-white">
+          <div className="container-aurora">
+            <div className="text-center mb-8">
+              <h2 className="font-serif text-2xl text-gray-800">Marcas que vendemos</h2>
+              <p className="text-sm text-gray-400 mt-1">Trabajamos con las mejores marcas para realzar tu belleza.</p>
+            </div>
+            <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
+              {brands.map((brand) => (
+                <div key={brand.id} className="h-20 w-40 relative grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100">
+                  <Image src={brand.imageUrl} alt="Marca" fill className="object-contain" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Featured products */}
       {featuredProducts.length > 0 && (

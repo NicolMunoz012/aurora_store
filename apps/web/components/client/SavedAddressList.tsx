@@ -1,12 +1,13 @@
 "use client";
 // =============================================================================
-// components/client/SavedAddressList.tsx (Req 15.4, 15.5)
+// components/client/SavedAddressList.tsx — Saved addresses (editorial style)
 // =============================================================================
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { SavedAddressRecord, CreateAddressData } from "@aurora/shared";
 import { addSavedAddressAction, removeSavedAddressAction } from "@/lib/actions/user.actions";
+import { MapPin } from "lucide-react";
 
 export function SavedAddressList({ addresses }: { addresses: SavedAddressRecord[] }) {
   const router = useRouter();
@@ -43,28 +44,30 @@ export function SavedAddressList({ addresses }: { addresses: SavedAddressRecord[
     });
   }
 
+  const inputClass = "w-full px-4 py-2.5 bg-white border border-gray-200 rounded-sm text-sm focus:outline-none focus:border-cerise-400 transition-colors";
+  const labelClass = "text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block";
+
   return (
     <div className="flex flex-col gap-4">
       {addresses.length === 0 && !showAdd && (
-        <p className="text-sm text-zinc-400">No tienes direcciones guardadas.</p>
+        <p className="text-sm text-gray-400">No tienes direcciones guardadas aún.</p>
       )}
 
       {addresses.map((addr) => (
-        <div
-          key={addr.id}
-          className="flex items-start justify-between rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
-        >
-          <div>
-            <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{addr.addressName}</p>
-            <p className="text-xs text-zinc-500">
-              {[addr.address, addr.neighborhood, addr.municipality, addr.department].filter(Boolean).join(", ")}
-            </p>
+        <div key={addr.id} className="flex items-start justify-between rounded-sm border border-gray-100 bg-blush-soft p-4">
+          <div className="flex items-start gap-3">
+            <MapPin className="size-4 text-cerise-400 mt-0.5 shrink-0" strokeWidth={1.5} />
+            <div>
+              <p className="text-sm font-medium text-gray-800">{addr.addressName}</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {[addr.address, addr.neighborhood, addr.municipality, addr.department].filter(Boolean).join(", ")}
+              </p>
+            </div>
           </div>
           <button
             onClick={() => handleRemove(addr.id)}
             disabled={isPending}
-            aria-label="Eliminar dirección"
-            className="text-xs text-red-500 hover:underline disabled:opacity-40"
+            className="text-xs text-red-400 hover:text-red-600 transition-colors ml-4 shrink-0"
           >
             Eliminar
           </button>
@@ -72,41 +75,38 @@ export function SavedAddressList({ addresses }: { addresses: SavedAddressRecord[
       ))}
 
       {showAdd ? (
-        <form onSubmit={handleAdd} className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-          {[
-            { id: "addressName", label: "Nombre (ej. Casa, Oficina)", key: "addressName" as const },
-            { id: "dept2", label: "Departamento", key: "department" as const },
-            { id: "muni2", label: "Municipio", key: "municipality" as const },
-            { id: "addr2", label: "Dirección", key: "address" as const },
-            { id: "barrio2", label: "Barrio (opcional)", key: "neighborhood" as const },
-          ].map(({ id, label, key }) => (
-            <div key={id}>
-              <label htmlFor={id} className="mb-1 block text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                {label}
-              </label>
-              <input
-                id={id}
-                type="text"
-                value={form[key] ?? ""}
-                onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-              />
-            </div>
-          ))}
+        <form onSubmit={handleAdd} className="flex flex-col gap-4 rounded-sm border border-gray-100 bg-gray-50/50 p-5 mt-2">
+          <h3 className="text-[11px] tracking-luxe font-semibold text-gray-500">Nueva dirección</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {([
+              { id: "addressName", label: "Nombre (ej. Casa, Oficina)", key: "addressName" as const },
+              { id: "dept", label: "Departamento", key: "department" as const },
+              { id: "muni", label: "Municipio", key: "municipality" as const },
+              { id: "addr", label: "Dirección", key: "address" as const },
+              { id: "barrio", label: "Barrio (opcional)", key: "neighborhood" as const },
+            ] as const).map(({ id, label, key }) => (
+              <div key={id} className={key === "addressName" || key === "address" ? "sm:col-span-2" : ""}>
+                <label htmlFor={id} className={labelClass}>{label}</label>
+                <input
+                  id={id}
+                  type="text"
+                  value={form[key] ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
+                  className={inputClass}
+                />
+              </div>
+            ))}
+          </div>
           {error && <p className="text-xs text-red-500">{error}</p>}
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               type="submit"
               disabled={isPending}
-              className="rounded-full bg-zinc-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60 dark:bg-white dark:text-zinc-900"
+              className="bg-cerise-600 text-white px-5 py-2 text-[12px] tracking-luxe font-semibold rounded-sm hover:bg-cerise-700 transition-colors disabled:opacity-60"
             >
-              Guardar
+              {isPending ? "Guardando..." : "Guardar dirección"}
             </button>
-            <button
-              type="button"
-              onClick={() => setShowAdd(false)}
-              className="text-xs text-zinc-400 underline"
-            >
+            <button type="button" onClick={() => setShowAdd(false)} className="text-xs text-gray-400 hover:text-gray-600">
               Cancelar
             </button>
           </div>
@@ -114,7 +114,7 @@ export function SavedAddressList({ addresses }: { addresses: SavedAddressRecord[
       ) : (
         <button
           onClick={() => setShowAdd(true)}
-          className="self-start text-sm font-medium text-zinc-700 underline dark:text-zinc-300"
+          className="self-start text-[12px] tracking-luxe font-semibold text-cerise-600 hover:text-cerise-700 transition-colors mt-2"
         >
           + Agregar dirección
         </button>

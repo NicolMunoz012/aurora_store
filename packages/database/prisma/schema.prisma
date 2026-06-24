@@ -505,3 +505,17 @@ model StoreConfig {
 
   @@map("store_config")
 }
+
+/// Marca comercial que vende la tienda (sección "Marcas que vendemos").
+/// Máximo 5 marcas activas. isActive controla visibilidad en el frontend.
+model Brand {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  imageKey  String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("brands")
+}
