@@ -1,14 +1,15 @@
 // =============================================================================
-// app/(shop)/layout.tsx — Shop layout (Req 6.3)
-// Server Component: wraps all public shop pages with Navbar + Footer.
-// Cart item count and auth state are resolved server-side.
+// app/(shop)/layout.tsx — Shop layout
 // =============================================================================
 
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { Navbar } from "@/components/ui/Navbar";
 import { Footer } from "@/components/ui/Footer";
+import { WhatsAppFloat } from "@/components/ui/WhatsAppFloat";
 import { getOrCreateCartAction } from "@/lib/actions/cart.actions";
+import { listActiveCategoriesAction, getStoreConfigAction } from "@/lib/actions/catalog.actions";
 
 export default async function ShopLayout({
   children,
@@ -19,7 +20,6 @@ export default async function ShopLayout({
   const sessionId = cookieStore.get("aurora_session_id")?.value ?? "";
   const session = await auth();
 
-  // Resolve cart item count server-side so it's in the initial HTML
   let cartItemCount = 0;
   if (sessionId) {
     const result = await getOrCreateCartAction(sessionId);
@@ -31,14 +31,32 @@ export default async function ShopLayout({
     }
   }
 
+  const categoriesResult = await listActiveCategoriesAction();
+  const categories = (categoriesResult.data ?? []).map((c) => ({ id: c.id, name: c.name }));
+
+  const configResult = await getStoreConfigAction();
+  const config = configResult.data;
+
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar
-        cartItemCount={cartItemCount}
-        userEmail={session?.user?.email ?? null}
-      />
+      <Suspense fallback={null}>
+        <Navbar
+          cartItemCount={cartItemCount}
+          userEmail={session?.user?.email ?? null}
+          userRole={session?.user?.role ?? null}
+          categories={categories}
+          announcementText={config?.announcementText ?? null}
+        />
+      </Suspense>
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer
+        instagramUrl={config?.instagramUrl ?? null}
+        facebookUrl={config?.facebookUrl ?? null}
+        tiktokUrl={config?.tiktokUrl ?? null}
+      />
+      {config?.whatsappNumber && (
+        <WhatsAppFloat whatsappNumber={config.whatsappNumber} />
+      )}
     </div>
   );
 }

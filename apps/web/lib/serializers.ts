@@ -85,8 +85,9 @@ export function serializeProductListItem(
 export function serializeProductDetail(
   product: ProductDetail,
 ): SerializedProductDetail {
+  const { wholesalePrice: _w, ...rest } = product as ProductDetail & { wholesalePrice?: unknown };
   return {
-    ...product,
+    ...rest,
     retailPrice: product.retailPrice.toString(),
   };
 }

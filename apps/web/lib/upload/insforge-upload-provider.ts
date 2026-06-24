@@ -1,42 +1,39 @@
 // =============================================================================
-// apps/web/lib/upload/insforge-upload-provider.ts (Req 16.6, 22.2)
-// InsForge Storage implementation of IUploadProvider.
-// Reads INSFORGE_STORAGE_BUCKET and INSFORGE_API_KEY from env.
+// apps/web/lib/upload/insforge-upload-provider.ts
+// InsForge Storage SDK implementation. Uses @insforge/sdk.
+// Requires INSFORGE_API_BASE and INSFORGE_API_KEY in env.
 // =============================================================================
 
+import { createClient } from "@insforge/sdk";
 import type { IUploadProvider } from "./upload-provider.interface";
 
 export class InsforgeUploadProvider implements IUploadProvider {
-  private readonly apiBase: string;
+  private readonly client;
   private readonly bucket: string;
-  private readonly apiKey: string;
 
   constructor() {
-    this.apiBase =
+    const baseUrl =
       process.env.INSFORGE_API_BASE ?? "https://6rip9ut9.us-east.insforge.app";
+    const apiKey = process.env.INSFORGE_API_KEY ?? "";
     this.bucket = process.env.INSFORGE_STORAGE_BUCKET ?? "product-images";
-    this.apiKey = process.env.INSFORGE_API_KEY ?? "";
+
+    this.client = createClient({
+      baseUrl,
+      anonKey: apiKey,
+    });
   }
 
   async upload(file: File): Promise<{ url: string; key: string }> {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("bucket", this.bucket);
+    const { data, error } = await this.client.storage
+      .from(this.bucket)
+      .uploadAuto(file);
 
-    const response = await fetch(`${this.apiBase}/storage/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`InsForge upload failed: ${response.status} ${text}`);
+    if (error || !data) {
+      throw new Error(
+        `InsForge upload failed: ${error?.message ?? "Unknown error"}`,
+      );
     }
 
-    const json = (await response.json()) as { url: string; key: string };
-    return { url: json.url, key: json.key };
+    return { url: data.url, key: data.key };
   }
 }

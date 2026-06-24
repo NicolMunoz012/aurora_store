@@ -1,10 +1,7 @@
 "use server";
 // =============================================================================
 // apps/web/lib/actions/auth.actions.ts
-// Server Actions para autenticación: registro, recuperación de contraseña (Req 1.1–1.3, 2.1, 2.2, 2.5).
-// NOTA: requestPasswordResetAction y resetPasswordAction requieren
-// requestPasswordResetUseCase y resetPasswordUseCase en @aurora/core/auth,
-// los cuales serán implementados como parte del Bloque D / Requisito 2.
+// Server Actions para autenticación: registro, recuperación de contraseña.
 // =============================================================================
 
 import { cookies } from "next/headers";
@@ -18,6 +15,67 @@ import {
   PrismaAuthRepository,
 } from "@aurora/core/auth";
 
+// ─── Validation helpers ───────────────────────────────────────────────────────
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
+
+function validateRegistrationInput(params: {
+  name: string;
+  email: string;
+  password: string;
+  termsAccepted: boolean;
+}): { code: string; message: string } | null {
+  const name = params.name.trim();
+  const email = params.email.trim();
+  const password = params.password;
+
+  if (!name || name.length < 2) {
+    return { code: "INVALID_NAME", message: "El nombre debe tener al menos 2 caracteres." };
+  }
+  if (name.length > 100) {
+    return { code: "INVALID_NAME", message: "El nombre no puede superar 100 caracteres." };
+  }
+  if (!NAME_REGEX.test(name)) {
+    return { code: "INVALID_NAME", message: "El nombre solo puede contener letras y espacios." };
+  }
+
+  if (!email) {
+    return { code: "INVALID_EMAIL", message: "El correo electrónico es obligatorio." };
+  }
+  if (/\s/.test(email)) {
+    return { code: "INVALID_EMAIL", message: "El correo no puede contener espacios." };
+  }
+  if (!EMAIL_REGEX.test(email)) {
+    return { code: "INVALID_EMAIL", message: "El formato del correo electrónico no es válido." };
+  }
+
+  if (!password || password.length < 8) {
+    return { code: "INVALID_PASSWORD", message: "La contraseña debe tener al menos 8 caracteres." };
+  }
+  if (/\s/.test(password)) {
+    return { code: "INVALID_PASSWORD", message: "La contraseña no puede contener espacios." };
+  }
+  if (password.length > 128) {
+    return { code: "INVALID_PASSWORD", message: "La contraseña no puede superar 128 caracteres." };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { code: "INVALID_PASSWORD", message: "La contraseña debe incluir al menos una mayúscula." };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { code: "INVALID_PASSWORD", message: "La contraseña debe incluir al menos una minúscula." };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { code: "INVALID_PASSWORD", message: "La contraseña debe incluir al menos un número." };
+  }
+
+  if (!params.termsAccepted) {
+    return { code: "TERMS_NOT_ACCEPTED", message: "Debes aceptar los términos y condiciones para registrarte." };
+  }
+
+  return null;
+}
+
 // ─── Register ─────────────────────────────────────────────────────────────────
 
 export async function registerAction(params: {
@@ -27,35 +85,30 @@ export async function registerAction(params: {
   termsAccepted: boolean;
 }): Promise<ActionResult<{ userId: string }>> {
   try {
-    // 1. Validate terms acceptance (Req 1.3)
-    if (!params.termsAccepted) {
-      return {
-        data: null,
-        error: {
-          code: "TERMS_NOT_ACCEPTED",
-          message: "Debes aceptar los términos y condiciones para registrarte.",
-        },
-      };
+    // 1. Server-side validation
+    const validationError = validateRegistrationInput(params);
+    if (validationError) {
+      return { data: null, error: validationError };
     }
 
     // 2. Register via use case (hashes password, validates email uniqueness)
     const repository = new PrismaAuthRepository(prisma);
     const user = await registerClientUseCase({
       repository,
-      email: params.email,
-      fullName: params.name,
+      email: params.email.trim().toLowerCase(),
+      fullName: params.name.trim(),
       password: params.password,
       termsAccepted: true,
     });
 
-    // 3. Auto-login after successful registration (Req 1.1)
+    // 3. Auto-login after successful registration
     await signIn("credentials", {
-      email: params.email,
+      email: params.email.trim().toLowerCase(),
       password: params.password,
       redirect: false,
     });
 
-    // 4. Merge anonymous cart if sessionId cookie is present (Req 7.1)
+    // 4. Merge anonymous cart if sessionId cookie is present
     const cookieStore = await cookies();
     const sessionId = cookieStore.get("aurora_session_id")?.value;
     if (sessionId) {

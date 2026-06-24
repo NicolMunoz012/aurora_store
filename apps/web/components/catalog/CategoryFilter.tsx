@@ -1,7 +1,6 @@
 "use client";
 // =============================================================================
-// components/catalog/CategoryFilter.tsx (Req 5.3)
-// Checkbox group — updates ?categoryIds= URL param (comma-separated).
+// components/catalog/CategoryFilter.tsx — Category filter pills (editorial)
 // =============================================================================
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -36,27 +35,67 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  function clearAll() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("categoryIds");
+    params.delete("discount");
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
+  const hasFilter = selected.size > 0;
+
+  // Discount filter from URL
+  const isDiscountActive = searchParams.get("discount") === "true";
+
+  function toggleDiscount() {
+    const params = new URLSearchParams(searchParams.toString());
+    if (isDiscountActive) {
+      params.delete("discount");
+    } else {
+      params.set("discount", "true");
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
   return (
-    <fieldset>
-      <legend className="mb-2 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-        Categorías
-      </legend>
-      <div className="flex flex-col gap-2">
-        {categories.map((cat) => (
-          <label
+    <div className="flex flex-wrap gap-2">
+      <button
+        onClick={clearAll}
+        className={`px-4 py-2 text-[11px] tracking-luxe font-semibold border rounded-full transition-colors ${
+          !hasFilter && !isDiscountActive
+            ? "bg-gray-900 text-white border-gray-900"
+            : "border-gray-200 text-gray-500 hover:border-cerise-300 hover:text-cerise-600"
+        }`}
+      >
+        Todos
+      </button>
+      <button
+        onClick={toggleDiscount}
+        className={`px-4 py-2 text-[11px] tracking-luxe font-semibold border rounded-full transition-colors ${
+          isDiscountActive
+            ? "bg-cerise-600 text-white border-cerise-600"
+            : "border-gray-200 text-gray-500 hover:border-cerise-300 hover:text-cerise-600"
+        }`}
+      >
+        En promoción
+      </button>
+      {categories.map((cat) => {
+        const isActive = selected.has(cat.id);
+        return (
+          <button
             key={cat.id}
-            className="flex cursor-pointer items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400"
+            onClick={() => toggle(cat.id)}
+            className={`px-4 py-2 text-[11px] tracking-luxe font-semibold border rounded-full transition-colors ${
+              isActive
+                ? "bg-gray-900 text-white border-gray-900"
+                : "border-gray-200 text-gray-500 hover:border-cerise-300 hover:text-cerise-600"
+            }`}
+            aria-pressed={isActive}
           >
-            <input
-              type="checkbox"
-              checked={selected.has(cat.id)}
-              onChange={() => toggle(cat.id)}
-              className="h-4 w-4 rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500"
-            />
             {cat.name}
-          </label>
-        ))}
-      </div>
-    </fieldset>
+          </button>
+        );
+      })}
+    </div>
   );
 }

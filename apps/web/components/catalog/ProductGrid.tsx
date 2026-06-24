@@ -1,6 +1,5 @@
 // =============================================================================
-// components/catalog/ProductGrid.tsx (Req 5.1)
-// Responsive grid: 1 col mobile → 2 tablet → 3–4 desktop.
+// components/catalog/ProductGrid.tsx — Responsive product grid
 // =============================================================================
 
 import type { SerializedProductListItem } from "@/lib/serializers";
@@ -13,9 +12,13 @@ interface ProductGridProps {
 export function ProductGrid({ products }: ProductGridProps) {
   if (products.length === 0) {
     return (
-      <div className="py-16 text-center">
-        <p className="text-zinc-500 dark:text-zinc-400">
+      <div className="flex flex-col items-center justify-center py-24">
+        <div className="mb-4 text-5xl">✨</div>
+        <p className="text-base font-medium text-gray-500">
           No se encontraron productos.
+        </p>
+        <p className="mt-1 text-sm text-gray-400">
+          Intenta con otra búsqueda o categoría.
         </p>
       </div>
     );
@@ -23,7 +26,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 
   return (
     <ul
-      className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4"
       aria-label="Productos"
     >
       {products.map((product) => (

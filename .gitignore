@@ -9,6 +9,9 @@ node_modules/
 !.yarn/releases
 !.yarn/versions
 
+# Uploaded files (local dev)
+apps/web/public/uploads/
+
 # Build outputs
 
 .next/

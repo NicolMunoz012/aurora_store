@@ -9,6 +9,18 @@ const nextConfig: NextConfig = {
     "bcryptjs",
   ],
   turbopack: {},
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "6rip9ut9.us-east.insforge.app",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

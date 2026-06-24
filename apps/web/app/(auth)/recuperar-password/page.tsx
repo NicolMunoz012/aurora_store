@@ -1,11 +1,12 @@
 "use client";
 // =============================================================================
-// app/(auth)/recuperar-password/page.tsx — Password reset request (Req 2.1, 2.2)
+// app/(auth)/recuperar-password/page.tsx — Password reset request
 // Always shows same confirmation to avoid email enumeration.
 // =============================================================================
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { requestPasswordResetAction } from "@/lib/actions/auth.actions";
 
 export default function RecuperarPasswordPage() {
@@ -16,71 +17,92 @@ export default function RecuperarPasswordPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     startTransition(async () => {
-      // Always show same confirmation regardless of whether email exists (Req 2.2)
       await requestPasswordResetAction(email);
       setSubmitted(true);
     });
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
-      <div className="w-full max-w-sm rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-        <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-white">
-          Recuperar contraseña
-        </h1>
+    <div className="min-h-screen grid lg:grid-cols-2">
+      {/* Brand panel */}
+      <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
+        <div className="absolute top-8 left-8">
+          <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} />
+        </div>
+        <div className="text-center max-w-md">
+          <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
+            Recupera tu acceso
+          </span>
+          <p className="font-serif text-3xl md:text-4xl leading-snug text-balance italic text-gray-800">
+            "Tu ritual de belleza te espera."
+          </p>
+          <p className="text-[11px] tracking-luxe text-gray-400 mt-8 font-medium">
+            — Aurora Belleza
+          </p>
+        </div>
+      </div>
 
-        {submitted ? (
-          <div className="mt-4">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Si el correo está registrado, recibirás un enlace para restablecer
-              tu contraseña.
-            </p>
-            <Link
-              href="/login"
-              className="mt-6 block text-center text-sm font-medium text-zinc-700 underline dark:text-zinc-300"
-            >
-              Volver a ingresar
-            </Link>
+      {/* Form panel */}
+      <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
+        <div className="w-full max-w-sm">
+          <div className="lg:hidden mb-8">
+            <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} />
           </div>
-        ) : (
-          <>
-            <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
-              Ingresa tu correo y te enviaremos un enlace para restablecer tu
-              contraseña.
-            </p>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-                >
-                  Correo electrónico
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isPending}
-                className="rounded-full bg-zinc-900 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900"
+
+          {submitted ? (
+            <div>
+              <h1 className="font-serif text-3xl md:text-4xl mb-4">Revisa tu correo.</h1>
+              <p className="text-gray-500 text-sm mb-8">
+                Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.
+              </p>
+              <Link
+                href="/login"
+                className="block text-center w-full bg-cerise-600 text-white py-3.5 text-[12px] tracking-luxe font-semibold rounded-sm hover:bg-cerise-700 transition-colors"
               >
-                {isPending ? "Enviando..." : "Enviar enlace"}
-              </button>
-            </form>
-            <p className="mt-6 text-center text-sm">
-              <Link href="/login" className="text-zinc-500 underline dark:text-zinc-400">
                 Volver a ingresar
               </Link>
-            </p>
-          </>
-        )}
+            </div>
+          ) : (
+            <>
+              <h1 className="font-serif text-3xl md:text-4xl mb-2">¿Olvidaste tu contraseña?</h1>
+              <p className="text-gray-500 text-sm mb-10">
+                Ingresa tu correo y te enviaremos un enlace para restablecerla.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                <div>
+                  <label className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">
+                    Correo electrónico
+                  </label>
+                  <input
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-sm text-sm focus:outline-none focus:border-cerise-400 transition-colors"
+                    placeholder="correo@ejemplo.com"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="w-full bg-cerise-600 text-white py-3.5 text-[12px] tracking-luxe font-semibold rounded-sm hover:bg-cerise-700 transition-colors disabled:opacity-60"
+                >
+                  {isPending ? "Enviando..." : "Enviar enlace de recuperación"}
+                </button>
+              </form>
+
+              <p className="mt-8 text-center text-sm text-gray-500">
+                ¿Recordaste tu contraseña?{" "}
+                <Link href="/login" className="text-cerise-600 font-medium hover:underline">
+                  Ingresar
+                </Link>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

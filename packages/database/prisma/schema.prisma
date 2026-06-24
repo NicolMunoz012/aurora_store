@@ -197,15 +197,18 @@ model Product {
   /// SOLO informativa: no activa precio mayorista. El único criterio de
   /// activación es el monto del carrito (RF017, RF048, RF051).
   minWholesaleQty Int?
+  /// Porcentaje de descuento predefinido (5, 10, 15, 20, 25, 30). null = sin descuento.
+  discountPercentage Int?
+  /// Marca del producto (opcional, máx 60 chars).
+  brand           String?
   isActive        Boolean  @default(true)
-  /// NOT NULL — ver OBS-004: desactivar categoría no rompe la FK.
-  /// Filtro de visibilidad en catálogo: where category.isActive = true (RF043).
-  categoryId      String
+  /// Categoría opcional. null = sin categoría asignada.
+  categoryId      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category   Category       @relation(fields: [categoryId], references: [id])
+  category   Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   images     ProductImage[]
   cartItems  CartItem[]
   orderItems OrderItem[]
@@ -491,6 +494,12 @@ model StoreConfig {
   /// Días para expirar pedidos PENDING_CONFIRMATION de usuarios registrados (RF049).
   /// Valor fijo documentado: 30 días.
   registeredOrderExpiryDays Int    @default(30)
+  /// URLs de redes sociales (opcionales).
+  instagramUrl            String?
+  facebookUrl             String?
+  tiktokUrl               String?
+  /// Texto del banner de anuncio en la tienda (editable por admin).
+  announcementText        String?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 

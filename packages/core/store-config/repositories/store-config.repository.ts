@@ -22,6 +22,10 @@ function mapToStoreConfigRecord(record: {
   storePhysicalAddress: string;
   anonOrderExpiryDays: number;
   registeredOrderExpiryDays: number;
+  instagramUrl: string | null;
+  facebookUrl: string | null;
+  tiktokUrl: string | null;
+  announcementText: string | null;
 }): StoreConfigRecord {
   return {
     id: record.id,
@@ -30,6 +34,10 @@ function mapToStoreConfigRecord(record: {
     storePhysicalAddress: record.storePhysicalAddress,
     anonOrderExpiryDays: record.anonOrderExpiryDays,
     registeredOrderExpiryDays: record.registeredOrderExpiryDays,
+    instagramUrl: record.instagramUrl,
+    facebookUrl: record.facebookUrl,
+    tiktokUrl: record.tiktokUrl,
+    announcementText: record.announcementText,
   };
 }
 
@@ -78,6 +86,18 @@ export class PrismaStoreConfigRepository implements IStoreConfigRepository {
       }
       if (data.registeredOrderExpiryDays !== undefined) {
         updateData.registeredOrderExpiryDays = data.registeredOrderExpiryDays;
+      }
+      if (data.instagramUrl !== undefined) {
+        updateData.instagramUrl = data.instagramUrl;
+      }
+      if (data.facebookUrl !== undefined) {
+        updateData.facebookUrl = data.facebookUrl;
+      }
+      if (data.tiktokUrl !== undefined) {
+        updateData.tiktokUrl = data.tiktokUrl;
+      }
+      if (data.announcementText !== undefined) {
+        updateData.announcementText = data.announcementText;
       }
 
       const updated = await this.prisma.storeConfig.update({

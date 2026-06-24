@@ -1,11 +1,11 @@
 "use client";
 // =============================================================================
-// components/cart/AddToCartButton.tsx (Req 5.7, 8.1)
-// Client Component. Resolves cart then adds item on click.
+// components/cart/AddToCartButton.tsx — Add to cart with visual feedback
 // =============================================================================
 
 import { useState, useTransition } from "react";
 import { getOrCreateCartAction, addItemToCartAction } from "@/lib/actions/cart.actions";
+import { Check, ShoppingBag } from "lucide-react";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -15,11 +15,7 @@ interface AddToCartButtonProps {
   userId: string | null;
 }
 
-export function AddToCartButton({
-  productId,
-  stock,
-  sessionId,
-}: AddToCartButtonProps) {
+export function AddToCartButton({ productId, stock, sessionId }: AddToCartButtonProps) {
   const [isPending, startTransition] = useTransition();
   const [added, setAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,14 +25,9 @@ export function AddToCartButton({
   function handleClick() {
     setError(null);
     startTransition(async () => {
-      // 1. Get or create cart
       const cartResult = await getOrCreateCartAction(sessionId);
-      if (cartResult.error) {
-        setError("No se pudo acceder al carrito.");
-        return;
-      }
+      if (cartResult.error) { setError("No se pudo acceder al carrito."); return; }
 
-      // 2. Add item
       const addResult = await addItemToCartAction({
         cartId: cartResult.data.id,
         productId,
@@ -44,42 +35,43 @@ export function AddToCartButton({
       });
 
       if (addResult.error) {
-        setError(
-          addResult.error.code === "INSUFFICIENT_STOCK"
-            ? "Stock insuficiente."
-            : "No se pudo agregar al carrito.",
-        );
+        setError(addResult.error.code === "INSUFFICIENT_STOCK" ? "Stock insuficiente." : "No se pudo agregar al carrito.");
         return;
       }
 
       setAdded(true);
-      setTimeout(() => setAdded(false), 2000);
+      setTimeout(() => setAdded(false), 2500);
     });
   }
 
   if (outOfStock) {
     return (
-      <button
-        disabled
-        aria-disabled="true"
-        className="w-full cursor-not-allowed rounded-full bg-zinc-200 py-3 text-sm font-semibold text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500"
-      >
+      <button disabled aria-disabled="true" className="w-full cursor-not-allowed rounded-sm bg-gray-100 py-4 text-[12px] tracking-luxe font-semibold text-gray-400">
         Agotado
       </button>
     );
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       <button
         onClick={handleClick}
-        disabled={isPending}
-        aria-disabled={isPending}
-        className="w-full rounded-full bg-zinc-900 py-3 text-sm font-semibold text-white transition hover:bg-zinc-700 disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+        disabled={isPending || added}
+        className={`w-full flex items-center justify-center gap-2 rounded-sm py-4 text-[12px] tracking-luxe font-semibold transition-all ${
+          added
+            ? "bg-green-500 text-white"
+            : "bg-cerise-600 text-white hover:bg-cerise-700"
+        } disabled:opacity-70`}
       >
-        {isPending ? "Agregando..." : added ? "¡Agregado! ✓" : "Agregar al carrito"}
+        {added ? (
+          <><Check className="size-4" /> Añadido al carrito</>
+        ) : isPending ? (
+          "Añadiendo..."
+        ) : (
+          <><ShoppingBag className="size-4" /> Añadir al carrito</>
+        )}
       </button>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 text-center">{error}</p>}
     </div>
   );
 }

@@ -1,20 +1,11 @@
 // =============================================================================
-// components/catalog/ProductCard.tsx (Req 5.1, 5.3, 5.7)
-// Accepts SerializedProductListItem — retailPrice is already a string.
+// components/catalog/ProductCard.tsx — Product card with discount support
 // =============================================================================
 
 import Image from "next/image";
 import Link from "next/link";
 import type { SerializedProductListItem } from "@/lib/serializers";
-
-function formatCOP(value: string): string {
-  const num = parseFloat(value);
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(num);
-}
+import { getDiscountedPrice, formatCOP } from "@/lib/discount";
 
 interface ProductCardProps {
   product: SerializedProductListItem;
@@ -22,55 +13,57 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.stock === 0;
+  const hasDiscount = product.discountPercentage && product.discountPercentage > 0;
+  const originalPrice = parseFloat(product.retailPrice);
+  const finalPrice = hasDiscount
+    ? getDiscountedPrice(originalPrice, product.discountPercentage)
+    : originalPrice;
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900">
-      <Link href={`/producto/${product.slug}`} className="block overflow-hidden">
-        <div className="relative aspect-square w-full bg-zinc-100 dark:bg-zinc-800">
-          <Image
-            src={product.mainImageUrl}
-            alt={product.mainImageAlt ?? product.name}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
-          />
-          {outOfStock && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-              <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-900">
-                Agotado
-              </span>
-            </div>
-          )}
-        </div>
+    <article className="group">
+      <Link href={`/producto/${product.slug}`} className="block relative aspect-[4/5] bg-warm-gray rounded-md overflow-hidden mb-4">
+        <Image
+          src={product.mainImageUrl}
+          alt={product.mainImageAlt ?? product.name}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          loading="lazy"
+        />
+        {outOfStock && (
+          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-600 text-[10px] font-semibold px-2.5 py-1 tracking-luxe rounded-sm">
+            Agotado
+          </span>
+        )}
+        {hasDiscount && !outOfStock && (
+          <span className="absolute top-3 left-3 bg-cerise-600 text-white text-[10px] font-semibold px-2.5 py-1 tracking-luxe rounded-sm">
+            -{product.discountPercentage}%
+          </span>
+        )}
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="text-xs font-medium uppercase tracking-wider text-zinc-400">
-          {product.category.name}
-        </div>
-        <Link
-          href={`/producto/${product.slug}`}
-          className="line-clamp-2 text-sm font-semibold text-zinc-800 hover:underline dark:text-zinc-100"
-        >
-          {product.name}
-        </Link>
-        <div className="mt-auto flex items-center justify-between">
-          <span className="text-base font-bold text-zinc-900 dark:text-white">
-            {formatCOP(product.retailPrice)}
-          </span>
-          <span className="text-xs text-zinc-400">IVA incluido</span>
-        </div>
-
-        {outOfStock && (
-          <button
-            disabled
-            aria-disabled="true"
-            className="mt-2 w-full cursor-not-allowed rounded-full bg-zinc-200 py-2 text-sm font-medium text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500"
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <Link
+            href={`/producto/${product.slug}`}
+            className="block font-serif text-[17px] leading-snug text-gray-900 truncate group-hover:text-cerise-600 transition-colors"
           >
-            Agotado
-          </button>
-        )}
+            {product.name}
+          </Link>
+          <p className="text-[13px] text-gray-400 mt-0.5 truncate">
+            {product.category?.name ?? "Sin categoría"}
+          </p>
+        </div>
+        <div className="shrink-0 mt-1 text-right">
+          {hasDiscount ? (
+            <>
+              <span className="text-cerise-600 font-semibold text-sm">{formatCOP(finalPrice)}</span>
+              <span className="block text-[11px] text-gray-400 line-through">{formatCOP(originalPrice)}</span>
+            </>
+          ) : (
+            <span className="text-cerise-600 font-semibold text-sm">{formatCOP(originalPrice)}</span>
+          )}
+        </div>
       </div>
     </article>
   );

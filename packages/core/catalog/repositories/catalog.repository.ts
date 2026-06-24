@@ -32,7 +32,9 @@ function mapToProductListItem(product: {
   retailPrice: unknown;
   stock: number;
   isActive: boolean;
-  category: { id: string; name: string; slug: string };
+  discountPercentage: number | null;
+  brand: string | null;
+  category: { id: string; name: string; slug: string } | null;
   images: Array<{ url: string; altText: string | null; displayOrder: number }>;
 }): ProductListItem {
   const mainImage = product.images.length > 0
@@ -46,13 +48,13 @@ function mapToProductListItem(product: {
     retailPrice: new Decimal(product.retailPrice!.toString()),
     stock: product.stock,
     isActive: product.isActive,
+    discountPercentage: product.discountPercentage,
+    brand: product.brand,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
-    category: {
-      id: product.category.id,
-      name: product.category.name,
-      slug: product.category.slug,
-    },
+    category: product.category
+      ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
+      : null,
   };
 }
 
@@ -70,8 +72,10 @@ function mapToInternalProductDetail(product: {
   stock: number;
   lowStockAlert: number;
   minWholesaleQty: number | null;
+  discountPercentage: number | null;
+  brand: string | null;
   isActive: boolean;
-  category: { id: string; name: string; slug: string };
+  category: { id: string; name: string; slug: string } | null;
   images: Array<{
     id: string;
     productId: string;
@@ -101,13 +105,13 @@ function mapToInternalProductDetail(product: {
     retailPrice: new Decimal(product.retailPrice!.toString()),
     stock: product.stock,
     isActive: product.isActive,
+    discountPercentage: product.discountPercentage,
+    brand: product.brand,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
-    category: {
-      id: product.category.id,
-      name: product.category.name,
-      slug: product.category.slug,
-    },
+    category: product.category
+      ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
+      : null,
     description: product.description,
     minWholesaleQty: product.minWholesaleQty,
     lowStockAlert: product.lowStockAlert,

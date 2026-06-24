@@ -6,6 +6,7 @@
 import { prisma } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import type { ActionResult } from "@/lib/types";
+import { Decimal } from "decimal.js";
 import type { ProductDetail, CategoryRecord, CreateProductData, UpdateProductData, CreateCategoryData, UpdateCategoryData } from "@aurora/shared";
 import { auth } from "@/lib/auth";
 import {
@@ -15,6 +16,7 @@ import {
   createCategoryUseCase,
   updateCategoryUseCase,
   toggleCategoryActiveUseCase,
+  deleteCategoryUseCase,
   PrismaCatalogRepository,
   PrismaCategoryRepository,
   CatalogService,
@@ -54,11 +56,43 @@ function buildAuditLogger() {
 
 // ─── Product actions ──────────────────────────────────────────────────────────
 
+const VALID_DISCOUNTS = [5, 10, 15, 20, 25, 30];
+
+function validateDiscountPercentage(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value !== "number" || !VALID_DISCOUNTS.includes(value)) {
+    return "Porcentaje de descuento inválido. Valores permitidos: 5, 10, 15, 20, 25, 30.";
+  }
+  return null;
+}
+
+// Plain-object input accepted from Client Components (no Decimal on the wire)
+interface ProductFormInput {
+  name: string;
+  description?: string | null;
+  retailPrice: string;
+  wholesalePrice: string;
+  stock?: number;
+  lowStockAlert?: number;
+  minWholesaleQty?: number | null;
+  discountPercentage?: number | null;
+  brand?: string | null;
+  categoryId?: string | null;
+  images: { url: string; altText?: string | null; displayOrder?: number }[];
+}
+
 export async function createProductAction(
-  data: CreateProductData,
+  input: ProductFormInput,
 ): Promise<ActionResult<ProductDetail>> {
   try {
     await assertAdmin();
+    const discountError = validateDiscountPercentage(input.discountPercentage);
+    if (discountError) return { data: null, error: { code: "VALIDATION_ERROR", message: discountError } };
+    const data: CreateProductData = {
+      ...input,
+      retailPrice: new Decimal(input.retailPrice),
+      wholesalePrice: new Decimal(input.wholesalePrice),
+    };
     const repository = new PrismaCatalogRepository(prisma);
     const auditLogger = buildAuditLogger();
     const product = await createProductUseCase({ repository, auditLogger, data });
@@ -70,10 +104,17 @@ export async function createProductAction(
 
 export async function updateProductAction(
   productId: string,
-  data: UpdateProductData,
+  input: ProductFormInput,
 ): Promise<ActionResult<ProductDetail>> {
   try {
     await assertAdmin();
+    const discountError = validateDiscountPercentage(input.discountPercentage);
+    if (discountError) return { data: null, error: { code: "VALIDATION_ERROR", message: discountError } };
+    const data: UpdateProductData = {
+      ...input,
+      retailPrice: new Decimal(input.retailPrice),
+      wholesalePrice: new Decimal(input.wholesalePrice),
+    };
     const repository = new PrismaCatalogRepository(prisma);
     const auditLogger = buildAuditLogger();
     const product = await updateProductUseCase({ repository, auditLogger, productId, data });
@@ -149,6 +190,40 @@ export async function toggleCategoryActiveAction(
     const auditLogger = buildAuditLogger();
     await toggleCategoryActiveUseCase({ categoryRepository, auditLogger, categoryId, isActive });
     return { data: {}, error: null };
+  } catch (error) {
+    return handleActionError(error);
+  }
+}
+
+export async function deleteCategoryAction(
+  categoryId: string,
+): Promise<ActionResult<void>> {
+  try {
+    await assertAdmin();
+    const categoryRepository = new PrismaCategoryRepository(prisma);
+    const auditLogger = buildAuditLogger();
+    await deleteCategoryUseCase({ categoryRepository, auditLogger, categoryId });
+    return { data: undefined, error: null };
+  } catch (error) {
+    return handleActionError(error);
+  }
+}
+
+/** Cuenta todos los productos (activos e inactivos) de cada categoría. */
+export async function getCategoryProductCountsAction(): Promise<
+  ActionResult<Record<string, number>>
+> {
+  try {
+    await assertAdmin();
+    const categoryRepository = new PrismaCategoryRepository(prisma);
+    const all = await categoryRepository.listAll();
+    const counts: Record<string, number> = {};
+    await Promise.all(
+      all.map(async (cat) => {
+        counts[cat.id] = await categoryRepository.countProductsInCategory(cat.id);
+      }),
+    );
+    return { data: counts, error: null };
   } catch (error) {
     return handleActionError(error);
   }
