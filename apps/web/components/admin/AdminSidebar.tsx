@@ -67,7 +67,11 @@ export function AdminSidebar() {
           Ver tienda <ArrowUpRight className="size-3" />
         </Link>
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={() => {
+            if (confirm("¿Deseas cerrar sesión?")) {
+              signOut({ callbackUrl: "/login" });
+            }
+          }}
           className="flex items-center gap-2 text-[11px] tracking-luxe text-gray-400 font-medium hover:text-cerise-600 transition-colors w-full"
         >
           <LogOut className="size-4" />

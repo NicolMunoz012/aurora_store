@@ -28,9 +28,15 @@ export function Navbar({ cartItemCount, userEmail, userRole, categories = [], an
   const isAdmin = userRole === "ADMIN";
 
   async function handleSignOut() {
+    if (!confirm("¿Deseas cerrar sesión?")) return;
     await signOut({ redirect: false });
     router.push("/catalog");
     router.refresh();
+  }
+
+  function handleLogoClick() {
+    setSearch("");
+    setHasInteracted(false);
   }
 
   const pushSearch = useCallback(
@@ -78,7 +84,7 @@ export function Navbar({ cartItemCount, userEmail, userRole, categories = [], an
             <Menu className="size-5" />
           </button>
 
-          <Link href="/" className="shrink-0">
+          <Link href="/" className="shrink-0" onClick={handleLogoClick}>
             <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} priority />
           </Link>
 
