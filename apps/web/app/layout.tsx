@@ -15,9 +15,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Aurora Belleza — Tienda de cosméticos",
-  description:
-    "Productos de belleza al mejor precio.",
+  title: "Aurora Belleza",
+  description: "Productos de belleza al mejor precio.",
+  icons: {
+    icon: "/aurora.png",
+    apple: "/aurora.png",
+  },
 };
 
 export default function RootLayout({

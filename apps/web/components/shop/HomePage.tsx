@@ -22,7 +22,7 @@ export function HomePage({ featuredProducts, categories }: HomePageProps) {
         <div className="container-aurora grid lg:grid-cols-2 items-center gap-10 py-10 md:py-14 lg:py-13">
           <div className="animate-fade-up">
             <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-5 block">
-              Tu ritual de belleza
+              Aurora Belleza
             </span>
             <h1 className="text-[44px] leading-[1.05] md:text-6xl lg:text-7xl text-balance">
               Luminosa{" "}

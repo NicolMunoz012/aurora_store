@@ -10,7 +10,7 @@ import { listProductsAction, listActiveCategoriesAction } from "@/lib/actions/ca
 import { HomePage } from "@/components/shop/HomePage";
 
 export const metadata = {
-  title: "Aurora Belleza — Tu ritual de belleza",
+  title: "Aurora Belleza",
   description: "Productos de belleza seleccionados.",
 };
 
