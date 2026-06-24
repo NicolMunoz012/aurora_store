@@ -1,12 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Internal workspace packages must be transpiled by Next.js/Turbopack,
+  // NOT externalized. Only true native Node.js packages go in serverExternalPackages.
   serverExternalPackages: [
     "@prisma/client",
-    "@aurora/database",
-    "@aurora/core",
-    "@aurora/shared",
     "bcryptjs",
+    "pg",
+  ],
+  // Transpile internal workspace packages so Next.js bundles their TypeScript
+  // source directly without requiring a separate compile step.
+  transpilePackages: [
+    "@aurora/core",
+    "@aurora/database",
+    "@aurora/shared",
   ],
   turbopack: {},
   images: {

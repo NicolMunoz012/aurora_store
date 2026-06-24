@@ -2,48 +2,48 @@
   "name": "@aurora/core",
   "version": "1.0.0",
   "private": true,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./index.ts",
+      "default": "./index.ts"
     },
     "./auth": {
-      "types": "./dist/auth/index.d.ts",
-      "default": "./dist/auth/index.js"
+      "types": "./auth/index.ts",
+      "default": "./auth/index.ts"
     },
     "./users": {
-      "types": "./dist/users/index.d.ts",
-      "default": "./dist/users/index.js"
+      "types": "./users/index.ts",
+      "default": "./users/index.ts"
     },
     "./catalog": {
-      "types": "./dist/catalog/index.d.ts",
-      "default": "./dist/catalog/index.js"
+      "types": "./catalog/index.ts",
+      "default": "./catalog/index.ts"
     },
     "./pricing": {
-      "types": "./dist/pricing/index.d.ts",
-      "default": "./dist/pricing/index.js"
+      "types": "./pricing/index.ts",
+      "default": "./pricing/index.ts"
     },
     "./cart": {
-      "types": "./dist/cart/index.d.ts",
-      "default": "./dist/cart/index.js"
+      "types": "./cart/index.ts",
+      "default": "./cart/index.ts"
     },
     "./inventory": {
-      "types": "./dist/inventory/index.d.ts",
-      "default": "./dist/inventory/index.js"
+      "types": "./inventory/index.ts",
+      "default": "./inventory/index.ts"
     },
     "./orders": {
-      "types": "./dist/orders/index.d.ts",
-      "default": "./dist/orders/index.js"
+      "types": "./orders/index.ts",
+      "default": "./orders/index.ts"
     },
     "./store-config": {
-      "types": "./dist/store-config/index.d.ts",
-      "default": "./dist/store-config/index.js"
+      "types": "./store-config/index.ts",
+      "default": "./store-config/index.ts"
     },
     "./audit": {
-      "types": "./dist/audit/index.d.ts",
-      "default": "./dist/audit/index.js"
+      "types": "./audit/index.ts",
+      "default": "./audit/index.ts"
     }
   },
   "scripts": {
