@@ -60,8 +60,8 @@ export default async function AdminPedidosPage({ searchParams }: AdminPedidosPag
           <p className="text-gray-500">No hay pedidos registrados.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className="border-b border-gray-100 bg-gray-50/80">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">ID</th>

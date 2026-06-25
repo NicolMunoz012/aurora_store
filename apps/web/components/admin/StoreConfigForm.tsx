@@ -66,7 +66,7 @@ export function StoreConfigForm({ initialConfig }: { initialConfig: SerializedSt
             <label htmlFor="storeAddr" className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">Dirección física</label>
             <input id="storeAddr" type="text" value={address} onChange={(e) => setAddress(e.target.value)} className={inputClass} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="anonDays" className="text-[11px] tracking-luxe font-medium text-gray-500 mb-1.5 block">Expiración anónimos (días)</label>
               <input id="anonDays" type="number" min={1} value={anonDays} onChange={(e) => setAnonDays(Number(e.target.value))} className={inputClass} />

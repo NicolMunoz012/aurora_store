@@ -4,7 +4,7 @@
 // Image upload via /api/upload. 1–5 images. Per-file error without blocking.
 // =============================================================================
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Decimal } from "decimal.js";
 import type { CategoryRecord, ProductImageRecord } from "@aurora/shared";
@@ -14,6 +14,7 @@ import {
   toggleProductActiveAction,
 } from "@/lib/actions/admin.catalog.actions";
 import { DISCOUNT_PERCENTAGES, getDiscountedPrice, getSavings, formatCOP } from "@/lib/discount";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface AdminProductFormProps {
   categories: CategoryRecord[];
@@ -68,6 +69,70 @@ export function AdminProductForm({
   const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [pendingNavHref, setPendingNavHref] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+
+  // Mark dirty on any field change
+  function markDirty() { setIsDirty(true); }
+
+  // Warn on browser close when dirty
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  // Intercept sidebar / any link click when dirty
+  useEffect(() => {
+    if (!isDirty) return;
+    function handleClick(e: MouseEvent) {
+      const target = (e.target as HTMLElement).closest("a[href]");
+      if (!target) return;
+      const href = (target as HTMLAnchorElement).getAttribute("href");
+      if (!href || href === "#") return;
+      // Only intercept admin nav links
+      if (href.startsWith("/admin") && href !== window.location.pathname) {
+        e.preventDefault();
+        setPendingNavHref(href);
+        setShowCancelDialog(true);
+      }
+    }
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
+  }, [isDirty]);
+
+  // ── Back-button interception via History API sentinel ──────────────────────
+  // When the form becomes dirty we push a "sentinel" history entry so that
+  // pressing the back button fires a popstate event instead of navigating away.
+  // If the user confirms leaving, we pop the sentinel and navigate.
+  // If they cancel, we re-push the sentinel so the next press is also caught.
+  const sentinelPushed = useRef(false);
+
+  useEffect(() => {
+    if (isDirty && !sentinelPushed.current) {
+      history.pushState({ sentinel: true }, "");
+      sentinelPushed.current = true;
+    }
+  }, [isDirty]);
+
+  useEffect(() => {
+    if (!isDirty) return;
+
+    function handlePopState(e: PopStateEvent) {
+      // Only act when the sentinel was popped (state is NOT sentinel anymore)
+      if (e.state?.sentinel) return; // just arrived at sentinel — nothing to do
+      // The sentinel was consumed: show the dialog and re-push it
+      history.pushState({ sentinel: true }, ""); // restore sentinel
+      setPendingNavHref(null); // null = go back after confirm
+      setShowCancelDialog(true);
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isDirty]);
+  // ──────────────────────────────────────────────────────────────────────────
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -159,7 +224,8 @@ export function AdminProductForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       {/* Name */}
       <div>
         <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-gray-700">
@@ -169,7 +235,7 @@ export function AdminProductForm({
           id="name"
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => { setName(e.target.value); markDirty(); }}
           required
           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
         />
@@ -199,7 +265,7 @@ export function AdminProductForm({
         <textarea
           id="description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => { setDescription(e.target.value); markDirty(); }}
           rows={3}
           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
         />
@@ -403,11 +469,7 @@ export function AdminProductForm({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => {
-              if (confirm("¿Salir sin guardar? Los cambios no guardados se perderán.")) {
-                router.push("/admin/productos");
-              }
-            }}
+            onClick={() => { setPendingNavHref("/admin/productos"); setShowCancelDialog(true); }}
             className="rounded-full px-4 py-2 text-xs font-semibold text-gray-500 border border-gray-200 hover:border-gray-300 hover:text-gray-700 transition-colors"
           >
             Cancelar
@@ -436,5 +498,29 @@ export function AdminProductForm({
         </button>
       </div>
     </form>
+
+    <ConfirmDialog
+      open={showCancelDialog}
+      title="¿Salir sin guardar?"
+      message="Los cambios que hiciste no se guardarán si sales ahora."
+      confirmLabel="Sí, salir"
+      cancelLabel="Quedarme"
+      onConfirm={() => {
+        setShowCancelDialog(false);
+        setIsDirty(false);
+        sentinelPushed.current = false;
+        if (pendingNavHref) {
+          // Pop the sentinel entry before navigating forward
+          history.back();
+          // Small delay so the sentinel pop completes before the push
+          setTimeout(() => router.push(pendingNavHref!), 50);
+        } else {
+          // Back button was pressed — pop sentinel then let browser go back
+          history.go(-2); // -1 was already restored by handlePopState, go one more
+        }
+      }}
+      onCancel={() => { setShowCancelDialog(false); setPendingNavHref(null); }}
+    />
+    </>
   );
 }

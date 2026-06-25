@@ -42,7 +42,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-end justify-between flex-wrap gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
         <div>
           <h1 className="font-serif text-3xl md:text-4xl text-gray-900">
             <Greeting />, Aurora.
@@ -51,7 +51,7 @@ export default async function AdminDashboardPage() {
         </div>
         <Link
           href="/admin/productos/nuevo"
-          className="bg-cerise-600 text-white px-5 py-2.5 text-[12px] tracking-luxe font-semibold rounded-sm inline-flex items-center gap-2 hover:bg-cerise-700 transition-colors"
+          className="bg-cerise-600 text-white px-5 py-2.5 text-[12px] tracking-luxe font-semibold rounded-sm inline-flex items-center gap-2 hover:bg-cerise-700 transition-colors shrink-0"
         >
           + Nuevo producto
         </Link>
@@ -80,40 +80,42 @@ export default async function AdminDashboardPage() {
           {products.length === 0 ? (
             <p className="px-5 py-8 text-sm text-gray-400 text-center">No hay productos registrados.</p>
           ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-warm-gray text-[11px] tracking-luxe text-gray-400">
-                <tr>
-                  <th className="text-left px-5 py-3 font-medium">Producto</th>
-                  <th className="text-left px-5 py-3 font-medium">Stock</th>
-                  <th className="text-left px-5 py-3 font-medium">Estado</th>
-                  <th className="text-right px-5 py-3 font-medium">Precio</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {products.slice(0, 7).map((p) => {
-                  const low = lowStockResult.data?.some((ls) => ls.id === p.id);
-                  return (
-                    <tr key={p.id} className="hover:bg-warm-gray/50">
-                      <td className="px-5 py-3">
-                        <div className="min-w-0">
-                          <div className="font-medium truncate text-gray-800">{p.name}</div>
-                          <div className="text-xs text-gray-400 truncate">{p.category?.name ?? "—"}</div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 text-gray-500">{p.stock} uds</td>
-                      <td className="px-5 py-3">
-                        <span className={`text-[10px] tracking-luxe px-2 py-1 rounded-sm font-semibold ${
-                          low ? "bg-blush text-cerise-600" : p.isActive ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-400"
-                        }`}>
-                          {low ? "Stock bajo" : p.isActive ? "Activo" : "Inactivo"}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-right font-medium text-gray-700">{formatCOP(p.retailPrice)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px] text-sm">
+                <thead className="bg-warm-gray text-[11px] tracking-luxe text-gray-400">
+                  <tr>
+                    <th className="text-left px-5 py-3 font-medium">Producto</th>
+                    <th className="text-left px-5 py-3 font-medium">Stock</th>
+                    <th className="text-left px-5 py-3 font-medium">Estado</th>
+                    <th className="text-right px-5 py-3 font-medium">Precio</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {products.slice(0, 7).map((p) => {
+                    const low = lowStockResult.data?.some((ls) => ls.id === p.id);
+                    return (
+                      <tr key={p.id} className="hover:bg-warm-gray/50">
+                        <td className="px-5 py-3">
+                          <div className="min-w-0">
+                            <div className="font-medium truncate text-gray-800">{p.name}</div>
+                            <div className="text-xs text-gray-400 truncate">{p.category?.name ?? "—"}</div>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3 text-gray-500">{p.stock} uds</td>
+                        <td className="px-5 py-3">
+                          <span className={`text-[10px] tracking-luxe px-2 py-1 rounded-sm font-semibold ${
+                            low ? "bg-blush text-cerise-600" : p.isActive ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-400"
+                          }`}>
+                            {low ? "Stock bajo" : p.isActive ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-right font-medium text-gray-700">{formatCOP(p.retailPrice)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 

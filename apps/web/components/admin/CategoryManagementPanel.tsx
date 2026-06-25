@@ -183,7 +183,7 @@ export function CategoryManagementPanel({ categories, productCounts }: Props) {
             {categories.map((cat) => {
               const count = productCounts[cat.id] ?? 0;
               return (
-                <li key={cat.id} className="flex items-center justify-between px-5 py-4 hover:bg-gray-50/50 transition-colors">
+                <li key={cat.id} className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4 px-5 py-4 hover:bg-gray-50/50 transition-colors">
                   {editId === cat.id ? (
                     <div className="flex flex-1 items-center gap-3">
                       <input
