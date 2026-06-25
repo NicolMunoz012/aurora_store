@@ -50,7 +50,7 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
             className="h-16 w-36 relative
               md:grayscale md:opacity-60 md:hover:grayscale-0 md:hover:opacity-100 md:transition-all md:duration-300"
           >
-            <Image src={brand.imageUrl} alt={brand.name ?? "Marca"} fill className="object-contain" sizes="144px" />
+            <Image src={brand.imageUrl} alt="Marca" fill className="object-contain" sizes="144px" />
           </div>
         ))}
       </div>
@@ -90,7 +90,7 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
             >
               <Image
                 src={brand.imageUrl}
-                alt={brand.name ?? "Marca"}
+                alt="Marca"
                 fill
                 className="object-contain"
                 sizes="140px"
