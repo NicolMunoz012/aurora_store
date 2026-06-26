@@ -17,7 +17,7 @@ import {
   PrismaUsersRepository,
 } from "@aurora/core/users";
 
-export const metadata = { title: "Checkout — Aurora Belleza" };
+export const metadata = { title: "Finalizar la compra" };
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -72,30 +72,47 @@ export default async function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <Link href="/carrito" className="text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
-        ← Volver al carrito
-      </Link>
-      <h1 className="font-serif text-4xl md:text-5xl mt-3 mb-2">Checkout</h1>
-      <CheckoutFlow
-        cart={cart}
-        storeConfig={
-          storeConfig
-            ? {
-                storePhysicalAddress: storeConfig.storePhysicalAddress,
-                wholesaleThreshold: storeConfig.wholesaleThreshold.toString(),
-                whatsappNumber: storeConfig.whatsappNumber,
-                anonOrderExpiryDays: storeConfig.anonOrderExpiryDays,
-                registeredOrderExpiryDays: storeConfig.registeredOrderExpiryDays,
-              }
-            : null
-        }
-        isAuthenticated={!!session}
-        prefill={{ name: prefillName, phone: prefillPhone, email: prefillEmail }}
-        savedAddresses={savedAddresses}
-        sessionId={sessionId}
-        userId={session?.user?.id ?? null}
-      />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header con logo */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center">
+            <span className="font-serif text-2xl font-bold text-gray-900">Aurora Belleza</span>
+          </Link>
+          <Link 
+            href="/carrito" 
+            className="text-sm text-gray-500 hover:text-cerise-600 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver al carrito
+          </Link>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <CheckoutFlow
+          cart={cart}
+          storeConfig={
+            storeConfig
+              ? {
+                  storePhysicalAddress: storeConfig.storePhysicalAddress,
+                  wholesaleThreshold: storeConfig.wholesaleThreshold.toString(),
+                  whatsappNumber: storeConfig.whatsappNumber,
+                  anonOrderExpiryDays: storeConfig.anonOrderExpiryDays,
+                  registeredOrderExpiryDays: storeConfig.registeredOrderExpiryDays,
+                }
+              : null
+          }
+          isAuthenticated={!!session}
+          prefill={{ name: prefillName, phone: prefillPhone, email: prefillEmail }}
+          savedAddresses={savedAddresses}
+          sessionId={sessionId}
+          userId={session?.user?.id ?? null}
+        />
+      </main>
     </div>
   );
 }

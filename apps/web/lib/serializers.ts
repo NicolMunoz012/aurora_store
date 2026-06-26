@@ -134,7 +134,12 @@ export function serializeResolvedCartItem(
   item: ResolvedCartItem,
 ): SerializedResolvedCartItem {
   return {
-    ...item,
+    cartItemId: item.cartItemId,
+    productId: item.productId,
+    productName: item.productName,
+    mainImageUrl: item.mainImageUrl,
+    quantity: item.quantity,
+    stock: item.stock,
     unitPrice: item.unitPrice.toString(),
     retailPrice: item.retailPrice.toString(),
     wholesalePrice: item.wholesalePrice.toString(),
@@ -146,7 +151,8 @@ export function serializeResolvedCart(
   cart: ResolvedCart,
 ): SerializedResolvedCart {
   return {
-    ...cart,
+    cartId: cart.cartId,
+    wholesaleApplied: cart.wholesaleApplied,
     items: cart.items.map(serializeResolvedCartItem),
     retailSubtotal: cart.retailSubtotal.toString(),
     finalSubtotal: cart.finalSubtotal.toString(),

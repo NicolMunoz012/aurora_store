@@ -16,4 +16,5 @@ export interface ResolveCartPricesParams {
   pricingService: IPricingService;
   items: CartItemWithProduct[];
   config: StoreConfigRecord;
+  cartId: string;
 }

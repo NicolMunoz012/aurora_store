@@ -38,6 +38,7 @@ export class PricingService implements IPricingService {
   resolveCartPrices(
     items: CartItemWithProduct[],
     config: StoreConfigRecord,
+    cartId: string,
   ): ResolvedCart {
     // 1. Calcular subtotal a precio detal (Req 6.1)
     const retailSubtotal = calculateRetailSubtotal(items);
@@ -57,9 +58,12 @@ export class PricingService implements IPricingService {
       const lineTotal = unitPrice.mul(item.quantity);
 
       return {
+        cartItemId: item.id,
         productId: item.product.id,
         productName: item.product.name,
+        mainImageUrl: item.product.mainImageUrl,
         quantity: item.quantity,
+        stock: item.product.stock,
         unitPrice,
         retailPrice: item.product.retailPrice,
         wholesalePrice: item.product.wholesalePrice,
@@ -80,6 +84,7 @@ export class PricingService implements IPricingService {
 
     // 6. Retornar carrito resuelto
     return {
+      cartId,
       items: resolvedItems,
       retailSubtotal,
       finalSubtotal,

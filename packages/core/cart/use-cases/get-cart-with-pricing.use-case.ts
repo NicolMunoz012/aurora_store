@@ -30,5 +30,5 @@ export async function getCartWithPricingUseCase(
   }
 
   // 3. Calcular precios con el servicio de pricing
-  return pricingService.resolveCartPrices(cart.items, config);
+  return pricingService.resolveCartPrices(cart.items, config, cart.id);
 }

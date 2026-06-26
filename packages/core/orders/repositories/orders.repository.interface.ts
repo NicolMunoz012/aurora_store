@@ -22,4 +22,5 @@ export interface IOrdersRepository {
   updateStatus(id: string, status: OrderStatus, extra?: UpdateOrderExtra): Promise<OrderRecord>;
   findExpiredPendingOrders(now: Date): Promise<OrderRecord[]>;
   markStockDeducted(orderId: string): Promise<void>;
+  deleteById(id: string): Promise<void>;
 }

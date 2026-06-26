@@ -66,9 +66,12 @@ export interface IInventoryService {
 
 /** Item resuelto con precios calculados */
 export interface ResolvedCartItem {
+  cartItemId: string;
   productId: string;
   productName: string;
+  mainImageUrl: string;
   quantity: number;
+  stock: number;
   unitPrice: Decimal;
   retailPrice: Decimal;
   wholesalePrice: Decimal;
@@ -77,6 +80,7 @@ export interface ResolvedCartItem {
 
 /** Resultado completo del cálculo de precios del carrito */
 export interface ResolvedCart {
+  cartId: string;
   items: ResolvedCartItem[];
   retailSubtotal: Decimal;
   finalSubtotal: Decimal;
@@ -94,10 +98,12 @@ export interface IPricingService {
    * Calcula precios finales para los items del carrito.
    * @param items — Items del carrito con datos de producto
    * @param config — Configuración actual de la tienda (umbral mayorista, etc.)
+   * @param cartId — ID del carrito para incluirlo en el resultado
    * @returns Carrito resuelto con precios calculados
    */
   resolveCartPrices(
     items: CartItemWithProduct[],
     config: StoreConfigRecord,
+    cartId: string,
   ): ResolvedCart;
 }

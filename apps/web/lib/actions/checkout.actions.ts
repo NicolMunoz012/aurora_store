@@ -2,6 +2,7 @@
 // =============================================================================
 // apps/web/lib/actions/checkout.actions.ts
 // Server Actions para el flujo de checkout (Req 12.5, 12.6, 13.1, 13.2).
+// Backend validation with Zod schemas
 // =============================================================================
 
 import { prisma } from "@/lib/db";
@@ -9,6 +10,9 @@ import { handleActionError } from "@/lib/action-error";
 import type { ActionResult } from "@/lib/types";
 import type { CreateOrderData, StockValidationResult } from "@aurora/shared";
 import { auth } from "@/lib/auth";
+import {
+  checkoutStep1Schema,
+} from "@/lib/validations/schemas";
 import {
   createOrderUseCase,
   generateWhatsappMessageUseCase,
@@ -23,10 +27,7 @@ import {
   getStoreConfigUseCase,
   PrismaStoreConfigRepository,
 } from "@aurora/core/store-config";
-import {
-  PrismaAuditRepository,
-} from "@aurora/core/audit";
-import { PrismaCartRepository } from "@aurora/core/cart";
+import { PrismaAuditRepository } from "@aurora/core/audit";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -36,28 +37,32 @@ function buildAuditLogger() {
 }
 
 // ─── Validate stock (Step 2 → Step 3 transition) ─────────────────────────────
+// Resolves cart by sessionId (anonymous) or userId (authenticated)
 
 export async function validateStockAction(
-  cartId: string,
+  sessionId: string,
 ): Promise<ActionResult<StockValidationResult>> {
   try {
-    // Fetch cart items from DB
-    const cart = await prisma.cart.findUnique({
-      where: { id: cartId },
+    const session = await auth();
+    const userId = session?.user?.id ?? null;
+
+    // Find ACTIVE cart by userId or sessionId
+    const cart = await prisma.cart.findFirst({
+      where: {
+        status: "ACTIVE",
+        ...(userId ? { userId } : { sessionId }),
+      },
       include: {
         items: {
           include: {
             product: {
-              select: {
-                id: true,
-                name: true,
-                stock: true,
-              },
+              select: { id: true, name: true, stock: true },
             },
           },
         },
       },
     });
+
     if (!cart) {
       return {
         data: null,
@@ -82,10 +87,40 @@ export async function validateStockAction(
 
 // ─── Create order ─────────────────────────────────────────────────────────────
 
+/** Plain-object version of CreateOrderData safe to cross the client→server boundary.
+ *  Prices are strings (Decimal.toString()) instead of Decimal instances,
+ *  which cannot be serialized by Next.js Server Functions. */
+type CreateOrderInput = Omit<CreateOrderData, "userId" | "expiresAt" | "productsTotal" | "items"> & {
+  productsTotal: string;
+  items: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    unitPriceAtPurchase: string;
+  }>;
+};
+
 export async function createOrderAction(
-  orderInput: Omit<CreateOrderData, "userId" | "expiresAt">,
+  orderInput: CreateOrderInput,
 ): Promise<ActionResult<{ orderId: string; whatsappUrl: string }>> {
   try {
+    // Backend validation
+    const step1Validation = checkoutStep1Schema.safeParse({
+      fullName: orderInput.clientName,
+      phone: orderInput.clientPhone,
+      email: orderInput.clientEmail || undefined,
+    });
+
+    if (!step1Validation.success) {
+      return {
+        data: null,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: step1Validation.error.errors[0]?.message || "Datos personales inválidos",
+        },
+      };
+    }
+
     const session = await auth();
     const userId = session?.user?.id ?? null;
 
@@ -100,7 +135,6 @@ export async function createOrderAction(
 
     const ordersRepo = new PrismaOrdersRepository(prisma);
     const inventoryRepo = new PrismaInventoryRepository(prisma);
-    const cartRepo = new PrismaCartRepository(prisma);
     const auditLogger = buildAuditLogger();
 
     // Build cart items for stock validation
@@ -120,16 +154,25 @@ export async function createOrderAction(
       },
     );
 
+    // Convert string prices → Decimal for the domain layer
+    const { Decimal } = await import("decimal.js");
+    const orderData: CreateOrderData = {
+      ...orderInput,
+      userId,
+      expiresAt,
+      productsTotal: new Decimal(orderInput.productsTotal),
+      items: orderInput.items.map((i) => ({
+        ...i,
+        unitPriceAtPurchase: new Decimal(i.unitPriceAtPurchase),
+      })),
+    };
+
     const order = await createOrderUseCase({
       repository: ordersRepo,
       inventoryService,
       auditLogger,
       clock: { now: () => new Date() },
-      data: {
-        ...orderInput,
-        userId,
-        expiresAt,
-      },
+      data: orderData,
       cartItems: orderInput.items.map((i) => ({
         productId: i.productId,
         quantity: i.quantity,

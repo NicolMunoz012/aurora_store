@@ -62,7 +62,20 @@ export default async function CartPage() {
           {/* Items */}
           <div className="divide-y divide-gray-100 border-y border-gray-100">
             {cart.items.map((item) => (
-              <div key={item.productId} className="py-6 grid grid-cols-[1fr_auto] gap-5 items-center">
+              <div key={item.cartItemId} className="py-6 grid grid-cols-[80px_1fr_auto] gap-5 items-center">
+                {item.mainImageUrl ? (
+                  <img
+                    src={item.mainImageUrl}
+                    alt={item.productName}
+                    className="w-20 h-20 object-cover rounded-md bg-gray-50"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-blush rounded-md grid place-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-8 text-cerise-500">
+                      <path fillRule="evenodd" d="M6 5v1H4.667a1.75 1.75 0 0 0-1.743 1.598l-.826 9.5A1.75 1.75 0 0 0 3.84 19H16.16a1.75 1.75 0 0 0 1.743-1.902l-.826-9.5A1.75 1.75 0 0 0 15.333 10H14V5a4 4 0 0 0-8 0Zm4-2.5A2.5 2.5 0 0 0 7.5 5v1h5V5A2.5 2.5 0 0 0 10 2.5ZM7.5 10a2.5 2.5 0 0 0 5 0V8.75a.75.75 0 0 1 1.5 0V10a4 4 0 0 1-8 0V8.75a.75.75 0 0 1 1.5 0V10Z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
                 <div className="min-w-0">
                   <p className="font-serif text-lg leading-tight text-gray-900">
                     {item.productName}
@@ -72,10 +85,10 @@ export default async function CartPage() {
                   </p>
                   <div className="mt-3">
                     <CartItemControls
-                      cartItemId={item.productId}
-                      cartId={sessionId}
+                      cartItemId={item.cartItemId}
+                      cartId={cart.cartId}
                       quantity={item.quantity}
-                      stock={999}
+                      stock={item.stock}
                     />
                   </div>
                 </div>
@@ -83,7 +96,6 @@ export default async function CartPage() {
                   <span className="font-medium text-gray-900">
                     {formatCOP(item.lineTotal)}
                   </span>
-                  
                 </div>
               </div>
             ))}
@@ -125,7 +137,7 @@ export default async function CartPage() {
               href="/checkout"
               className="block text-center mt-6 bg-cerise-600 text-white py-3.5 text-[12px] tracking-luxe font-semibold rounded-sm hover:bg-cerise-700 transition-colors"
             >
-              Proceder al checkout
+              Finalizar compra
             </Link>
 
             {!session && (

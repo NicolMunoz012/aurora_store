@@ -9,6 +9,6 @@ import type { ResolveCartPricesParams } from "../types";
 export async function resolveCartPricesUseCase(
   params: ResolveCartPricesParams,
 ): Promise<ResolvedCart> {
-  const { pricingService, items, config } = params;
-  return pricingService.resolveCartPrices(items, config);
+  const { pricingService, items, config, cartId } = params;
+  return pricingService.resolveCartPrices(items, config, cartId);
 }

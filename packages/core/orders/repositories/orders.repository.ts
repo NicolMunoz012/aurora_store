@@ -376,6 +376,14 @@ export class PrismaOrdersRepository implements IOrdersRepository {
     }
   }
 
+  async deleteById(id: string): Promise<void> {
+    try {
+      await this.prisma.order.delete({ where: { id } });
+    } catch (error) {
+      throw this.handlePrismaError(error, "deleteById");
+    }
+  }
+
   /**
    * Captura errores de Prisma y los transforma en AuroraError.
    * Nunca se exponen errores crudos de Prisma fuera de la capa de repositorio (Req 11.3).

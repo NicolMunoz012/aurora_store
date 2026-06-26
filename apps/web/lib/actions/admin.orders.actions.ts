@@ -93,3 +93,30 @@ export async function cancelOrderAction(
     return handleActionError(error);
   }
 }
+
+export async function getOrderAdminAction(
+  orderId: string,
+): Promise<ActionResult<SerializedOrderWithItems>> {
+  try {
+    await assertAdmin();
+    const { ordersRepo } = buildDeps();
+    const order = await ordersRepo.findById(orderId);
+    if (!order) throw Object.assign(new Error("Order not found"), { code: "ENTITY_NOT_FOUND" });
+    return { data: serializeOrderWithItems(order), error: null };
+  } catch (error) {
+    return handleActionError(error);
+  }
+}
+
+export async function deleteOrderAction(
+  orderId: string,
+): Promise<ActionResult<void>> {
+  try {
+    await assertAdmin();
+    const { ordersRepo } = buildDeps();
+    await ordersRepo.deleteById(orderId);
+    return { data: undefined, error: null };
+  } catch (error) {
+    return handleActionError(error);
+  }
+}

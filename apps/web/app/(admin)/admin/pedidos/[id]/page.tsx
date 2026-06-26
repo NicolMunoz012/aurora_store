@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
-import { getOrderAction } from "@/lib/actions/orders.actions";
+import { getOrderAdminAction } from "@/lib/actions/admin.orders.actions";
 import { AdminOrderStatusForm } from "@/components/admin/AdminOrderStatusForm";
 
 export const metadata = { title: "Detalle pedido — Admin" };
@@ -17,7 +17,7 @@ interface AdminOrderDetailPageProps {
 
 export default async function AdminOrderDetailPage({ params }: AdminOrderDetailPageProps) {
   const { id } = await params;
-  const result = await getOrderAction(id);
+  const result = await getOrderAdminAction(id);
   if (result.error || !result.data) notFound();
 
   const order = result.data;

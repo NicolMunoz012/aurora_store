@@ -2,17 +2,17 @@
 
 @theme inline {
   /* Cerise Red palette */
-  --color-cerise-50: #FFECF0;
-  --color-cerise-100: #FED3DC;
-  --color-cerise-200: #FDABBD;
-  --color-cerise-300: #FD82A1;
-  --color-cerise-400: #FD5388;
-  --color-cerise-500: #F21370;
-  --color-cerise-600: #CD0E5E;
-  --color-cerise-700: #A8094C;
-  --color-cerise-800: #780434;
-  --color-cerise-900: #45011B;
-  --color-cerise-950: #2B010E;
+  --color-cerise-50: #FFffff;
+  --color-cerise-100: #FFD1DD;
+  --color-cerise-200: #FFA6BF;
+  --color-cerise-300: #FF79A5;
+  --color-cerise-400: #FF5695;
+  --color-cerise-500: #F7007F;
+  --color-cerise-600: #c77480;
+  --color-cerise-700: #9E004F;
+  --color-cerise-800: #6F0036;
+  --color-cerise-900: #42001D;
+  --color-cerise-950: #2B0011;
 
   /* Soft tones */
   --color-blush: oklch(0.96 0.025 350);
@@ -37,8 +37,8 @@ h1, h2, h3, h4, .font-serif {
 }
 
 ::selection {
-  background: color-mix(in oklch, #CD0E5E 18%, transparent);
-  color: #CD0E5E;
+  background: color-mix(in oklch, #FF79A5 18%, transparent);
+  color: #FF79A5;
 }
 
 html {
@@ -46,7 +46,7 @@ html {
 }
 
 :focus-visible {
-  outline: 2px solid #FD5388;
+  outline: 2px solid #e7b6be;
   outline-offset: 2px;
 }
 
