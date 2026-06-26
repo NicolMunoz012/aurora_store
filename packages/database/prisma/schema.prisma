@@ -199,8 +199,9 @@ model Product {
   minWholesaleQty Int?
   /// Porcentaje de descuento predefinido (5, 10, 15, 20, 25, 30). null = sin descuento.
   discountPercentage Int?
-  /// Marca del producto (opcional, máx 60 chars).
-  brand           String?
+  /// FK a la marca del producto. Null = sin marca asignada.
+  /// onDelete:SetNull — si se elimina la marca, el producto no se borra.
+  brandId         String?
   isActive        Boolean  @default(true)
   /// Categoría opcional. null = sin categoría asignada.
   categoryId      String?
@@ -209,11 +210,13 @@ model Product {
   updatedAt DateTime @updatedAt
 
   category   Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand      ProductBrand?  @relation(fields: [brandId], references: [id], onDelete: SetNull)
   images     ProductImage[]
   cartItems  CartItem[]
   orderItems OrderItem[]
 
   @@index([categoryId])
+  @@index([brandId])
   @@index([slug])
   @@index([isActive])
   @@map("products")
@@ -518,4 +521,23 @@ model Brand {
   updatedAt DateTime @updatedAt
 
   @@map("brands")
+}
+
+/// Marca de producto (RF-nuevo) — integridad referencial real.
+/// onDelete en Product: SetNull (si se elimina la marca, los productos
+/// no se borran; brandId pasa a null).
+/// slug generado automáticamente desde name, listo para rutas /marca/[slug].
+model ProductBrand {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  isActive  Boolean   @default(true)
+
+  products  Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@map("product_brands")
 }

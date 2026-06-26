@@ -19,6 +19,14 @@ export { toggleCategoryActiveUseCase } from "./use-cases/toggle-category-active.
 export { deleteCategoryUseCase } from "./use-cases/delete-category.use-case";
 export type { DeleteCategoryParams } from "./use-cases/delete-category.use-case";
 
+// Use cases — ProductBrands
+export {
+  createProductBrandUseCase,
+  updateProductBrandUseCase,
+  toggleProductBrandActiveUseCase,
+  deleteProductBrandUseCase,
+} from "./use-cases/product-brand.use-cases";
+
 // Types (params for use cases)
 export type {
   ListProductsParams,
@@ -35,10 +43,12 @@ export type {
 // Repository interfaces (for DI wiring in apps/web)
 export type { ICatalogRepository } from "./repositories/catalog.repository.interface";
 export type { ICategoryRepository } from "./repositories/category.repository.interface";
+export type { IProductBrandRepository } from "./repositories/product-brand.repository.interface";
 
 // Repository implementations (for DI wiring in apps/web)
 export { PrismaCatalogRepository } from "./repositories/catalog.repository";
 export { PrismaCategoryRepository } from "./repositories/category.repository";
+export { PrismaProductBrandRepository } from "./repositories/product-brand.repository";
 
 // Services (for DI wiring in apps/web)
 export { CatalogService } from "./services/catalog.service";

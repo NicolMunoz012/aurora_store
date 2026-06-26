@@ -31,6 +31,7 @@ import {
 
 export async function listProductsAction(params: {
   categoryIds?: string[];
+  brandId?: string;
 }): Promise<ActionResult<SerializedProductListItem[]>> {
   try {
     const repository = new PrismaCatalogRepository(prisma);
@@ -39,6 +40,7 @@ export async function listProductsAction(params: {
       filters: {
         isActive: true,
         categoryIds: params.categoryIds,
+        brandId: params.brandId,
       },
     });
     return { data: products.map(serializeProductListItem), error: null };

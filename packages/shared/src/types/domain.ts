@@ -79,6 +79,16 @@ export interface SavedAddressRecord {
   updatedAt: Date;
 }
 
+/** Registro de marca de producto (product_brands) */
+export interface ProductBrandRecord {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /** Producto en listado — sin wholesalePrice (NF001) */
 export interface ProductListItem {
   id: string;
@@ -88,7 +98,7 @@ export interface ProductListItem {
   stock: number;
   isActive: boolean;
   discountPercentage: number | null;
-  brand: string | null;
+  brand: { id: string; name: string; slug: string } | null;
   mainImageUrl: string;
   mainImageAlt: string | null;
   secondImageUrl: string | null;
@@ -324,6 +334,7 @@ export interface CreateAddressData {
 /** Filtros para listar productos (RF009, RF010) */
 export interface ProductFilters {
   categoryIds?: string[];
+  brandId?: string;
   search?: string;
   isActive?: boolean;
 }
@@ -338,7 +349,7 @@ export interface CreateProductData {
   lowStockAlert?: number;
   minWholesaleQty?: number | null;
   discountPercentage?: number | null;
-  brand?: string | null;
+  brandId?: string | null;
   categoryId?: string | null;
   images: AddImageData[];
 }
@@ -353,8 +364,19 @@ export interface UpdateProductData {
   lowStockAlert?: number;
   minWholesaleQty?: number | null;
   discountPercentage?: number | null;
-  brand?: string | null;
+  brandId?: string | null;
   categoryId?: string | null;
+  isActive?: boolean;
+}
+
+/** Datos para crear marca de producto */
+export interface CreateProductBrandData {
+  name: string;
+}
+
+/** Datos para actualizar marca de producto */
+export interface UpdateProductBrandData {
+  name?: string;
   isActive?: boolean;
 }
 

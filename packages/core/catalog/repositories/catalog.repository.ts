@@ -33,7 +33,7 @@ function mapToProductListItem(product: {
   stock: number;
   isActive: boolean;
   discountPercentage: number | null;
-  brand: string | null;
+  brand: { id: string; name: string; slug: string } | null;
   category: { id: string; name: string; slug: string } | null;
   images: Array<{ url: string; altText: string | null; displayOrder: number }>;
 }): ProductListItem {
@@ -51,7 +51,9 @@ function mapToProductListItem(product: {
     stock: product.stock,
     isActive: product.isActive,
     discountPercentage: product.discountPercentage,
-    brand: product.brand,
+    brand: product.brand
+      ? { id: product.brand.id, name: product.brand.name, slug: product.brand.slug }
+      : null,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
     secondImageUrl: secondImage?.url ?? null,
@@ -76,7 +78,7 @@ function mapToInternalProductDetail(product: {
   lowStockAlert: number;
   minWholesaleQty: number | null;
   discountPercentage: number | null;
-  brand: string | null;
+  brand: { id: string; name: string; slug: string } | null;
   isActive: boolean;
   category: { id: string; name: string; slug: string } | null;
   images: Array<{
@@ -109,10 +111,12 @@ function mapToInternalProductDetail(product: {
     stock: product.stock,
     isActive: product.isActive,
     discountPercentage: product.discountPercentage,
-    brand: product.brand,
+    brand: product.brand
+      ? { id: product.brand.id, name: product.brand.name, slug: product.brand.slug }
+      : null,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
-    secondImageUrl: null, // InternalProductDetail has full images array
+    secondImageUrl: null,
     category: product.category
       ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
       : null,
@@ -128,6 +132,7 @@ function mapToInternalProductDetail(product: {
 
 const productListInclude = {
   category: { select: { id: true, name: true, slug: true } },
+  brand: { select: { id: true, name: true, slug: true } },
   images: {
     select: { url: true, altText: true, displayOrder: true },
     orderBy: { displayOrder: "asc" as const },
@@ -137,6 +142,7 @@ const productListInclude = {
 
 const productDetailInclude = {
   category: { select: { id: true, name: true, slug: true } },
+  brand: { select: { id: true, name: true, slug: true } },
   images: {
     select: {
       id: true,
@@ -168,6 +174,10 @@ export class PrismaCatalogRepository implements ICatalogRepository {
 
       if (filters.categoryIds && filters.categoryIds.length > 0) {
         where.categoryId = { in: filters.categoryIds };
+      }
+
+      if (filters.brandId) {
+        where.brandId = filters.brandId;
       }
 
       const products = await this.prisma.product.findMany({
@@ -243,7 +253,9 @@ export class PrismaCatalogRepository implements ICatalogRepository {
           stock: data.stock ?? 0,
           lowStockAlert: data.lowStockAlert ?? 0,
           minWholesaleQty: data.minWholesaleQty ?? null,
-          categoryId: data.categoryId,
+          discountPercentage: data.discountPercentage ?? null,
+          categoryId: data.categoryId ?? null,
+          brandId: data.brandId ?? null,
           images: {
             create: data.images.map((img, index) => ({
               url: img.url,
@@ -276,6 +288,7 @@ export class PrismaCatalogRepository implements ICatalogRepository {
       if (data.lowStockAlert !== undefined) updateData.lowStockAlert = data.lowStockAlert;
       if (data.minWholesaleQty !== undefined) updateData.minWholesaleQty = data.minWholesaleQty;
       if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+      if (data.brandId !== undefined) updateData.brandId = data.brandId;
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
       const product = await this.prisma.product.update({

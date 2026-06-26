@@ -89,7 +89,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <>
                 {product.category && <span className="text-gray-300">·</span>}
                 <span className="text-[11px] tracking-luxe text-gray-400 uppercase">
-                  {product.brand}
+                  {product.brand.name}
                 </span>
               </>
             )}

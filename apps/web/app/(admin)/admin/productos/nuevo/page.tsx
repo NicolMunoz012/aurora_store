@@ -5,10 +5,15 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { AdminProductForm } from "@/components/admin/AdminProductForm";
 import { listActiveCategoriesAction } from "@/lib/actions/catalog.actions";
+import { listActiveProductBrandsAction } from "@/lib/actions/admin.product-brands.actions";
 
 export default async function NuevoProductoPage() {
-  const result = await listActiveCategoriesAction();
-  const categories = result.data ?? [];
+  const [categoriesResult, brandsResult] = await Promise.all([
+    listActiveCategoriesAction(),
+    listActiveProductBrandsAction(),
+  ]);
+  const categories = categoriesResult.data ?? [];
+  const productBrands = brandsResult.data ?? [];
 
   if (categories.length === 0) {
     return (
@@ -32,7 +37,7 @@ export default async function NuevoProductoPage() {
       <h1 className="font-serif text-3xl mb-2 text-gray-900">Nuevo producto</h1>
       <p className="text-gray-400 text-sm mb-8">Completa los datos para agregar un producto al catálogo.</p>
       <div className="bg-white border border-gray-100 rounded-md p-8">
-        <AdminProductForm categories={categories} mode="create" />
+        <AdminProductForm categories={categories} productBrands={productBrands} mode="create" />
       </div>
     </div>
   );

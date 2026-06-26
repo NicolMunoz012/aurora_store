@@ -7,7 +7,7 @@
 import { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Decimal } from "decimal.js";
-import type { CategoryRecord, ProductImageRecord } from "@aurora/shared";
+import type { CategoryRecord, ProductImageRecord, ProductBrandRecord } from "@aurora/shared";
 import {
   createProductAction,
   updateProductAction,
@@ -18,6 +18,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface AdminProductFormProps {
   categories: CategoryRecord[];
+  productBrands: ProductBrandRecord[];
   mode: "create" | "edit";
   productId?: string;
   initialData?: {
@@ -29,7 +30,7 @@ interface AdminProductFormProps {
     lowStockAlert: number;
     minWholesaleQty?: number;
     discountPercentage?: number | null;
-    brand?: string | null;
+    brandId?: string | null;
     categoryId: string;
     isActive: boolean;
     images: Pick<ProductImageRecord, "id" | "url" | "altText" | "displayOrder">[];
@@ -44,6 +45,7 @@ interface UploadedImage {
 
 export function AdminProductForm({
   categories,
+  productBrands,
   mode,
   productId,
   initialData,
@@ -61,7 +63,7 @@ export function AdminProductForm({
   const [categoryId, setCategoryId] = useState(initialData?.categoryId ?? categories[0]?.id ?? "");
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
   const [discountPercentage, setDiscountPercentage] = useState<number | null>(initialData?.discountPercentage ?? null);
-  const [brand, setBrand] = useState(initialData?.brand ?? "");
+  const [brandId, setBrandId] = useState(initialData?.brandId ?? "");
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>(
     initialData?.images.map((img) => ({ url: img.url, key: img.url, altText: img.altText ?? "" })) ?? [],
@@ -194,7 +196,7 @@ export function AdminProductForm({
         lowStockAlert,
         minWholesaleQty: minWholesaleQty > 0 ? minWholesaleQty : null,
         discountPercentage,
-        brand: brand.trim() || null,
+        brandId: brandId || null,
         categoryId: categoryId || null,
         images: uploadedImages.map((img, i) => ({
           url: img.url,
@@ -243,18 +245,27 @@ export function AdminProductForm({
 
       {/* Brand */}
       <div>
-        <label htmlFor="brand" className="mb-1.5 block text-sm font-medium text-gray-700">
+        <label htmlFor="brandId" className="mb-1.5 block text-sm font-medium text-gray-700">
           Marca <span className="text-gray-400 font-normal">(opcional)</span>
         </label>
-        <input
-          id="brand"
-          type="text"
-          maxLength={60}
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          placeholder="Ej: Maybelline, MAC, L'Oréal"
+        <select
+          id="brandId"
+          value={brandId}
+          onChange={(e) => setBrandId(e.target.value)}
           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 shadow-sm transition-all focus:border-cerise-300 focus:outline-none focus:ring-2 focus:ring-cerise-100"
-        />
+        >
+          <option value="">Sin marca</option>
+          {productBrands.map((b) => (
+            <option key={b.id} value={b.id}>{b.name}</option>
+          ))}
+        </select>
+        {productBrands.length === 0 && (
+          <p className="mt-1.5 text-xs text-gray-400">
+            No hay marcas creadas aún. Ve a{" "}
+            <a href="/admin/marcas" className="text-cerise-600 hover:underline">Marcas</a>{" "}
+            para agregar.
+          </p>
+        )}
       </div>
 
       {/* Description */}

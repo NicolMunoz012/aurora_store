@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import type { ActionResult } from "@/lib/types";
 import { Decimal } from "decimal.js";
-import type { ProductDetail, CategoryRecord, CreateProductData, UpdateProductData, CreateCategoryData, UpdateCategoryData } from "@aurora/shared";
+import type { CategoryRecord, CreateProductData, UpdateProductData } from "@aurora/shared";
 import { auth } from "@/lib/auth";
 import {
   createProductUseCase,
@@ -76,14 +76,14 @@ interface ProductFormInput {
   lowStockAlert?: number;
   minWholesaleQty?: number | null;
   discountPercentage?: number | null;
-  brand?: string | null;
+  brandId?: string | null;
   categoryId?: string | null;
   images: { url: string; altText?: string | null; displayOrder?: number }[];
 }
 
 export async function createProductAction(
   input: ProductFormInput,
-): Promise<ActionResult<ProductDetail>> {
+): Promise<ActionResult<void>> {
   try {
     await assertAdmin();
     const discountError = validateDiscountPercentage(input.discountPercentage);
@@ -92,11 +92,12 @@ export async function createProductAction(
       ...input,
       retailPrice: new Decimal(input.retailPrice),
       wholesalePrice: new Decimal(input.wholesalePrice),
+      brandId: input.brandId ?? null,
     };
     const repository = new PrismaCatalogRepository(prisma);
     const auditLogger = buildAuditLogger();
-    const product = await createProductUseCase({ repository, auditLogger, data });
-    return { data: product, error: null };
+    await createProductUseCase({ repository, auditLogger, data });
+    return { data: undefined, error: null };
   } catch (error) {
     return handleActionError(error);
   }
@@ -105,7 +106,7 @@ export async function createProductAction(
 export async function updateProductAction(
   productId: string,
   input: ProductFormInput,
-): Promise<ActionResult<ProductDetail>> {
+): Promise<ActionResult<void>> {
   try {
     await assertAdmin();
     const discountError = validateDiscountPercentage(input.discountPercentage);
@@ -114,11 +115,12 @@ export async function updateProductAction(
       ...input,
       retailPrice: new Decimal(input.retailPrice),
       wholesalePrice: new Decimal(input.wholesalePrice),
+      brandId: input.brandId ?? null,
     };
     const repository = new PrismaCatalogRepository(prisma);
     const auditLogger = buildAuditLogger();
-    const product = await updateProductUseCase({ repository, auditLogger, productId, data });
-    return { data: product, error: null };
+    await updateProductUseCase({ repository, auditLogger, productId, data });
+    return { data: undefined, error: null };
   } catch (error) {
     return handleActionError(error);
   }
