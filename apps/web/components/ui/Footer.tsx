@@ -19,7 +19,7 @@ export function Footer({ instagramUrl, facebookUrl, tiktokUrl }: FooterProps) {
       <div className="container-aurora py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1">
-          <Image src="/footer.png" alt="Aurora Belleza" width={80} height={26} className="mb-4 brightness-0 invert" />
+          <Image src="/footer.png" alt="LunaRose" width={80} height={26} className="mb-4 brightness-0 invert" />
           <p className="text-sm text-white/70 leading-relaxed max-w-xs">
             Productos de belleza seleccionados para potenciar tu brillo natural.
           </p>
@@ -81,7 +81,7 @@ export function Footer({ instagramUrl, facebookUrl, tiktokUrl }: FooterProps) {
 
       {/* Bottom bar */}
       <div className="container-aurora py-6 border-t border-white/20 flex flex-col sm:flex-row justify-between items-center gap-3 text-[10px] tracking-luxe text-white/50">
-        <span>© {new Date().getFullYear()} Aurora Belleza. Todos los derechos reservados.</span>
+        <span>© {new Date().getFullYear()} LunaRose. Todos los derechos reservados.</span>
         <span>Hecho con ♡ en Colombia</span>
       </div>
     </footer>

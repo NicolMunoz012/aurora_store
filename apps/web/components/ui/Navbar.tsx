@@ -125,7 +125,7 @@ export function Navbar({
             </button>
 
             <Link href="/" className="shrink-0" onClick={handleLogoClick}>
-              <Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} priority />
+              <Image src="/aurora.png" alt="LunaRose" width={90} height={28} priority />
             </Link>
 
             <div className="hidden md:flex items-center gap-7 text-[12px] tracking-luxe font-medium text-gray-500">
@@ -269,7 +269,7 @@ export function Navbar({
         {/* Drawer header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <Link href="/" onClick={closeMobile}>
-            <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={24} priority />
+            <Image src="/aurora.png" alt="LunaRose" width={80} height={24} priority />
           </Link>
           <button
             onClick={closeMobile}

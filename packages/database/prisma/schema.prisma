@@ -1,5 +1,5 @@
 // =============================================================================
-// Aurora Belleza — Prisma Schema
+// LunaRose — Prisma Schema
 // Arquitectura: Lean Modular Monolith | Next.js | PostgreSQL | Prisma ORM v7
 // Fuente de verdad: dominio y requisitos del negocio (DER.md, SRS, HU)
 // Última auditoría: ver informe de auditoría adjunto
@@ -164,7 +164,7 @@ model Category {
   @@map("categories")
 }
 
-/// Producto del catálogo de Aurora Belleza.
+/// Producto del catálogo de LunaRose.
 ///
 /// PRECIOS: retailPrice y wholesalePrice incluyen IVA (RF018).
 /// La lógica de activación del precio mayorista reside exclusivamente

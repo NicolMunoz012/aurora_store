@@ -10,7 +10,7 @@ export function TermsContent() {
       </p>
 
       <LegalCard title="Uso de la cuenta">
-        <p>Al crear una cuenta en Aurora Belleza aceptas proporcionar información veraz y mantener tus credenciales de acceso de forma confidencial.</p>
+        <p>Al crear una cuenta en LunaRose aceptas proporcionar información veraz y mantener tus credenciales de acceso de forma confidencial.</p>
         <p>Cada cuenta es personal e intransferible. El uso indebido puede resultar en la suspensión del acceso sin previo aviso.</p>
       </LegalCard>
 
@@ -23,7 +23,7 @@ export function TermsContent() {
       <LegalCard title="Pedidos y confirmación">
         <p>Al confirmar tu pedido, este se registra en estado "por confirmar" y se genera un mensaje de WhatsApp para coordinar el pago y envío.</p>
         <p>Los pedidos no confirmados dentro del plazo establecido serán cancelados automáticamente por el sistema.</p>
-        <p>Aurora Belleza se reserva el derecho de cancelar pedidos por falta de stock o información incorrecta.</p>
+        <p>LunaRose se reserva el derecho de cancelar pedidos por falta de stock o información incorrecta.</p>
       </LegalCard>
 
       <LegalCard title="Envíos">
@@ -38,7 +38,7 @@ export function TermsContent() {
       </LegalCard>
 
       <LegalCard title="Propiedad intelectual">
-        <p>Todo el contenido de Aurora Belleza — incluyendo imágenes, textos, logotipos y diseño — es propiedad exclusiva de la marca.</p>
+        <p>Todo el contenido de LunaRose — incluyendo imágenes, textos, logotipos y diseño — es propiedad exclusiva de la marca.</p>
         <p>Queda prohibida su reproducción sin autorización escrita.</p>
       </LegalCard>
 

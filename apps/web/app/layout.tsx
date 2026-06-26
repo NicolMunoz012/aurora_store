@@ -15,7 +15,7 @@ const dmSerifDisplay = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Aurora Belleza",
+  title: "LunaRose",
   description: "Productos de belleza al mejor precio.",
   icons: {
     icon: "/aurora.png",

@@ -77,7 +77,7 @@ export default async function CheckoutPage() {
       <header className="bg-white border-b border-gray-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <span className="font-serif text-2xl font-bold text-gray-900">Aurora Belleza</span>
+            <span className="font-serif text-2xl font-bold text-gray-900">LunaRose</span>
           </Link>
           <Link 
             href="/carrito" 

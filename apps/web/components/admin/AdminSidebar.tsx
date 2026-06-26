@@ -87,7 +87,7 @@ function DesktopSidebar({
       {/* Brand */}
       <div className="p-6 border-b border-gray-100">
         <Link href="/admin">
-          <Image src="/aurora.png" alt="Aurora Belleza" width={100} height={32} />
+          <Image src="/aurora.png" alt="LunaRose" width={100} height={32} />
         </Link>
         <p className="text-[11px] tracking-luxe text-gray-400 mt-2">Panel de administración</p>
       </div>
@@ -187,7 +187,7 @@ function MobileNav({
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <Link href="/admin" onClick={() => setOpen(false)}>
-              <Image src="/aurora.png" alt="Aurora Belleza" width={80} height={24} />
+              <Image src="/aurora.png" alt="LunaRose" width={80} height={24} />
             </Link>
             <p className="text-[10px] tracking-luxe text-gray-400 mt-1">Panel de administración</p>
           </div>

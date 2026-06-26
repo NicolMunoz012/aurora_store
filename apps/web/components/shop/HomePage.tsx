@@ -213,7 +213,7 @@ export function HomePage({
         <div className="container-aurora grid lg:grid-cols-2 items-center gap-10 py-10 md:py-14 lg:py-13">
           <div className="animate-fade-up">
             <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-5 block">
-              Aurora Belleza
+              LunaRose
             </span>
             <h1 className="text-[44px] leading-[1.05] md:text-6xl lg:text-7xl text-balance">
               Luminosa{" "}
@@ -302,7 +302,7 @@ export function HomePage({
       <section className="py-24 md:py-32 bg-cerise-600 text-white">
         <div className="container-aurora text-center max-w-2xl mx-auto">
           <span className="text-white/60 text-[11px] font-semibold tracking-luxe mb-6 block">
-            Aurora Belleza
+            LunaRose
           </span>
           <h2 className="text-3xl md:text-4xl leading-snug text-balance italic">
             &ldquo;La belleza es la forma en que te haces sentir a ti misma.&rdquo;

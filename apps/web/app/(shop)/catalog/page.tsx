@@ -16,7 +16,7 @@ export const revalidate = 60;
 export const runtime = "nodejs";
 
 export const metadata = {
-  title: "Catálogo — Aurora Belleza",
+  title: "Catálogo — LunaRose",
   description: "Explora nuestros productos de belleza.",
 };
 

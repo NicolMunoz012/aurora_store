@@ -71,7 +71,7 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="w-full max-w-sm text-center">
-        <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} className="mx-auto mb-10" /></Link>
+        <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={90} height={28} className="mx-auto mb-10" /></Link>
         <h1 className="font-serif text-3xl mb-3 text-gray-900">Enlace inválido</h1>
         <p className="text-gray-500 text-sm mb-8">
           Este enlace de restablecimiento no es válido o ya fue utilizado.
@@ -90,7 +90,7 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="w-full max-w-sm text-center">
-        <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} className="mx-auto mb-10" /></Link>
+        <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={90} height={28} className="mx-auto mb-10" /></Link>
         <div className="mb-6 mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-green-500">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-7">
             <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
@@ -113,7 +113,7 @@ function ResetPasswordForm() {
   // ── Form ──
   return (
     <div className="w-full max-w-sm">
-      <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} className="mb-10" /></Link>
+      <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={90} height={28} className="mb-10" /></Link>
       <h1 className="font-serif text-3xl md:text-4xl mb-2 text-gray-900">Nueva contraseña.</h1>
       <p className="text-gray-500 text-sm mb-10">
         Elige una contraseña segura para tu cuenta.
@@ -210,7 +210,7 @@ export default function ResetPasswordPage() {
       {/* Brand panel */}
       <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
         <div className="absolute top-8 left-8">
-          <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} /></Link>
+          <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={90} height={28} /></Link>
         </div>
         <div className="text-center max-w-md">
           <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
@@ -220,7 +220,7 @@ export default function ResetPasswordPage() {
             "Tu privacidad es nuestra prioridad."
           </p>
           <p className="text-[11px] tracking-luxe text-gray-400 mt-8 font-medium">
-            — Aurora Belleza
+            — LunaRose
           </p>
         </div>
       </div>

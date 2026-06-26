@@ -22,9 +22,9 @@ interface ProductPageProps {
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params;
   const result = await getProductBySlugAction(slug);
-  if (!result.data) return { title: "Producto no encontrado — Aurora Belleza" };
+  if (!result.data) return { title: "Producto no encontrado — LunaRose" };
   return {
-    title: `${result.data.name} — Aurora Belleza`,
+    title: `${result.data.name} — LunaRose`,
     description: result.data.description ?? undefined,
   };
 }

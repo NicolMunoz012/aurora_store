@@ -11,7 +11,7 @@ import Link from "next/link";
 import { getOrderAction, generateWhatsappMessageAction } from "@/lib/actions/orders.actions";
 import { WhatsappButton } from "@/components/client/WhatsappButton";
 
-export const metadata = { title: "Detalle de pedido — Aurora Belleza" };
+export const metadata = { title: "Detalle de pedido — LunaRose" };
 
 const STATUS_STEPS = [
   "PENDING_CONFIRMATION",

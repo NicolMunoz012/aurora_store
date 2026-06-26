@@ -48,7 +48,7 @@ function LoginForm() {
       {/* Brand panel — solo desktop */}
       <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
         <div className="absolute top-8 left-8">
-          <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={90} height={28} /></Link>
+          <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={90} height={28} /></Link>
         </div>
         <div className="text-center max-w-md">
           <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
@@ -58,7 +58,7 @@ function LoginForm() {
             "La belleza es sentirte bien en tu propia piel."
           </p>
           <p className="text-[11px] tracking-luxe text-gray-400 mt-8 font-medium">
-            — Aurora Belleza
+            — LunaRose
           </p>
         </div>
       </div>
@@ -67,7 +67,7 @@ function LoginForm() {
       <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8">
-            <Link href="/"><Image src="/aurora.png" alt="Aurora Belleza" width={80} height={26} /></Link>
+            <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={80} height={26} /></Link>
           </div>
           <div className="mb-6">
             <Link href="/catalog" className="inline-flex items-center gap-1.5 text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
@@ -76,7 +76,7 @@ function LoginForm() {
             </Link>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl mb-2">Bienvenida de nuevo.</h1>
-          <p className="text-gray-500 text-sm mb-10">Ingresa a tu cuenta Aurora.</p>
+          <p className="text-gray-500 text-sm mb-10">Ingresa a tu cuenta LunaRose.</p>
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div>

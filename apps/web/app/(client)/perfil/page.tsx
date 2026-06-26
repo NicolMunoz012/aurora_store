@@ -5,7 +5,7 @@ import { getProfileAction, listSavedAddressesAction } from "@/lib/actions/user.a
 import { ProfileForm } from "@/components/client/ProfileForm";
 import { SavedAddressList } from "@/components/client/SavedAddressList";
 
-export const metadata = { title: "Mi perfil — Aurora Belleza" };
+export const metadata = { title: "Mi perfil — LunaRose" };
 
 export default async function PerfilPage() {
   const [profileResult, addressesResult] = await Promise.all([

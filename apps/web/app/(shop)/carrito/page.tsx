@@ -11,7 +11,7 @@ import { getCartWithPricingAction } from "@/lib/actions/cart.actions";
 import { CartItemControls } from "@/components/cart/CartItemControls";
 import Link from "next/link";
 
-export const metadata = { title: "Tu carrito — Aurora Belleza" };
+export const metadata = { title: "Tu carrito — LunaRose" };
 
 function formatCOP(value: string): string {
   return new Intl.NumberFormat("es-CO", {

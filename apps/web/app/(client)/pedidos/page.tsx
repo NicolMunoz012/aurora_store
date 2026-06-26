@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { listOrdersByUserAction } from "@/lib/actions/orders.actions";
 
-export const metadata = { title: "Mis pedidos — Aurora Belleza" };
+export const metadata = { title: "Mis pedidos — LunaRose" };
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING_CONFIRMATION: "Pendiente de confirmación",

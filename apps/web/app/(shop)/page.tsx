@@ -12,7 +12,7 @@ import { HomePage } from "@/components/shop/HomePage";
 import type { SerializedProductListItem } from "@/lib/serializers";
 
 export const metadata = {
-  title: "Aurora Belleza",
+  title: "LunaRose",
   description: "Productos de belleza seleccionados.",
 };
 
