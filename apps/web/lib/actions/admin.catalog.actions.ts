@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import type { ActionResult } from "@/lib/types";
 import { Decimal } from "decimal.js";
-import type { CategoryRecord, CreateProductData, UpdateProductData } from "@aurora/shared";
+import type { CategoryRecord, CreateProductData, UpdateProductData, CreateCategoryData, UpdateCategoryData } from "@aurora/shared";
 import { auth } from "@/lib/auth";
 import {
   createProductUseCase,
@@ -19,8 +19,6 @@ import {
   deleteCategoryUseCase,
   PrismaCatalogRepository,
   PrismaCategoryRepository,
-  CatalogService,
-  CategoryService,
 } from "@aurora/core/catalog";
 import {
   verifyUserRoleUseCase,
