@@ -1,7 +1,8 @@
 "use client";
 // =============================================================================
 // components/catalog/ProductImageGallery.tsx (Req 5.6)
-// Client Component image carousel using next/image.
+// Client Component image carousel with stable image rendering.
+// Filters invalid URLs and respects displayOrder.
 // =============================================================================
 
 import { useState } from "react";
@@ -13,17 +14,30 @@ interface ProductImageGalleryProps {
   productName: string;
 }
 
+/**
+ * Validates that a URL string is non-empty and not just whitespace.
+ */
+function isValidImageUrl(url: string | null | undefined): url is string {
+  return typeof url === "string" && url.trim().length > 0;
+}
+
 export function ProductImageGallery({
   images,
   productName,
 }: ProductImageGalleryProps) {
-  const sorted = [...images].sort((a, b) => a.displayOrder - b.displayOrder);
+  // Filter out invalid URLs, then sort by displayOrder
+  const validImages = images
+    .filter((img) => isValidImageUrl(img.url))
+    .sort((a, b) => a.displayOrder - b.displayOrder);
+
   const [activeIndex, setActiveIndex] = useState(0);
-  const active = sorted[activeIndex];
+  const active = validImages[activeIndex];
 
   if (!active) {
     return (
-      <div className="aspect-square w-full rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+      <div className="aspect-square w-full rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 text-sm">
+        Sin imágenes disponibles
+      </div>
     );
   }
 
@@ -42,13 +56,13 @@ export function ProductImageGallery({
       </div>
 
       {/* Thumbnails */}
-      {sorted.length > 1 && (
+      {validImages.length > 1 && (
         <div
           role="tablist"
           aria-label="Imágenes del producto"
           className="flex gap-2 overflow-x-auto"
         >
-          {sorted.map((img, i) => (
+          {validImages.map((img, i) => (
             <button
               key={img.id}
               role="tab"

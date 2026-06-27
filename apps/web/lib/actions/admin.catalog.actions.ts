@@ -114,6 +114,12 @@ export async function updateProductAction(
       retailPrice: new Decimal(input.retailPrice),
       wholesalePrice: new Decimal(input.wholesalePrice),
       brandId: input.brandId ?? null,
+      // Always sync images on edit — the form always sends the current full set
+      images: input.images.map((img, i) => ({
+        url: img.url,
+        altText: img.altText ?? null,
+        displayOrder: img.displayOrder ?? i,
+      })),
     };
     const repository = new PrismaCatalogRepository(prisma);
     const auditLogger = buildAuditLogger();

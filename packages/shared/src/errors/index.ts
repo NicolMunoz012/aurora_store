@@ -4,6 +4,7 @@ export {
   UnauthorizedRoleError,
   ProductNotFoundError,
   ProductRequiresImageError,
+  ProductDuplicateNameError,
   SlugAlreadyExistsError,
   InsufficientStockError,
   CartNotFoundError,

@@ -85,7 +85,23 @@ export interface ICatalogRepository {
   removeImage(imageId: string): Promise<void>;
 
   /**
-   * Verifica si un slug ya existe en la tabla de productos.
+   * Verifies if a product with the given normalized name already exists.
+   * Case-insensitive and trim-aware. Optionally excludes a product by ID
+   * (used when updating to allow keeping the same name).
+   * @param name — raw name (will be trimmed/lowercased internally)
+   * @param excludeId — productId to exclude from the check (for updates)
+   */
+  nameExistsForOther(name: string, excludeId?: string): Promise<boolean>;
+
+  /**
+   * Replaces ALL images of a product atomically.
+   * Deletes existing images and creates the new set in a single transaction.
+   * Preserves displayOrder from the provided array.
+   */
+  syncImages(productId: string, images: AddImageData[]): Promise<void>;
+
+  /**
+   * Verifies if a slug ya existe en la tabla de productos.
    * Usado por generateUniqueSlug como existsFn.
    */
   slugExists(slug: string): Promise<boolean>;

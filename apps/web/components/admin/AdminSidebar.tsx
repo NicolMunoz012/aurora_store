@@ -83,7 +83,7 @@ function DesktopSidebar({
   onSignOut: () => void;
 }) {
   return (
-    <aside className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col h-full">
+    <aside className="hidden md:flex md:fixed md:left-0 md:top-0 md:h-screen w-64 bg-white border-r border-gray-100 flex-col">
       {/* Brand */}
       <div className="p-6 border-b border-gray-100">
         <Link href="/admin">

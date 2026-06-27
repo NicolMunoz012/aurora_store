@@ -90,11 +90,12 @@ function mapToInternalProductDetail(product: {
     createdAt: Date;
   }>;
 }): InternalProductDetail {
-  const mainImage = product.images.length > 0
-    ? [...product.images].sort((a, b) => a.displayOrder - b.displayOrder)[0]
-    : null;
+  // Sort before deriving mainImageUrl so displayOrder is respected
+  const sortedImages = [...product.images].sort((a, b) => a.displayOrder - b.displayOrder);
+  const mainImage = sortedImages[0] ?? null;
+  const secondImage = sortedImages[1] ?? null;
 
-  const images: ProductImageRecord[] = product.images.map((img) => ({
+  const images: ProductImageRecord[] = sortedImages.map((img) => ({
     id: img.id,
     productId: img.productId,
     url: img.url,
@@ -116,7 +117,7 @@ function mapToInternalProductDetail(product: {
       : null,
     mainImageUrl: mainImage?.url ?? "",
     mainImageAlt: mainImage?.altText ?? null,
-    secondImageUrl: null,
+    secondImageUrl: secondImage?.url ?? null,
     category: product.category
       ? { id: product.category.id, name: product.category.name, slug: product.category.slug }
       : null,
@@ -291,6 +292,21 @@ export class PrismaCatalogRepository implements ICatalogRepository {
       if (data.brandId !== undefined) updateData.brandId = data.brandId;
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
+      // If images are provided, replace them atomically inside the same transaction
+      if (data.images !== undefined && data.images.length > 0) {
+        await this.prisma.$transaction([
+          this.prisma.productImage.deleteMany({ where: { productId: id } }),
+          this.prisma.productImage.createMany({
+            data: data.images.map((img, index) => ({
+              productId: id,
+              url: img.url,
+              displayOrder: img.displayOrder ?? index,
+              altText: img.altText ?? null,
+            })),
+          }),
+        ]);
+      }
+
       const product = await this.prisma.product.update({
         where: { id },
         data: updateData,
@@ -371,6 +387,49 @@ export class PrismaCatalogRepository implements ICatalogRepository {
       return product !== null;
     } catch (error) {
       throw this.handlePrismaError(error, "slugExists");
+    }
+  }
+
+  /**
+   * Returns true when another product (excluding `excludeId`) already has the
+   * same normalized name (trimmed + lower-cased).  Uses Prisma's insensitive
+   * mode so it works across any Postgres collation.
+   */
+  async nameExistsForOther(name: string, excludeId?: string): Promise<boolean> {
+    try {
+      const normalized = name.trim();
+      const existing = await this.prisma.product.findFirst({
+        where: {
+          name: { equals: normalized, mode: "insensitive" },
+          ...(excludeId ? { NOT: { id: excludeId } } : {}),
+        },
+        select: { id: true },
+      });
+      return existing !== null;
+    } catch (error) {
+      throw this.handlePrismaError(error, "nameExistsForOther");
+    }
+  }
+
+  /**
+   * Replaces ALL images of a product atomically using a transaction.
+   * Safe to call on create (no existing rows) or on edit.
+   */
+  async syncImages(productId: string, images: AddImageData[]): Promise<void> {
+    try {
+      await this.prisma.$transaction([
+        this.prisma.productImage.deleteMany({ where: { productId } }),
+        this.prisma.productImage.createMany({
+          data: images.map((img, index) => ({
+            productId,
+            url: img.url,
+            displayOrder: img.displayOrder ?? index,
+            altText: img.altText ?? null,
+          })),
+        }),
+      ]);
+    } catch (error) {
+      throw this.handlePrismaError(error, "syncImages");
     }
   }
 

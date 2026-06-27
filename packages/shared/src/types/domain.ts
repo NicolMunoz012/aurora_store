@@ -367,6 +367,8 @@ export interface UpdateProductData {
   brandId?: string | null;
   categoryId?: string | null;
   isActive?: boolean;
+  /** Reemplaza el conjunto completo de imágenes cuando se provee (opcional). */
+  images?: AddImageData[];
 }
 
 /** Datos para crear marca de producto */

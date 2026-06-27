@@ -65,6 +65,15 @@ export class SlugAlreadyExistsError extends AuroraError {
   }
 }
 
+export class ProductDuplicateNameError extends AuroraError {
+  public readonly duplicateName: string;
+
+  constructor(name: string) {
+    super('PRODUCT_DUPLICATE_NAME', `A product with the name "${name}" already exists`);
+    this.duplicateName = name;
+  }
+}
+
 // ─── Cart & Orders Errors ─────────────────────────────────────────────────────
 
 export class InsufficientStockError extends AuroraError {

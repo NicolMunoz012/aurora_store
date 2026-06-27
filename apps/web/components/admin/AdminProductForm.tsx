@@ -74,6 +74,8 @@ export function AdminProductForm({
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [pendingNavHref, setPendingNavHref] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Mark dirty on any field change
   function markDirty() { setIsDirty(true); }
@@ -175,6 +177,43 @@ export function AdminProductForm({
       return;
     }
     setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  // ─── Drag & Drop handlers ─────────────────────────────────────────────────
+  function handleDragStart(index: number) {
+    setDraggedIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault(); // Required to allow drop
+    if (draggedIndex === null || draggedIndex === index) return;
+    setDragOverIndex(index);
+  }
+
+  function handleDragLeave() {
+    setDragOverIndex(null);
+  }
+
+  function handleDrop(e: React.DragEvent, dropIndex: number) {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+
+    // Reorder the array
+    setUploadedImages((prev) => {
+      const newArray = [...prev];
+      const [draggedItem] = newArray.splice(draggedIndex, 1);
+      newArray.splice(dropIndex, 0, draggedItem);
+      return newArray;
+    });
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    markDirty();
+  }
+
+  function handleDragEnd() {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -426,23 +465,58 @@ export function AdminProductForm({
 
       {/* Images */}
       <div>
-        <p className="mb-2 text-sm font-medium text-gray-700">
+        <p className="mb-1 text-sm font-medium text-gray-700">
           Imágenes ({uploadedImages.length}/5) — JPG, PNG o WebP, máx. 2 MB
         </p>
+        {uploadedImages.length > 1 && (
+          <p className="mb-2 text-xs text-gray-400">
+            Arrastra las imágenes para cambiar el orden. La primera se mostrará como imagen principal.
+          </p>
+        )}
         <div className="flex flex-wrap gap-3 mb-3">
           {uploadedImages.map((img, i) => (
-            <div key={img.key + i} className="relative h-20 w-20 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-              <img src={img.url} alt="" className="h-full w-full object-cover" />
+            <div
+              key={img.key + i}
+              draggable
+              onDragStart={() => handleDragStart(i)}
+              onDragOver={(e) => handleDragOver(e, i)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, i)}
+              onDragEnd={handleDragEnd}
+              className={`relative h-20 w-20 rounded-xl overflow-hidden border-2 shadow-sm cursor-grab active:cursor-grabbing select-none transition-all duration-150 ${
+                draggedIndex === i
+                  ? "opacity-40 scale-95 border-cerise-300"
+                  : dragOverIndex === i
+                    ? "border-cerise-500 scale-105 shadow-md"
+                    : "border-gray-200 hover:border-cerise-200"
+              }`}
+            >
+              <img src={img.url} alt="" className="h-full w-full object-cover pointer-events-none" />
+
+              {/* Order badge */}
+              <span className="absolute bottom-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/50 text-[9px] font-bold text-white leading-none">
+                {i + 1}
+              </span>
+
+              {/* Main image label */}
+              {i === 0 && (
+                <span className="absolute top-1 left-1 rounded-sm bg-cerise-500 px-1 py-0.5 text-[8px] font-bold text-white leading-none tracking-wide">
+                  PRINCIPAL
+                </span>
+              )}
+
+              {/* Delete button */}
               <button
                 type="button"
                 onClick={() => removeImage(i)}
-                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm hover:bg-red-600"
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm hover:bg-red-600 transition-colors"
                 aria-label="Eliminar imagen"
               >
                 ✕
               </button>
             </div>
           ))}
+
           {uploadedImages.length < 5 && (
             <label className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-gray-400 transition-colors hover:border-cerise-300 hover:text-cerise-500">
               {isUploading ? (
