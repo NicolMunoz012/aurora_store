@@ -4,7 +4,7 @@
 // Server Actions para el catálogo público (Req 5.1, 5.4, 5.5, 9.3).
 // =============================================================================
 
-import { prisma } from "@/lib/db";
+import { prisma, withDbRetry } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import {
   serializeProductListItem,
@@ -35,14 +35,16 @@ export async function listProductsAction(params: {
 }): Promise<ActionResult<SerializedProductListItem[]>> {
   try {
     const repository = new PrismaCatalogRepository(prisma);
-    const products = await listProductsUseCase({
-      repository,
-      filters: {
-        isActive: true,
-        categoryIds: params.categoryIds,
-        brandId: params.brandId,
-      },
-    });
+    const products = await withDbRetry(() =>
+      listProductsUseCase({
+        repository,
+        filters: {
+          isActive: true,
+          categoryIds: params.categoryIds,
+          brandId: params.brandId,
+        },
+      }),
+    );
     return { data: products.map(serializeProductListItem), error: null };
   } catch (error) {
     return handleActionError(error);
@@ -54,7 +56,9 @@ export async function searchProductsAction(
 ): Promise<ActionResult<SerializedProductListItem[]>> {
   try {
     const repository = new PrismaCatalogRepository(prisma);
-    const products = await searchProductsUseCase({ repository, query });
+    const products = await withDbRetry(() =>
+      searchProductsUseCase({ repository, query }),
+    );
     return { data: products.map(serializeProductListItem), error: null };
   } catch (error) {
     return handleActionError(error);
@@ -66,7 +70,9 @@ export async function getProductBySlugAction(
 ): Promise<ActionResult<SerializedProductDetail | null>> {
   try {
     const repository = new PrismaCatalogRepository(prisma);
-    const product = await getProductBySlugUseCase({ repository, slug });
+    const product = await withDbRetry(() =>
+      getProductBySlugUseCase({ repository, slug }),
+    );
     if (!product) return { data: null, error: null };
     return { data: serializeProductDetail(product), error: null };
   } catch (error) {
@@ -79,7 +85,9 @@ export async function getStoreConfigAction(): Promise<
 > {
   try {
     const repository = new PrismaStoreConfigRepository(prisma);
-    const config = await getStoreConfigUseCase({ repository });
+    const config = await withDbRetry(() =>
+      getStoreConfigUseCase({ repository }),
+    );
     return { data: config, error: null };
   } catch (error) {
     return handleActionError(error);
@@ -91,7 +99,7 @@ export async function getProductByIdAction(
 ): Promise<ActionResult<SerializedInternalProductDetail | null>> {
   try {
     const repository = new PrismaCatalogRepository(prisma);
-    const product = await repository.findById(id);
+    const product = await withDbRetry(() => repository.findById(id));
     if (!product) return { data: null, error: null };
     return { data: serializeInternalProductDetail(product), error: null };
   } catch (error) {
@@ -104,7 +112,7 @@ export async function listActiveCategoriesAction(): Promise<
 > {
   try {
     const repository = new PrismaCategoryRepository(prisma);
-    const categories = await repository.listActive();
+    const categories = await withDbRetry(() => repository.listActive());
     return { data: categories, error: null };
   } catch (error) {
     return handleActionError(error);
@@ -116,7 +124,7 @@ export async function listAllCategoriesAction(): Promise<
 > {
   try {
     const repository = new PrismaCategoryRepository(prisma);
-    const categories = await repository.listAll();
+    const categories = await withDbRetry(() => repository.listAll());
     return { data: categories, error: null };
   } catch (error) {
     return handleActionError(error);

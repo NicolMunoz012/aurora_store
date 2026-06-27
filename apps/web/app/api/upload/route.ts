@@ -50,9 +50,21 @@ export async function POST(req: NextRequest) {
     const result = await provider.upload(file);
     return NextResponse.json({ url: result.url, key: result.key });
   } catch (err) {
-    console.error("[Upload Route] Error:", err);
+    const insforgeErr = err as { statusCode?: number; error?: string; message?: string };
+    console.error("[Upload Route] Error details:", {
+      message: insforgeErr?.message,
+      statusCode: insforgeErr?.statusCode,
+      errorCode: insforgeErr?.error,
+      raw: err,
+    });
+    const userMessage =
+      insforgeErr?.statusCode === 404
+        ? "El bucket de almacenamiento no existe. Verifica la configuración de InsForge."
+        : insforgeErr?.statusCode === 401 || insforgeErr?.statusCode === 403
+          ? "Sin permisos para subir archivos. Verifica INSFORGE_API_KEY."
+          : "Error al subir el archivo. Intenta de nuevo.";
     return NextResponse.json(
-      { error: "Error al subir el archivo. Intenta de nuevo." },
+      { error: userMessage },
       { status: 500 },
     );
   }

@@ -3,7 +3,7 @@
 // apps/web/lib/actions/admin.brands.actions.ts — Brand management
 // =============================================================================
 
-import { prisma } from "@/lib/db";
+import { prisma, withDbRetry } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import type { ActionResult } from "@/lib/types";
 import { auth } from "@/lib/auth";
@@ -28,9 +28,9 @@ async function assertAdmin(): Promise<void> {
 
 export async function listBrandsAction(): Promise<ActionResult<BrandRecord[]>> {
   try {
-    const brands = await prisma.brand.findMany({
-      orderBy: { order: "asc" },
-    });
+    const brands = await withDbRetry(() =>
+      prisma.brand.findMany({ orderBy: { order: "asc" } }),
+    );
     return { data: brands, error: null };
   } catch (error) {
     return handleActionError(error);
@@ -39,11 +39,13 @@ export async function listBrandsAction(): Promise<ActionResult<BrandRecord[]>> {
 
 export async function listActiveBrandsAction(): Promise<ActionResult<BrandRecord[]>> {
   try {
-    const brands = await prisma.brand.findMany({
-      where: { isActive: true },
-      orderBy: { order: "asc" },
-      take: 5,
-    });
+    const brands = await withDbRetry(() =>
+      prisma.brand.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
+        take: 5,
+      }),
+    );
     return { data: brands, error: null };
   } catch (error) {
     return handleActionError(error);
@@ -57,17 +59,19 @@ export async function saveBrandsAction(
     await assertAdmin();
 
     // Delete all and recreate in order (max 5)
-    await prisma.brand.deleteMany();
+    await withDbRetry(() => prisma.brand.deleteMany());
 
     if (brands.length > 0) {
-      await prisma.brand.createMany({
-        data: brands.slice(0, 5).map((b, i) => ({
-          imageUrl: b.imageUrl,
-          imageKey: b.imageKey,
-          order: i,
-          isActive: true,
-        })),
-      });
+      await withDbRetry(() =>
+        prisma.brand.createMany({
+          data: brands.slice(0, 5).map((b, i) => ({
+            imageUrl: b.imageUrl,
+            imageKey: b.imageKey,
+            order: i,
+            isActive: true,
+          })),
+        }),
+      );
     }
 
     return { data: undefined, error: null };

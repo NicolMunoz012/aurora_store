@@ -3,7 +3,7 @@
 // apps/web/lib/actions/admin.orders.actions.ts (Req 3.5, 18.1, 18.3–18.6)
 // =============================================================================
 
-import { prisma } from "@/lib/db";
+import { prisma, withDbRetry } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import { serializeOrderWithItems, serializeOrderSummary, type SerializedOrderWithItems, type SerializedOrderSummary } from "@/lib/serializers";
 import type { ActionResult } from "@/lib/types";
@@ -49,7 +49,9 @@ export async function listOrdersAdminAction(
   try {
     await assertAdmin();
     const { ordersRepo } = buildDeps();
-    const orders = await listOrdersAdminUseCase({ repository: ordersRepo, filters });
+    const orders = await withDbRetry(() =>
+      listOrdersAdminUseCase({ repository: ordersRepo, filters }),
+    );
     return { data: orders.map(serializeOrderSummary), error: null };
   } catch (error) {
     return handleActionError(error);
@@ -64,16 +66,18 @@ export async function updateOrderStatusAction(
   try {
     await assertAdmin();
     const { ordersRepo, inventoryService, auditLogger } = buildDeps();
-    await updateOrderStatusUseCase({
-      repository: ordersRepo,
-      inventoryService,
-      auditLogger,
-      orderId,
-      newStatus: status,
-      trackingNumber: trackingNumber ?? null,
-    });
+    await withDbRetry(() =>
+      updateOrderStatusUseCase({
+        repository: ordersRepo,
+        inventoryService,
+        auditLogger,
+        orderId,
+        newStatus: status,
+        trackingNumber: trackingNumber ?? null,
+      }),
+    );
     // Reload order with items to return complete data
-    const order = await ordersRepo.findById(orderId);
+    const order = await withDbRetry(() => ordersRepo.findById(orderId));
     if (!order) throw Object.assign(new Error("Order not found"), { code: "ENTITY_NOT_FOUND" });
     return { data: serializeOrderWithItems(order), error: null };
   } catch (error) {
@@ -87,7 +91,9 @@ export async function cancelOrderAction(
   try {
     await assertAdmin();
     const { ordersRepo, inventoryService, auditLogger } = buildDeps();
-    await cancelOrderUseCase({ repository: ordersRepo, inventoryService, auditLogger, orderId });
+    await withDbRetry(() =>
+      cancelOrderUseCase({ repository: ordersRepo, inventoryService, auditLogger, orderId }),
+    );
     return { data: undefined, error: null };
   } catch (error) {
     return handleActionError(error);
@@ -100,7 +106,7 @@ export async function getOrderAdminAction(
   try {
     await assertAdmin();
     const { ordersRepo } = buildDeps();
-    const order = await ordersRepo.findById(orderId);
+    const order = await withDbRetry(() => ordersRepo.findById(orderId));
     if (!order) throw Object.assign(new Error("Order not found"), { code: "ENTITY_NOT_FOUND" });
     return { data: serializeOrderWithItems(order), error: null };
   } catch (error) {
@@ -114,7 +120,7 @@ export async function deleteOrderAction(
   try {
     await assertAdmin();
     const { ordersRepo } = buildDeps();
-    await ordersRepo.deleteById(orderId);
+    await withDbRetry(() => ordersRepo.deleteById(orderId));
     return { data: undefined, error: null };
   } catch (error) {
     return handleActionError(error);
