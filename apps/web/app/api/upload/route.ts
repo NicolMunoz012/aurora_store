@@ -46,8 +46,17 @@ export async function POST(req: NextRequest) {
 
   // 5. Upload via provider (Req 16.4)
   try {
+    // Ensure the file object is a proper File with a name for the InsForge SDK.
+    // Next.js formData() can return a Blob without a filename in some edge runtimes.
+    const uploadFile =
+      file.name && file.name !== "blob"
+        ? file
+        : new File([file], `upload-${Date.now()}.${file.type.split("/")[1] ?? "jpg"}`, {
+            type: file.type,
+          });
+
     const provider = getUploadProvider();
-    const result = await provider.upload(file);
+    const result = await provider.upload(uploadFile);
     return NextResponse.json({ url: result.url, key: result.key });
   } catch (err) {
     const insforgeErr = err as { statusCode?: number; error?: string; message?: string };
@@ -55,7 +64,10 @@ export async function POST(req: NextRequest) {
       message: insforgeErr?.message,
       statusCode: insforgeErr?.statusCode,
       errorCode: insforgeErr?.error,
-      raw: err,
+      fileName: (file as File).name,
+      fileType: file.type,
+      fileSize: file.size,
+      raw: String(err),
     });
     const userMessage =
       insforgeErr?.statusCode === 404

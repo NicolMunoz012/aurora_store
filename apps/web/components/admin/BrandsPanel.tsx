@@ -33,8 +33,8 @@ export function BrandsPanel({ initialBrands }: { initialBrands: BrandRecord[] })
   async function handleUpload(index: number, e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(file.type)) {
-      setError("Formato no permitido. Usa JPG, PNG, WebP o SVG.");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setError("Formato no permitido. Usa JPG, PNG o WebP.");
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
@@ -116,7 +116,7 @@ export function BrandsPanel({ initialBrands }: { initialBrands: BrandRecord[] })
                 {slot ? "Cambiar" : "Subir imagen"}
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/svg+xml"
+                  accept="image/jpeg,image/png,image/webp"
                   className="sr-only"
                   onChange={(e) => handleUpload(i, e)}
                   disabled={uploading !== null}
