@@ -48,12 +48,14 @@ export default auth(function middleware(req) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths EXCEPT:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
+     * Run middleware on all paths EXCEPT:
+     * - _next/static  — Next.js static assets
+     * - _next/image   — Next.js image optimization
      * - favicon.ico
-     * - api/auth (Auth.js route handler)
+     * - api/auth      — Auth.js own route handler (must not intercept itself)
+     * - api/upload    — file upload endpoint; auth is checked inside the handler
+     * - api/debug-*   — diagnostic endpoints; auth checked inside the handler
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/auth).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/upload|api/debug-).*)",
   ],
 };

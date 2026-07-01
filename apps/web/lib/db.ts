@@ -2,51 +2,55 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@aurora/database";
 
-// ─── Singleton — persists across requests in both dev and production ──────────
-// In production Next.js runs in a long-lived Node process; we must reuse the
-// same Pool instance to avoid opening a new connection on every request.
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+// ─── Singleton — one Pool, one PrismaClient, for the entire process lifetime ──
+//
+// WHY globalThis:
+//   Next.js hot-reloads modules in dev, re-running module-level code on each
+//   reload. Without globalThis the singleton would be re-created on every hot
+//   reload, opening a new Pool. In production the module is only evaluated once
+//   but we keep the same pattern for consistency.
+//
+// WHY no conditional (process.env.NODE_ENV !== "production"):
+//   The old code only assigned the singleton in dev. In production nothing was
+//   stored, so every cold-start could create a new instance. Now we always store.
+const g = globalThis as unknown as { prisma?: PrismaClient };
 
-function createPrismaClient() {
+function createPrismaClient(): PrismaClient {
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
 
-    // Keep idle connections alive — the DB server closes them after ~10 min.
-    // 30 s idle timeout ensures we drop them first and avoid "connection
-    // terminated unexpectedly" errors on the NEXT request.
-    idleTimeoutMillis: 30_000,
+    // Maximum simultaneous pg connections this process may hold.
+    // InsForge free tier — keep this low so multiple dynos/instances
+    // can coexist without hitting P2037.
+    max: 3,
 
-    // Give up quickly if no connection is available rather than hanging.
-    connectionTimeoutMillis: 10_000,
+    // Release idle connections after 20 s so they don't accumulate
+    // when the process is quiet between requests.
+    idleTimeoutMillis: 20_000,
 
-    // Conservative cap — avoids exhausting the DB connection limit.
-    max: 5,
+    // Fail the query quickly rather than queuing indefinitely behind
+    // a saturated pool.
+    connectionTimeoutMillis: 8_000,
 
-    // !! Do NOT set allowExitOnIdle — it destroys the pool while the process
-    // is still alive (production), causing every subsequent request to fail.
+    // DO NOT set allowExitOnIdle — it destroys the pool while the
+    // process is still alive, causing every subsequent request to fail.
   });
 
-  // Surface idle-client errors in server logs instead of silent crashes.
   pool.on("error", (err) => {
+    // Surface unexpected idle-client errors in server logs.
     console.error("[DB Pool] Idle client error:", err.message);
   });
 
-  const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter });
+  return new PrismaClient({ adapter: new PrismaPg(pool) });
 }
 
-// Store the singleton on globalThis so it survives hot-reloads in dev AND
-// is shared across the whole production process lifetime.
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-globalForPrisma.prisma = prisma;
+// Always store on globalThis — works correctly in both dev and production.
+export const prisma: PrismaClient = g.prisma ?? (g.prisma = createPrismaClient());
 
-// ─── Connection-error retry helper ───────────────────────────────────────────
-// Prisma over pg can throw "Connection terminated unexpectedly" when the pool
-// has a stale socket. A single retry is almost always enough to get a fresh one.
-export const RETRYABLE_MESSAGES = [
+// ─── Connection-error classifier ─────────────────────────────────────────────
+
+const RETRYABLE_MESSAGES = [
   "connection terminated unexpectedly",
   "connection terminated",
   "server closed the connection unexpectedly",
@@ -63,20 +67,22 @@ export function isDbConnectionError(err: unknown): boolean {
 }
 
 /**
- * Wraps a Prisma query with a single automatic retry on transient connection
- * errors. Use in Server Actions and Server Components.
+ * Retries a single Prisma query ONCE on transient connection errors.
  *
- * @example
- *   const brands = await withDbRetry(() => prisma.brand.findMany());
+ * Rules:
+ * - Do NOT nest withDbRetry inside another withDbRetry call.
+ * - Do NOT pass a function that internally calls withDbRetry again.
+ * - One retry level only — avoids connection storms on a degraded DB.
  */
-export async function withDbRetry<T>(fn: () => Promise<T>, retries = 1): Promise<T> {
+export async function withDbRetry<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
   } catch (err) {
-    if (retries > 0 && isDbConnectionError(err)) {
-      console.warn("[DB] Connection error, retrying once…", (err as Error).message);
+    if (isDbConnectionError(err)) {
+      console.warn("[DB] Transient connection error, retrying once:", (err as Error).message);
       await new Promise((r) => setTimeout(r, 150));
-      return withDbRetry(fn, retries - 1);
+      // Second attempt — no further retry
+      return fn();
     }
     throw err;
   }

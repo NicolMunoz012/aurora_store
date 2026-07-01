@@ -20,21 +20,18 @@ export default async function ShopLayout({
   const sessionId = cookieStore.get("aurora_session_id")?.value ?? "";
   const session = await auth();
 
-  let cartItemCount = 0;
-  if (sessionId) {
-    const result = await getOrCreateCartAction(sessionId);
-    if (result.data) {
-      cartItemCount = result.data.items.reduce(
-        (sum, item) => sum + item.quantity,
-        0,
-      );
-    }
-  }
+  // Run all 3 queries in parallel — previously sequential (holding connections longer)
+  const [cartResult, categoriesResult, configResult] = await Promise.all([
+    sessionId ? getOrCreateCartAction(sessionId) : Promise.resolve(null),
+    listActiveCategoriesAction(),
+    getStoreConfigAction(),
+  ]);
 
-  const categoriesResult = await listActiveCategoriesAction();
+  const cartItemCount = cartResult?.data
+    ? cartResult.data.items.reduce((sum, item) => sum + item.quantity, 0)
+    : 0;
+
   const categories = (categoriesResult.data ?? []).map((c) => ({ id: c.id, name: c.name }));
-
-  const configResult = await getStoreConfigAction();
   const config = configResult.data;
 
   return (
