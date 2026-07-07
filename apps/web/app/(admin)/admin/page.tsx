@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
 
   const lowStockCount = lowStockResult.data?.length ?? 0;
   const orders = ordersResult.data ?? [];
-  const products = productsResult.data ?? [];
+  const products = productsResult.data?.products ?? [];
   const pendingOrders = orders.filter((o) => o.status === "PENDING_CONFIRMATION" || o.status === "PENDING");
   const recentOrders = orders.slice(0, 5);
 

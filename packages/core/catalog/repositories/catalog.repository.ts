@@ -170,7 +170,7 @@ export class PrismaCatalogRepository implements ICatalogRepository {
     try {
       const where: Record<string, unknown> = {
         isActive: true,
-        category: { isActive: true },
+        ...(filters.includeInactiveCategories ? {} : { category: { isActive: true } }),
       };
 
       if (filters.categoryIds && filters.categoryIds.length > 0) {
@@ -181,15 +181,43 @@ export class PrismaCatalogRepository implements ICatalogRepository {
         where.brandId = filters.brandId;
       }
 
+      console.log("🗄️ Repository listActiveProducts - WHERE clause:", JSON.stringify(where, null, 2));
+      console.log("🗄️ Repository listActiveProducts - Filters:", JSON.stringify(filters, null, 2));
+
       const products = await this.prisma.product.findMany({
         where,
         include: productListInclude,
         orderBy: { name: "asc" },
+        ...(filters.limit !== undefined ? { take: filters.limit } : {}),
+        ...(filters.offset !== undefined ? { skip: filters.offset } : {}),
       });
+
+      console.log("🗄️ Repository found products:", products.length);
 
       return products.map(mapToProductListItem);
     } catch (error) {
       throw this.handlePrismaError(error, "listActiveProducts");
+    }
+  }
+
+  async countActiveProducts(filters: Omit<ProductFilters, "limit" | "offset">): Promise<number> {
+    try {
+      const where: Record<string, unknown> = {
+        isActive: true,
+        ...(filters.includeInactiveCategories ? {} : { category: { isActive: true } }),
+      };
+
+      if (filters.categoryIds && filters.categoryIds.length > 0) {
+        where.categoryId = { in: filters.categoryIds };
+      }
+
+      if (filters.brandId) {
+        where.brandId = filters.brandId;
+      }
+
+      return await this.prisma.product.count({ where });
+    } catch (error) {
+      throw this.handlePrismaError(error, "countActiveProducts");
     }
   }
 

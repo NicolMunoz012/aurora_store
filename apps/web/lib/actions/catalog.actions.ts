@@ -22,31 +22,56 @@ import {
   getProductBySlugUseCase,
   PrismaCatalogRepository,
   PrismaCategoryRepository,
-
 } from "@aurora/core/catalog";
 import {
   getStoreConfigUseCase,
   PrismaStoreConfigRepository,
 } from "@aurora/core/store-config";
 
+export interface ProductsPage {
+  products: SerializedProductListItem[];
+  total: number;
+}
+
 export async function listProductsAction(params: {
   categoryIds?: string[];
   brandId?: string;
-}): Promise<ActionResult<SerializedProductListItem[]>> {
+  limit?: number;
+  offset?: number;
+}): Promise<ActionResult<ProductsPage>> {
   try {
+    console.log("📦 listProductsAction received:", params);
+    
     const repository = new PrismaCatalogRepository(prisma);
-    const products = await withDbRetry(() =>
-      listProductsUseCase({
-        repository,
-        filters: {
-          isActive: true,
-          categoryIds: params.categoryIds,
-          brandId: params.brandId,
-        },
-      }),
+    const filters = {
+      isActive: true,
+      categoryIds: params.categoryIds,
+      brandId: params.brandId,
+      limit: params.limit,
+      offset: params.offset,
+    };
+
+    console.log("📦 Filters being passed to repository:", filters);
+
+    const [products, total] = await withDbRetry(() =>
+      Promise.all([
+        listProductsUseCase({ repository, filters }),
+        repository.countActiveProducts(filters),
+      ]),
     );
-    return { data: products.map(serializeProductListItem), error: null };
+
+    console.log("📦 Query results:", {
+      productsCount: products.length,
+      total,
+      firstProduct: products[0]?.name,
+    });
+
+    return {
+      data: { products: products.map(serializeProductListItem), total },
+      error: null,
+    };
   } catch (error) {
+    console.error("❌ listProductsAction error:", error);
     return handleActionError(error);
   }
 }

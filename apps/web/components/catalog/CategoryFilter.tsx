@@ -32,14 +32,17 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
     } else {
       params.delete("categoryIds");
     }
-    router.push(`${pathname}?${params.toString()}`);
+    // Reset page when filter changes so the new first page is shown
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   function clearAll() {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("categoryIds");
     params.delete("discount");
-    router.push(`${pathname}?${params.toString()}`);
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   const hasFilter = selected.size > 0;

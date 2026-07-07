@@ -23,8 +23,15 @@ export interface ICatalogRepository {
   /**
    * Lista productos activos aplicando filtros opcionales.
    * Solo retorna productos donde isActive=true AND category.isActive=true.
+   * Admite limit/offset para paginación.
    */
   listActiveProducts(filters: ProductFilters): Promise<ProductListItem[]>;
+
+  /**
+   * Cuenta los productos activos que coinciden con los filtros dados.
+   * Usado para calcular si hay más páginas disponibles (hasMore).
+   */
+  countActiveProducts(filters: Omit<ProductFilters, "limit" | "offset">): Promise<number>;
 
   /**
    * Busca un producto por su slug.

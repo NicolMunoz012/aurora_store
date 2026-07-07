@@ -9,8 +9,9 @@ import {
   getStoreConfigAction,
   listActiveCategoriesAction,
 } from "@/lib/actions/catalog.actions";
-import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { CategoryFilter } from "@/components/catalog/CategoryFilter";
+import { CatalogClient } from "@/components/catalog/CatalogClient";
+import { ProductGrid } from "@/components/catalog/ProductGrid";
 
 export const revalidate = 60;
 export const runtime = "nodejs";
@@ -21,8 +22,10 @@ export const metadata = {
 };
 
 interface CatalogPageProps {
-  searchParams: Promise<{ search?: string; categoryIds?: string; page?: string; discount?: string }>;
+  searchParams: Promise<{ search?: string; categoryIds?: string; discount?: string; page?: string }>;
 }
+
+const PAGE_SIZE = 16;
 
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const params = await searchParams;
@@ -30,25 +33,51 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const categoryIds = params.categoryIds
     ? params.categoryIds.split(",").filter(Boolean)
     : undefined;
-  const page = Math.max(1, parseInt(params.page ?? "1", 10));
   const discountFilter = params.discount === "true";
-  const PAGE_SIZE = 16;
+  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
+
+  // Debug logging
+  console.log("🔍 Catalog Page - Search Params:", {
+    raw: params,
+    searchQuery,
+    categoryIds,
+    discountFilter,
+    currentPage,
+  });
 
   const categoriesResult = await listActiveCategoriesAction();
   const allCategories = categoriesResult.data ?? [];
 
-  const productsResult = searchQuery
-    ? await searchProductsAction(searchQuery)
-    : await listProductsAction({ categoryIds });
-
-  const allProducts = (productsResult.data ?? []).filter(
-    (p) => !discountFilter || (p.discountPercentage && p.discountPercentage > 0),
-  );
-  const products = allProducts.slice(0, page * PAGE_SIZE);
-  const hasMore = allProducts.length > products.length;
-
   const configResult = await getStoreConfigAction();
   const wholesaleThreshold = configResult.data?.wholesaleThreshold;
+
+  // Use new pagination-aware action when no search query
+  let productsResult;
+  let useClientPagination = false;
+
+  if (searchQuery) {
+    // Search still uses in-memory filter (search is a small set)
+    productsResult = await searchProductsAction(searchQuery);
+  } else {
+    // Use paginated action
+    const offset = (currentPage - 1) * PAGE_SIZE;
+    console.log("🔍 Calling listProductsAction with:", {
+      categoryIds,
+      limit: PAGE_SIZE,
+      offset,
+    });
+    productsResult = await listProductsAction({
+      categoryIds,
+      limit: PAGE_SIZE,
+      offset,
+    });
+    console.log("🔍 Products result:", {
+      count: productsResult.data?.products.length,
+      total: productsResult.data?.total,
+      error: productsResult.error,
+    });
+    useClientPagination = true;
+  }
 
   return (
     <div>
@@ -87,10 +116,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             </Suspense>
           )}
 
-          {/* Result count */}
-          {allProducts.length > 0 && (
+          {/* Result count - shown for paginated results */}
+          {useClientPagination && productsResult.data && productsResult.data.total > 0 && (
             <p className="text-[11px] tracking-luxe text-gray-400 font-medium">
-              {products.length} de {allProducts.length} producto{allProducts.length !== 1 ? "s" : ""}
+              {productsResult.data.total} producto{productsResult.data.total !== 1 ? "s" : ""}
             </p>
           )}
         </div>
@@ -101,32 +130,37 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             <p className="font-serif text-2xl mb-2">Error al cargar</p>
             <p className="text-gray-400 text-sm">Intenta de nuevo más tarde.</p>
           </div>
-        ) : products.length === 0 ? (
-          <div className="py-24 text-center">
-            <p className="font-serif text-2xl mb-2">Sin resultados</p>
-            <p className="text-gray-400 text-sm">Intenta con otra búsqueda o categoría.</p>
-          </div>
+        ) : useClientPagination ? (
+          // Client-paginated catalog (numbered pages)
+          productsResult.data && productsResult.data.products.length === 0 ? (
+            <div className="py-24 text-center">
+              <p className="font-serif text-2xl mb-2">Sin resultados</p>
+              <p className="text-gray-400 text-sm">Intenta con otra búsqueda o categoría.</p>
+            </div>
+          ) : (
+            <CatalogClient
+              initialProducts={productsResult.data?.products ?? []}
+              initialTotal={productsResult.data?.total ?? 0}
+              initialPage={currentPage}
+              categoryIds={categoryIds}
+              discountOnly={discountFilter}
+            />
+          )
         ) : (
-          <>
-            <ProductGrid products={products} />
-            {hasMore && (
-              <div className="mt-12 text-center">
-                <a
-                  href={`/catalog?${new URLSearchParams({
-                    ...(searchQuery ? { search: searchQuery } : {}),
-                    ...(categoryIds ? { categoryIds: categoryIds.join(",") } : {}),
-                    page: String(page + 1),
-                  }).toString()}`}
-                  className="inline-flex px-8 py-3 border border-gray-200 text-[12px] tracking-luxe font-semibold text-gray-600 rounded-full hover:border-cerise-300 hover:text-cerise-600 transition-colors"
-                >
-                  Ver más productos
-                </a>
-                <p className="text-[11px] text-gray-400 mt-3">
-                  Mostrando {products.length} de {allProducts.length}
-                </p>
+          // Search results (legacy in-memory filter)
+          (() => {
+            const allProducts = (productsResult.data ?? []).filter(
+              (p) => !discountFilter || (p.discountPercentage && p.discountPercentage > 0),
+            );
+            return allProducts.length === 0 ? (
+              <div className="py-24 text-center">
+                <p className="font-serif text-2xl mb-2">Sin resultados</p>
+                <p className="text-gray-400 text-sm">Intenta con otra búsqueda o categoría.</p>
               </div>
-            )}
-          </>
+            ) : (
+              <ProductGrid products={allProducts} />
+            );
+          })()
         )}
       </section>
     </div>

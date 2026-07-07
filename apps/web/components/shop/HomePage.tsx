@@ -198,6 +198,54 @@ function CategoryCarousel({
 }
 
 // ---------------------------------------------------------------------------
+// SimpleHeroImageRotator — rotación automática de imágenes sin controles
+// Mantiene el tamaño original del hero, solo cambia las imágenes cada 7 segundos
+// ---------------------------------------------------------------------------
+function SimpleHeroImageRotator({ images }: { images: { url: string; alt: string }[] }) {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const id = setInterval(() => {
+      setCurrent((c) => (c + 1) % images.length);
+    }, 7000); // 7 segundos
+    return () => clearInterval(id);
+  }, [images.length]);
+
+  if (images.length === 0) {
+    return (
+      <div className="relative w-full h-[550px] rounded-lg bg-warm-gray shadow-[0_30px_80px_-30px_rgba(205,14,94,0.3)]">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-cerise-200 text-6xl">✿</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-[550px] rounded-lg overflow-hidden shadow-[0_30px_80px_-30px_rgba(205,14,94,0.3)]">
+      {images.map((img, i) => (
+        <div
+          key={i}
+          className="absolute inset-0 transition-opacity duration-1000"
+          style={{ opacity: i === current ? 1 : 0 }}
+        >
+          <Image
+            src={img.url}
+            alt={img.alt}
+            fill
+            sizes="50vw"
+            className="object-cover"
+            priority={i === 0}
+            quality={90}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // HomePage
 // ---------------------------------------------------------------------------
 export function HomePage({
@@ -206,6 +254,15 @@ export function HomePage({
   brands,
   categoryProducts,
 }: HomePageProps) {
+  // Build hero images from featured products (max 5, filter out those without image)
+  const heroImages = featuredProducts
+    .slice(0, 5)
+    .filter((p) => p.mainImageUrl)
+    .map((p) => ({
+      url: p.mainImageUrl,
+      alt: p.name,
+    }));
+
   return (
     <div>
       {/* Hero */}
@@ -239,19 +296,7 @@ export function HomePage({
             </div>
           </div>
           <div className="relative hidden lg:block">
-            {featuredProducts[0]?.mainImageUrl ? (
-              <Image
-                src={featuredProducts[0].mainImageUrl}
-                alt="Producto destacado"
-                width={600}
-                height={750}
-                className="w-full aspect-[4/5] object-cover rounded-md shadow-[0_30px_80px_-30px_rgba(205,14,94,0.3)]"
-              />
-            ) : (
-              <div className="w-full aspect-[4/5] rounded-md bg-cerise-50 flex items-center justify-center">
-                <span className="text-cerise-200 text-6xl">✿</span>
-              </div>
-            )}
+            <SimpleHeroImageRotator images={heroImages} />
           </div>
         </div>
       </section>

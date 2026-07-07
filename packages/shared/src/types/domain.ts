@@ -337,6 +337,12 @@ export interface ProductFilters {
   brandId?: string;
   search?: string;
   isActive?: boolean;
+  /** Number of rows to return. Omit for all rows (admin use). */
+  limit?: number;
+  /** Number of rows to skip (offset pagination). */
+  offset?: number;
+  /** When true also return products in inactive categories (admin use). */
+  includeInactiveCategories?: boolean;
 }
 
 /** Datos para crear producto (RF040) */

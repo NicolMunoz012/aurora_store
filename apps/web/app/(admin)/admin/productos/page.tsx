@@ -21,7 +21,7 @@ export default async function AdminProductosPage() {
     getLowStockProductsAction(),
   ]);
 
-  const products = productsResult.data ?? [];
+  const products = productsResult.data?.products ?? [];
   const lowStockIds = new Set((lowStockResult.data ?? []).map((p) => p.id));
 
   return (

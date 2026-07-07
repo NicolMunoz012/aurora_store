@@ -28,7 +28,7 @@ export default async function ShopHomePage() {
     listActiveBrandsAction(),
   ]);
 
-  const featuredProducts = productsResult.data ?? [];
+  const featuredProducts = productsResult.data?.products ?? [];
   const categories = categoriesResult.data ?? [];
   const brands = brandsResult.data ?? [];
 
