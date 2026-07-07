@@ -117,7 +117,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           )}
 
           {/* Result count - shown for paginated results */}
-          {useClientPagination && productsResult.data && productsResult.data.total > 0 && (
+          {useClientPagination && productsResult.data && "total" in productsResult.data && productsResult.data.total > 0 && (
             <p className="text-[11px] tracking-luxe text-gray-400 font-medium">
               {productsResult.data.total} producto{productsResult.data.total !== 1 ? "s" : ""}
             </p>
@@ -132,24 +132,36 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           </div>
         ) : useClientPagination ? (
           // Client-paginated catalog (numbered pages)
-          productsResult.data && productsResult.data.products.length === 0 ? (
-            <div className="py-24 text-center">
-              <p className="font-serif text-2xl mb-2">Sin resultados</p>
-              <p className="text-gray-400 text-sm">Intenta con otra búsqueda o categoría.</p>
-            </div>
-          ) : (
-            <CatalogClient
-              initialProducts={productsResult.data?.products ?? []}
-              initialTotal={productsResult.data?.total ?? 0}
-              initialPage={currentPage}
-              categoryIds={categoryIds}
-              discountOnly={discountFilter}
-            />
-          )
+          (() => {
+            const data = productsResult.data;
+            if (!data || !("products" in data)) return null;
+            
+            if (data.products.length === 0) {
+              return (
+                <div className="py-24 text-center">
+                  <p className="font-serif text-2xl mb-2">Sin resultados</p>
+                  <p className="text-gray-400 text-sm">Intenta con otra búsqueda o categoría.</p>
+                </div>
+              );
+            }
+            
+            return (
+              <CatalogClient
+                initialProducts={data.products}
+                initialTotal={data.total}
+                initialPage={currentPage}
+                categoryIds={categoryIds}
+                discountOnly={discountFilter}
+              />
+            );
+          })()
         ) : (
           // Search results (legacy in-memory filter)
           (() => {
-            const allProducts = (productsResult.data ?? []).filter(
+            const data = productsResult.data;
+            if (!data || !Array.isArray(data)) return null;
+            
+            const allProducts = data.filter(
               (p) => !discountFilter || (p.discountPercentage && p.discountPercentage > 0),
             );
             return allProducts.length === 0 ? (
@@ -158,6 +170,10 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                 <p className="text-gray-400 text-sm">Intenta con otra búsqueda o categoría.</p>
               </div>
             ) : (
+              <ProductGrid products={allProducts} />
+            );
+          })()
+        )}
               <ProductGrid products={allProducts} />
             );
           })()
