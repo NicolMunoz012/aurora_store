@@ -174,10 +174,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
             );
           })()
         )}
-              <ProductGrid products={allProducts} />
-            );
-          })()
-        )}
       </section>
     </div>
   );
