@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
   ],
   turbopack: {},
   images: {
+    // Disable Vercel's image optimization globally — the free-tier quota
+    // is exhausted and every /_next/image request returns 402.
+    // TODO: replace with a Cloudinary loader once the CDN is configured.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
