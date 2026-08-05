@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import type { SerializedStoreConfig } from "@/lib/actions/admin.store-config.actions";
 import { updateStoreConfigAction } from "@/lib/actions/admin.store-config.actions";
+import { BrandSettingsPanel } from "@/components/admin/BrandSettingsPanel";
 
 export function StoreConfigForm({ initialConfig }: { initialConfig: SerializedStoreConfig }) {
   const [isPending, startTransition] = useTransition();
@@ -113,6 +114,13 @@ export function StoreConfigForm({ initialConfig }: { initialConfig: SerializedSt
       <button type="submit" disabled={isPending} className="bg-cerise-600 text-white px-6 py-3 text-[12px] tracking-luxe font-semibold rounded-sm hover:bg-cerise-700 transition-colors disabled:opacity-60">
         {isPending ? "Guardando..." : "Guardar configuración"}
       </button>
+
+      {/* Logo */}
+      <div className="border-t border-gray-100 pt-8">
+        <h3 className="font-serif text-xl text-gray-900 mb-1">Logo de la tienda</h3>
+        <p className="text-[11px] tracking-luxe text-gray-400 mb-5">Aparece en la barra de navegación, footer y páginas de autenticación.</p>
+        <BrandSettingsPanel initialConfig={initialConfig} />
+      </div>
     </form>
   );
 }

@@ -12,13 +12,11 @@
 import { createContext, useContext } from "react";
 import type { BrandingConfig } from "@/lib/branding";
 
-// Fallback values mirror the static-file defaults in branding.ts so the hook
+// Fallback values mirror the static-file default in branding.ts so the hook
 // is always safe to call even outside a provider (e.g. in tests or Storybook).
 const FALLBACK: BrandingConfig = {
-  primaryLogoUrl: "/footer.png",
-  secondaryLogoUrl: "/auroraa.png",
-  primaryLogoKey: null,
-  secondaryLogoKey: null,
+  logoUrl: "/aurora.png",
+  logoKey: null,
 };
 
 const BrandingContext = createContext<BrandingConfig>(FALLBACK);

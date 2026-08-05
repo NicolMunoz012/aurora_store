@@ -26,6 +26,8 @@ function mapToStoreConfigRecord(record: {
   facebookUrl: string | null;
   tiktokUrl: string | null;
   announcementText: string | null;
+  logoUrl: string | null;
+  logoKey: string | null;
 }): StoreConfigRecord {
   return {
     id: record.id,
@@ -38,6 +40,8 @@ function mapToStoreConfigRecord(record: {
     facebookUrl: record.facebookUrl,
     tiktokUrl: record.tiktokUrl,
     announcementText: record.announcementText,
+    logoUrl: record.logoUrl,
+    logoKey: record.logoKey,
   };
 }
 
@@ -98,6 +102,12 @@ export class PrismaStoreConfigRepository implements IStoreConfigRepository {
       }
       if (data.announcementText !== undefined) {
         updateData.announcementText = data.announcementText;
+      }
+      if (data.logoUrl !== undefined) {
+        updateData.logoUrl = data.logoUrl;
+      }
+      if (data.logoKey !== undefined) {
+        updateData.logoKey = data.logoKey;
       }
 
       const updated = await this.prisma.storeConfig.update({

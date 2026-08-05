@@ -262,6 +262,8 @@ export interface StoreConfigRecord {
   facebookUrl: string | null;
   tiktokUrl: string | null;
   announcementText: string | null;
+  logoUrl: string | null;
+  logoKey: string | null;
 }
 
 /** Registro de auditoría (NF010, DA-007) */
@@ -492,4 +494,6 @@ export interface UpdateStoreConfigData {
   facebookUrl?: string | null;
   tiktokUrl?: string | null;
   announcementText?: string | null;
+  logoUrl?: string | null;
+  logoKey?: string | null;
 }

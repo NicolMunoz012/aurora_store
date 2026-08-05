@@ -503,6 +503,9 @@ model StoreConfig {
   tiktokUrl               String?
   /// Texto del banner de anuncio en la tienda (editable por admin).
   announcementText        String?
+  /// Logo de la tienda configurable por el admin desde el panel.
+  logoUrl                 String?
+  logoKey                 String?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 

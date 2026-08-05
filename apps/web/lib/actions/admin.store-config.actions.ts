@@ -27,6 +27,8 @@ export interface SerializedStoreConfig {
   facebookUrl: string | null;
   tiktokUrl: string | null;
   announcementText: string | null;
+  logoUrl: string | null;
+  logoKey: string | null;
 }
 
 async function assertAdmin(): Promise<void> {
@@ -37,7 +39,7 @@ async function assertAdmin(): Promise<void> {
   if (!isAdmin) throw Object.assign(new Error("Forbidden"), { code: "UNAUTHORIZED_ROLE" });
 }
 
-function serialize(config: { id: string; wholesaleThreshold: { toString(): string }; whatsappNumber: string; storePhysicalAddress: string; anonOrderExpiryDays: number; registeredOrderExpiryDays: number; instagramUrl: string | null; facebookUrl: string | null; tiktokUrl: string | null; announcementText: string | null }): SerializedStoreConfig {
+function serialize(config: { id: string; wholesaleThreshold: { toString(): string }; whatsappNumber: string; storePhysicalAddress: string; anonOrderExpiryDays: number; registeredOrderExpiryDays: number; instagramUrl: string | null; facebookUrl: string | null; tiktokUrl: string | null; announcementText: string | null; logoUrl: string | null; logoKey: string | null }): SerializedStoreConfig {
   return {
     id: config.id,
     wholesaleThreshold: config.wholesaleThreshold.toString(),
@@ -49,6 +51,8 @@ function serialize(config: { id: string; wholesaleThreshold: { toString(): strin
     facebookUrl: config.facebookUrl,
     tiktokUrl: config.tiktokUrl,
     announcementText: config.announcementText,
+    logoUrl: config.logoUrl,
+    logoKey: config.logoKey,
   };
 }
 
@@ -103,6 +107,31 @@ export async function updateStoreConfigAction(data: {
         facebookUrl: data.facebookUrl,
         tiktokUrl: data.tiktokUrl,
         announcementText: data.announcementText,
+      },
+    });
+
+    return { data: serialize(updated), error: null };
+  } catch (error) {
+    return handleActionError(error);
+  }
+}
+
+export async function updateBrandingAction(data: {
+  logoUrl: string | null;
+  logoKey: string | null;
+}): Promise<ActionResult<SerializedStoreConfig>> {
+  try {
+    await assertAdmin();
+    const repository = new PrismaStoreConfigRepository(prisma);
+    const auditRepo = new PrismaAuditRepository(prisma);
+    const auditLogger = { log: auditRepo.log.bind(auditRepo) };
+
+    const updated = await updateStoreConfigUseCase({
+      repository,
+      auditLogger,
+      data: {
+        logoUrl: data.logoUrl,
+        logoKey: data.logoKey,
       },
     });
 
