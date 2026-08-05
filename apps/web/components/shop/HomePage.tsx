@@ -26,11 +26,26 @@ interface HomePageProps {
 // Shows carousel when > 2 brands, static row otherwise.
 // ---------------------------------------------------------------------------
 function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
-  const VISIBLE = 3; // how many fit in view at once (mobile)
-  const useCarousel = brands.length > 2;
+  // Responsive visible count: 1 on mobile, 3 on desktop
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      setVisibleCount(entry.contentRect.width < 480 ? 1 : 3);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const useCarousel = brands.length > visibleCount;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Reset index when visibleCount changes (e.g., resize)
+  useEffect(() => { setIndex(0); }, [visibleCount]);
 
   useEffect(() => {
     if (!useCarousel || paused) return;
@@ -41,31 +56,36 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
   }, [useCarousel, paused, brands.length]);
 
   if (!useCarousel) {
-    // Static row — ≤ 2 brands
+    // Static row — fits all brands without scrolling
     return (
-      <div className="flex justify-center items-center gap-8 md:gap-12 flex-wrap">
+      <div ref={containerRef} className="flex justify-center items-center gap-8 md:gap-12 flex-wrap">
         {brands.map((brand) => (
           <div
             key={brand.id}
-            className="h-16 w-36 relative
+            className="h-16 w-36 flex items-center justify-center
               md:grayscale md:opacity-60 md:hover:grayscale-0 md:hover:opacity-100 md:transition-all md:duration-300"
           >
-            <Image src={brand.imageUrl} alt="Marca" fill className="object-contain" sizes="144px" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={brand.imageUrl}
+              alt="Marca"
+              className="max-h-full max-w-full object-contain"
+            />
           </div>
         ))}
       </div>
     );
   }
 
-  // Carousel — > 2 brands
-  // We duplicate the list to allow seamless looping
+  // Carousel — more brands than visible slots
+  // Duplicate list for seamless looping
   const doubled = [...brands, ...brands];
-  // Each slide is 33.33% wide (3 visible). We shift by index * (100 / brands.length)%
-  const slideWidthPct = 100 / VISIBLE;
+  const slideWidthPct = 100 / visibleCount;
   const translatePct = -(index * slideWidthPct);
 
   return (
     <div
+      ref={containerRef}
       className="relative overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -74,7 +94,6 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
     >
       {/* Track */}
       <div
-        ref={trackRef}
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(${translatePct}%)` }}
       >
@@ -85,16 +104,15 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
             style={{ width: `${slideWidthPct}%` }}
           >
             <div
-              className="h-16 w-full max-w-[140px] relative
+              className="h-16 w-full max-w-[140px] flex items-center justify-center
                 md:grayscale md:opacity-60 md:hover:grayscale-0 md:hover:opacity-100 md:transition-all md:duration-300"
             >
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={brand.imageUrl}
                 alt="Marca"
-                fill
-                className="object-contain"
-                sizes="140px"
                 loading="lazy"
+                className="max-h-full max-w-full object-contain"
               />
             </div>
           </div>
@@ -107,10 +125,11 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`rounded-full transition-all duration-300 ${i === index
+            className={`rounded-full transition-all duration-300 ${
+              i === index
                 ? "bg-cerise-400 w-4 h-1.5"
                 : "bg-gray-200 w-1.5 h-1.5 hover:bg-cerise-200"
-              }`}
+            }`}
             aria-label={`Marca ${i + 1}`}
           />
         ))}
