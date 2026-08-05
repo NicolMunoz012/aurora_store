@@ -27,13 +27,13 @@ import {
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 const NAV_ITEMS = [
-  { href: "/admin",              label: "Dashboard",    icon: LayoutDashboard, exact: true },
-  { href: "/admin/productos",    label: "Productos",    icon: Package },
-  { href: "/admin/categorias",   label: "Categorías",   icon: Tag },
-  { href: "/admin/marcas",       label: "Marcas",       icon: Star },
-  { href: "/admin/pedidos",      label: "Pedidos",      icon: ShoppingBag },
-  { href: "/admin/inventario",   label: "Inventario",   icon: BarChart3 },
-  { href: "/admin/configuracion",label: "Configuración",icon: Settings },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/productos", label: "Productos", icon: Package },
+  { href: "/admin/categorias", label: "Categorías", icon: Tag },
+  { href: "/admin/marcas", label: "Marcas", icon: Star },
+  { href: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
+  { href: "/admin/inventario", label: "Inventario", icon: BarChart3 },
+  { href: "/admin/configuracion", label: "Configuración", icon: Settings },
 ];
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -59,11 +59,10 @@ function NavList({
             key={item.href}
             href={item.href}
             onClick={onNavigate}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all ${
-              active
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-all ${active
                 ? "bg-blush text-cerise-600 font-semibold"
                 : "text-gray-600 hover:bg-warm-gray hover:text-gray-800"
-            }`}
+              }`}
           >
             <Icon className={`size-4 shrink-0 ${active ? "text-cerise-500" : "text-gray-400"}`} />
             {item.label}
@@ -87,7 +86,7 @@ function DesktopSidebar({
       {/* Brand */}
       <div className="p-6 border-b border-gray-100">
         <Link href="/admin">
-          <Image src="/aurora.png" alt="LunaRose" width={100} height={32} />
+          <Image src="/aurora.png" alt="Aurora" width={100} height={32} />
         </Link>
         <p className="text-[11px] tracking-luxe text-gray-400 mt-2">Panel de administración</p>
       </div>
@@ -163,9 +162,8 @@ function MobileNav({
       {/* Overlay */}
       <div
         onClick={() => setOpen(false)}
-        className={`md:hidden fixed inset-0 z-[60] transition-all duration-300 ${
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`md:hidden fixed inset-0 z-[60] transition-all duration-300 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
         style={{
           background: "rgba(10,5,12,0.55)",
           backdropFilter: open ? "blur(4px)" : "none",
@@ -187,7 +185,7 @@ function MobileNav({
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <Link href="/admin" onClick={() => setOpen(false)}>
-              <Image src="/aurora.png" alt="LunaRose" width={80} height={24} />
+              <Image src="/aurora.png" alt="Aurora" width={80} height={24} />
             </Link>
             <p className="text-[10px] tracking-luxe text-gray-400 mt-1">Panel de administración</p>
           </div>
@@ -210,24 +208,21 @@ function MobileNav({
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center justify-between mx-3 px-4 py-3.5 rounded-xl text-sm transition-all mb-0.5 group ${
-                  active
+                className={`flex items-center justify-between mx-3 px-4 py-3.5 rounded-xl text-sm transition-all mb-0.5 group ${active
                     ? "bg-blush text-cerise-700 font-semibold"
                     : "text-gray-600 hover:bg-warm-gray hover:text-gray-800"
-                }`}
+                  }`}
               >
                 <span className="flex items-center gap-3">
                   <Icon
-                    className={`size-4 shrink-0 ${
-                      active ? "text-cerise-500" : "text-gray-400 group-hover:text-gray-600"
-                    }`}
+                    className={`size-4 shrink-0 ${active ? "text-cerise-500" : "text-gray-400 group-hover:text-gray-600"
+                      }`}
                   />
                   {item.label}
                 </span>
                 <ChevronRight
-                  className={`size-4 ${
-                    active ? "text-cerise-400" : "text-gray-200 group-hover:text-gray-400"
-                  }`}
+                  className={`size-4 ${active ? "text-cerise-400" : "text-gray-200 group-hover:text-gray-400"
+                    }`}
                 />
               </Link>
             );

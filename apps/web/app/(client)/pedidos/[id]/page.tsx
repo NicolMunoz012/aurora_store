@@ -11,7 +11,7 @@ import Link from "next/link";
 import { getOrderAction, generateWhatsappMessageAction } from "@/lib/actions/orders.actions";
 import { WhatsappButton } from "@/components/client/WhatsappButton";
 
-export const metadata = { title: "Detalle de pedido — LunaRose" };
+export const metadata = { title: "Detalle de pedido — Aurora" };
 
 const STATUS_STEPS = [
   "PENDING_CONFIRMATION",
@@ -81,13 +81,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             return (
               <li key={step} className="flex flex-1 flex-col items-center text-center">
                 <div
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                    done
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${done
                       ? "bg-green-500 text-white"
                       : active
-                      ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-                      : "bg-zinc-200 text-zinc-400 dark:bg-zinc-700"
-                  }`}
+                        ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                        : "bg-zinc-200 text-zinc-400 dark:bg-zinc-700"
+                    }`}
                 >
                   {done ? "✓" : i + 1}
                 </div>

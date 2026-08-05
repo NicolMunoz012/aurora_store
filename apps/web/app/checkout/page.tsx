@@ -77,10 +77,10 @@ export default async function CheckoutPage() {
       <header className="bg-white border-b border-gray-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <span className="font-serif text-2xl font-bold text-gray-900">LunaRose</span>
+            <span className="font-serif text-2xl font-bold text-gray-900">Aurora</span>
           </Link>
-          <Link 
-            href="/carrito" 
+          <Link
+            href="/carrito"
             className="text-sm text-gray-500 hover:text-cerise-600 transition-colors flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,12 +98,12 @@ export default async function CheckoutPage() {
           storeConfig={
             storeConfig
               ? {
-                  storePhysicalAddress: storeConfig.storePhysicalAddress,
-                  wholesaleThreshold: storeConfig.wholesaleThreshold.toString(),
-                  whatsappNumber: storeConfig.whatsappNumber,
-                  anonOrderExpiryDays: storeConfig.anonOrderExpiryDays,
-                  registeredOrderExpiryDays: storeConfig.registeredOrderExpiryDays,
-                }
+                storePhysicalAddress: storeConfig.storePhysicalAddress,
+                wholesaleThreshold: storeConfig.wholesaleThreshold.toString(),
+                whatsappNumber: storeConfig.whatsappNumber,
+                anonOrderExpiryDays: storeConfig.anonOrderExpiryDays,
+                registeredOrderExpiryDays: storeConfig.registeredOrderExpiryDays,
+              }
               : null
           }
           isAuthenticated={!!session}

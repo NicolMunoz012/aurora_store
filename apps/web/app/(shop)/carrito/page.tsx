@@ -11,7 +11,7 @@ import { getCartWithPricingAction } from "@/lib/actions/cart.actions";
 import { CartItemControls } from "@/components/cart/CartItemControls";
 import Link from "next/link";
 
-export const metadata = { title: "Tu carrito — LunaRose" };
+export const metadata = { title: "Tu carrito — Aurora" };
 
 function formatCOP(value: string): string {
   return new Intl.NumberFormat("es-CO", {
@@ -131,7 +131,7 @@ export default async function CartPage() {
               <span>Total productos</span>
               <span>{formatCOP(cart.finalSubtotal)}</span>
             </div>
-            
+
 
             <Link
               href="/checkout"

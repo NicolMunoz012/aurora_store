@@ -47,7 +47,7 @@ export default async function AdminDashboardPage() {
           <h1 className="font-serif text-3xl md:text-4xl text-gray-900">
             ¡<Greeting />!
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Así va LunaRose hoy.</p>
+          <p className="text-gray-400 text-sm mt-1">Así va Aurora hoy.</p>
         </div>
         <Link
           href="/admin/productos/nuevo"
@@ -103,9 +103,8 @@ export default async function AdminDashboardPage() {
                         </td>
                         <td className="px-5 py-3 text-gray-500">{p.stock} uds</td>
                         <td className="px-5 py-3">
-                          <span className={`text-[10px] tracking-luxe px-2 py-1 rounded-sm font-semibold ${
-                            low ? "bg-blush text-cerise-600" : p.isActive ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-400"
-                          }`}>
+                          <span className={`text-[10px] tracking-luxe px-2 py-1 rounded-sm font-semibold ${low ? "bg-blush text-cerise-600" : p.isActive ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-400"
+                            }`}>
                             {low ? "Stock bajo" : p.isActive ? "Activo" : "Inactivo"}
                           </span>
                         </td>

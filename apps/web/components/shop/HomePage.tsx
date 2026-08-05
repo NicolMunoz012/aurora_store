@@ -107,11 +107,10 @@ function BrandsCarousel({ brands }: { brands: BrandRecord[] }) {
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`rounded-full transition-all duration-300 ${
-              i === index
+            className={`rounded-full transition-all duration-300 ${i === index
                 ? "bg-cerise-400 w-4 h-1.5"
                 : "bg-gray-200 w-1.5 h-1.5 hover:bg-cerise-200"
-            }`}
+              }`}
             aria-label={`Marca ${i + 1}`}
           />
         ))}
@@ -185,9 +184,8 @@ function CategoryCarousel({
                 e.preventDefault();
                 setCurrent(i);
               }}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === current ? "bg-white scale-125" : "bg-white/50"
-              }`}
+              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === current ? "bg-white scale-125" : "bg-white/50"
+                }`}
               aria-label={`Imagen ${i + 1}`}
             />
           ))}
@@ -270,7 +268,7 @@ export function HomePage({
         <div className="container-aurora grid lg:grid-cols-2 items-center gap-10 py-10 md:py-14 lg:py-13">
           <div className="animate-fade-up">
             <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-5 block">
-              LunaRose
+              Aurora
             </span>
             <h1 className="text-[44px] leading-[1.05] md:text-6xl lg:text-7xl text-balance">
               Luminosa{" "}
@@ -347,7 +345,7 @@ export function HomePage({
       <section className="py-24 md:py-32 bg-cerise-600 text-white">
         <div className="container-aurora text-center max-w-2xl mx-auto">
           <span className="text-white/60 text-[11px] font-semibold tracking-luxe mb-6 block">
-            LunaRose
+            Aurora
           </span>
           <h2 className="text-3xl md:text-4xl leading-snug text-balance italic">
             &ldquo;La belleza es la forma en que te haces sentir a ti misma.&rdquo;

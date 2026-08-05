@@ -16,7 +16,7 @@ import { HomePage } from "@/components/shop/HomePage";
 import type { SerializedProductListItem } from "@/lib/serializers";
 
 export const metadata = {
-  title: "LunaRose",
+  title: "Aurora",
   description: "Productos de belleza seleccionados.",
 };
 

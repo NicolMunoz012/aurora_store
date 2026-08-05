@@ -80,9 +80,8 @@ function PasswordStrength({ password }: { password: string }) {
       {checks.map((check) => (
         <span
           key={check.label}
-          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-            check.valid ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"
-          }`}
+          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${check.valid ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"
+            }`}
         >
           {check.valid ? "✓" : "○"} {check.label}
         </span>
@@ -157,7 +156,7 @@ export default function RegistroPage() {
       {/* Brand panel */}
       <div className="hidden lg:flex relative bg-blush items-center justify-center p-16">
         <div className="absolute top-8 left-8">
-          <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={90} height={28} /></Link>
+          <Link href="/"><Image src="/aurora.png" alt="Aurora" width={90} height={28} /></Link>
         </div>
         <div className="text-center max-w-md">
           <span className="text-cerise-600 text-[11px] font-semibold tracking-luxe mb-6 block">
@@ -167,7 +166,7 @@ export default function RegistroPage() {
             "Cada mujer merece sentirse radiante, todos los días."
           </p>
           <p className="text-[11px] tracking-luxe text-gray-400 mt-8 font-medium">
-            — LunaRose
+            — Aurora
           </p>
         </div>
       </div>
@@ -176,7 +175,7 @@ export default function RegistroPage() {
       <div className="flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8">
-            <Link href="/"><Image src="/aurora.png" alt="LunaRose" width={80} height={26} /></Link>
+            <Link href="/"><Image src="/aurora.png" alt="Aurora" width={80} height={26} /></Link>
           </div>
           <div className="mb-6">
             <Link href="/catalog" className="inline-flex items-center gap-1.5 text-[11px] tracking-luxe text-gray-400 hover:text-cerise-600 transition-colors">
@@ -185,7 +184,7 @@ export default function RegistroPage() {
             </Link>
           </div>
           <h1 className="font-serif text-3xl md:text-4xl mb-2">Comienza tu ritual.</h1>
-          <p className="text-gray-500 text-sm mb-8">Crea tu cuenta LunaRose.</p>
+          <p className="text-gray-500 text-sm mb-8">Crea tu cuenta Aurora.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Name */}

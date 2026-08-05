@@ -17,7 +17,7 @@ export const revalidate = 60;
 export const runtime = "nodejs";
 
 export const metadata = {
-  title: "Catálogo — LunaRose",
+  title: "Catálogo — Aurora",
   description: "Explora nuestros productos de belleza.",
 };
 
@@ -135,7 +135,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           (() => {
             const data = productsResult.data;
             if (!data || !("products" in data)) return null;
-            
+
             if (data.products.length === 0) {
               return (
                 <div className="py-24 text-center">
@@ -144,7 +144,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
                 </div>
               );
             }
-            
+
             return (
               <CatalogClient
                 initialProducts={data.products}
@@ -160,7 +160,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
           (() => {
             const data = productsResult.data;
             if (!data || !Array.isArray(data)) return null;
-            
+
             const allProducts = data.filter(
               (p) => !discountFilter || (p.discountPercentage && p.discountPercentage > 0),
             );
