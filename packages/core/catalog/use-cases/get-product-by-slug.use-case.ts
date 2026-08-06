@@ -1,25 +1,15 @@
 // =============================================================================
 // @aurora/core/catalog — getProductBySlugUseCase
-// Obtiene un producto por su slug, ocultando wholesalePrice (Req 4.4, 4.12).
+// Retorna InternalProductDetail (incluye wholesalePrice).
+// La capa de presentación decide qué exponer al cliente.
 // =============================================================================
 
-import type { ProductDetail, InternalProductDetail } from "@aurora/shared";
+import type { InternalProductDetail } from "@aurora/shared";
 import type { GetProductBySlugParams } from "../types";
-
-function toPublicProductDetail(internal: InternalProductDetail): ProductDetail {
-  const { wholesalePrice, ...publicDetail } = internal;
-  return publicDetail;
-}
 
 export async function getProductBySlugUseCase(
   params: GetProductBySlugParams,
-): Promise<ProductDetail | null> {
+): Promise<InternalProductDetail | null> {
   const { repository, slug } = params;
-  const product = await repository.findBySlug(slug);
-
-  if (!product) {
-    return null;
-  }
-
-  return toPublicProductDetail(product);
+  return repository.findBySlug(slug);
 }

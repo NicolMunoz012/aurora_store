@@ -85,10 +85,26 @@ export async function getOrCreateCartAction(
   try {
     const session = await auth();
     const repository = new PrismaCartRepository(prisma);
+
+    // If there's no sessionId (anonymous user, first visit) and no logged-in user,
+    // generate a new UUID session and persist it as a cookie so subsequent calls
+    // can find the same cart.
+    let effectiveSessionId = sessionId;
+    if (!effectiveSessionId && !session?.user?.id) {
+      effectiveSessionId = crypto.randomUUID();
+      const cookieStore = await cookies();
+      cookieStore.set("aurora_session_id", effectiveSessionId, {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
+
     const cart = await getOrCreateCartUseCase({
       repository,
       userId: session?.user?.id ?? null,
-      sessionId,
+      sessionId: effectiveSessionId || null,
     });
     return { data: cart, error: null };
   } catch (error) {

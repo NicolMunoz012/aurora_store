@@ -48,12 +48,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const session = await auth();
 
   const originalPrice = parseFloat(product.retailPrice);
+  const wholesalePrice = parseFloat(product.wholesalePrice);
   const finalPrice = product.discountPercentage
     ? getDiscountedPrice(originalPrice, product.discountPercentage)
     : originalPrice;
   const savings = product.discountPercentage
     ? getSavings(originalPrice, product.discountPercentage)
     : 0;
+
+  // Show wholesale block only when wholesalePrice < retailPrice
+  const hasWholesale = wholesalePrice > 0 && wholesalePrice < originalPrice;
 
   return (
     <div className="container-aurora py-10 md:py-16">
@@ -126,11 +130,37 @@ export default async function ProductPage({ params }: ProductPageProps) {
           )}
 
           {/* Wholesale info */}
-          {product.minWholesaleQty != null && config && (
-            <div className="rounded-sm bg-blush border border-cerise-100 px-4 py-3 text-sm text-cerise-700">
-              Precio mayorista disponible al comprar <strong>{product.minWholesaleQty}</strong> unidades
-              o más, cuando tu carrito supere{" "}
-              <strong>{formatCOP(config.wholesaleThreshold.toString())}</strong>.
+          {hasWholesale && (
+            <div className="rounded-sm border border-cerise-100 bg-blush overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-cerise-100 bg-cerise-50">
+                <span className="text-[11px] tracking-luxe font-semibold text-cerise-700 uppercase">
+                  Precio mayorista
+                </span>
+              </div>
+              <div className="px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-serif text-2xl text-cerise-700">
+                    {formatCOP(wholesalePrice)}
+                  </span>
+                  <span className="text-sm text-gray-400 line-through">
+                    {formatCOP(originalPrice)} al detal
+                  </span>
+                </div>
+                {product.minWholesaleQty != null && (
+                  <span className="text-[11px] tracking-luxe text-cerise-600 bg-cerise-100 px-2 py-1 rounded-sm whitespace-nowrap">
+                    Desde {product.minWholesaleQty} und.
+                  </span>
+                )}
+              </div>
+              {config && (
+                <p className="px-4 pb-3 text-[12px] text-gray-400 leading-relaxed">
+                  Aplica cuando tu carrito supere{" "}
+                  <strong className="text-gray-600">{formatCOP(config.wholesaleThreshold.toString())}</strong>
+                  {product.minWholesaleQty != null && (
+                    <> y compres mínimo <strong className="text-gray-600">{product.minWholesaleQty}</strong> und. de este producto</>)
+                  }.
+                </p>
+              )}
             </div>
           )}
 

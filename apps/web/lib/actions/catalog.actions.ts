@@ -8,10 +8,8 @@ import { prisma, withDbRetry } from "@/lib/db";
 import { handleActionError } from "@/lib/action-error";
 import {
   serializeProductListItem,
-  serializeProductDetail,
   serializeInternalProductDetail,
   type SerializedProductListItem,
-  type SerializedProductDetail,
   type SerializedInternalProductDetail,
 } from "@/lib/serializers";
 import type { ActionResult } from "@/lib/types";
@@ -92,14 +90,14 @@ export async function searchProductsAction(
 
 export async function getProductBySlugAction(
   slug: string,
-): Promise<ActionResult<SerializedProductDetail | null>> {
+): Promise<ActionResult<SerializedInternalProductDetail | null>> {
   try {
     const repository = new PrismaCatalogRepository(prisma);
     const product = await withDbRetry(() =>
       getProductBySlugUseCase({ repository, slug }),
     );
     if (!product) return { data: null, error: null };
-    return { data: serializeProductDetail(product), error: null };
+    return { data: serializeInternalProductDetail(product), error: null };
   } catch (error) {
     return handleActionError(error);
   }
